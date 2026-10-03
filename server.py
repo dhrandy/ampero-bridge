@@ -181,6 +181,27 @@ class Handler(BaseHTTPRequestHandler):
                 frame = _request(am.msg_query_firmware())
                 fw = am.reply_body(frame).split(b"\0")[0].decode("ascii", "replace")
                 self._send_json(200, {"firmware": fw})
+            elif path == "/api/identity":
+                # Standard MIDI Identity Request. Every compliant device answers.
+                # If this works but Hotone commands don't, the Mini uses a
+                # different SysEx dialect than the II Stage.
+                import mido
+                with _lock:
+                    if not _pedal_ok and not _open_pedal():
+                        raise RuntimeError("pedal not connected")
+                    _drain()
+                    _pedal["out"].send(mido.Message("sysex", data=[0x7E, 0x7F, 0x06, 0x01]))
+                    deadline = time.monotonic() + 2.0
+                    found = None
+                    while time.monotonic() < deadline:
+                        for m in _pedal["in"].iter_pending():
+                            if m.type == "sysex":
+                                found = bytes(m.bytes()).hex()
+                                break
+                        if found:
+                            break
+                        time.sleep(0.01)
+                self._send_json(200, {"identity_hex": found})
             else:
                 self._send_json(404, {"error": "not found"})
         except Exception as e:
