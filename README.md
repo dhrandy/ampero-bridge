@@ -18,11 +18,17 @@ Mini specifics used here (verify against hardware on first connect):
 
 ## Deploy (CasaOS / Dockhand, compose only)
 
-1. Copy this directory to the Docker host.
-2. In Dockhand, create a stack from `docker-compose.yml`.
+Same pattern as mc-bot:
+
+1. `git clone https://github.com/dhrandy/ampero-bridge.git` on the NAS
+   (one time).
+2. In Dockhand, create a stack from the repo's `docker-compose.yml`.
 3. Set `API_KEY` in Dockhand's Environment tab (same key Todd uses).
 4. The container needs `/dev/snd` for USB MIDI. If the pedal isn't seen,
    check the port name with `amidi -l` on the host and set AMPERO_PORT.
+
+To update: `git pull` in the repo directory on the NAS, then rebuild in
+Dockhand. No registry images, no remote builds.
 
 The pedal only needs to be plugged in when changes are wanted. `/health`
 reports `pedal_connected` so Todd knows whether it's there.
