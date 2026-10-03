@@ -27,6 +27,7 @@ currently visible.
 import json
 import logging
 import os
+import signal
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -265,6 +266,17 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, *args):
         log.info("%s", args[0] % args[1:])
+
+
+def _handle_term(signum, frame):
+    # Docker stop: exit immediately. Graceful MIDI port close can block
+    # forever on a hung ALSA driver, which is what wedges the container.
+    log.info("received signal %d, exiting", signum)
+    os._exit(0)
+
+
+signal.signal(signal.SIGTERM, _handle_term)
+signal.signal(signal.SIGINT, _handle_term)
 
 
 def main():
