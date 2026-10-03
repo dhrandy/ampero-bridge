@@ -2,7 +2,6 @@ services:
   ampero-bridge:
     # Build context straight from git, like mc-bot. Dockhand pulls and builds.
     build: https://github.com/dhrandy/ampero-bridge.git#main
-    container_name: ampero-bridge
     # Secrets live in Dockhand's Environment tab. ${API_KEY} is interpolated
     # from there at deploy time. Never put raw secret values in this file.
     environment:
