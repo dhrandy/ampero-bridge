@@ -7,18 +7,20 @@ services:
     environment:
       - PORT=8080
       - API_KEY=${API_KEY}
-      # Override if the pedal's MIDI port name differs.
-      - AMPERO_PORT=Ampero Mini MIDI
+      # Optional overrides, only after checking GET /api/usb on the real pedal:
+      # - AMPERO_USB_INTERFACE=3
+      # - AMPERO_USB_MODE=midi   (midi = USB-MIDI 4-byte packets, raw = bytes as-is)
+      # - AMPERO_USB_TIMEOUT_MS=1000
     ports:
       # Synology reverse proxy needs the port on the host interface, not localhost-only.
       - "28551:8080"
-    devices:
-      # USB MIDI (ALSA sequencer) so the bridge can see the pedal when it is
-      # plugged in. The pedal only needs to be connected when changes are wanted.
-      - /dev/snd:/dev/snd
-    group_add:
-      - audio
+    # libusb talks to the pedal directly. No /dev/snd: nothing in this container
+    # may open an ALSA MIDI port, that is what wedged the host kernel.
+    device_cgroup_rules:
+      - "c 189:* rmw"
     volumes:
+      # USB bus nodes, bind-mounted so replugging the pedal is seen live.
+      - /dev/bus/usb:/dev/bus/usb
       # CasaOS-style host path for app data. The bridge is currently stateless
       # (backups save client-side), but this is here for logs/caches later.
       # Add the same path in Dockhand if you mount it.
