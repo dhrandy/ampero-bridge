@@ -96,6 +96,7 @@ def _drain():
 
 def _request(frame: bytes, timeout: float = 2.0):
     """Send a frame, return the reply frame. Raises on timeout."""
+    global _pedal_ok
     with _lock:
         if not _pedal_ok and not _open_pedal():
             raise RuntimeError("pedal not connected")
@@ -107,7 +108,6 @@ def _request(frame: bytes, timeout: float = 2.0):
                 raise TimeoutError("no reply from pedal (it may need a power cycle)")
             return reply
         except Exception:
-            global _pedal_ok
             _pedal_ok = False
             raise
 
