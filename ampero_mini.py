@@ -1,4 +1,4 @@
-"""Hotone Ampero Mini USB-MIDI SysEx protocol.
+"""Hotone Ampero Mini SysEx protocol (UNVERIFIED on the Mini).
 
 Adapted from the Ampero II Stage reverse-engineering work by jpfaria
 (hotone-ampero-2, MIT licensed). The Mini speaks the same SysEx frame family,
@@ -34,7 +34,7 @@ SLOTS = 9            # II Stage: 12
 PATCHES = 198        # II Stage: 300
 PATCHES_PER_BANK = 5
 PATCH_NAME_LEN = 16  # plus NUL on the wire
-PORT_NAME = "Ampero Mini MIDI"
+PORT_NAME = "Ampero Mini"  # USB product string; transport matches by vid:pid (see usbmidi.py)
 MAX_CHUNK = 185
 
 _CK_FROM = 10
