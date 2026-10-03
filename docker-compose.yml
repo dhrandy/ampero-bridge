@@ -1,7 +1,8 @@
 services:
   ampero-bridge:
-    # Local build, like mc-bot: git pull the repo on the NAS, Dockhand builds.
-    build: .
+    # Pre-built by GitHub Actions on every push to main. Pull to update,
+    # no local building.
+    image: ghcr.io/dhrandy/ampero-bridge:latest
     container_name: ampero-bridge
     # Secrets live in Dockhand's Environment tab. ${API_KEY} is interpolated
     # from there at deploy time. Never put raw secret values in this file.
