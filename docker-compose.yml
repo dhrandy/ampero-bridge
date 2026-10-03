@@ -1,0 +1,22 @@
+services:
+  ampero-bridge:
+    # Built automatically by GitHub Actions on every push to main.
+    image: ghcr.io/dhrandy/ampero-bridge:latest
+    container_name: ampero-bridge
+    # Secrets live in Dockhand's Environment tab. ${API_KEY} is interpolated
+    # from there at deploy time. Never put raw secret values in this file.
+    environment:
+      - PORT=8080
+      - API_KEY=${API_KEY}
+      # Override if the pedal's MIDI port name differs.
+      - AMPERO_PORT=Ampero Mini MIDI
+    ports:
+      # Bound to localhost; Cloudflare Tunnel fronts it. Do not publish to LAN.
+      - "127.0.0.1:28551:8080"
+    devices:
+      # USB MIDI (ALSA sequencer) so the bridge can see the pedal when it is
+      # plugged in. The pedal only needs to be connected when changes are wanted.
+      - /dev/snd:/dev/snd
+    group_add:
+      - audio
+    restart: unless-stopped
