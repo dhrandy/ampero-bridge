@@ -11,7 +11,7 @@ services:
       # Override if the pedal's MIDI port name differs.
       - AMPERO_PORT=Ampero Mini MIDI
     ports:
-      # Bound to localhost; Cloudflare Tunnel fronts it. Do not publish to LAN.
+      # Bound to localhost; the Synology reverse proxy fronts it. Do not publish to LAN.
       - "127.0.0.1:28551:8080"
     devices:
       # USB MIDI (ALSA sequencer) so the bridge can see the pedal when it is
