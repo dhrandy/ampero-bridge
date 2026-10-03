@@ -181,6 +181,10 @@ class Handler(BaseHTTPRequestHandler):
                 frame = _request(am.msg_query_firmware())
                 fw = am.reply_body(frame).split(b"\0")[0].decode("ascii", "replace")
                 self._send_json(200, {"firmware": fw})
+            elif path == "/api/ports":
+                import mido
+                self._send_json(200, {"inputs": mido.get_input_names(),
+                                     "outputs": mido.get_output_names()})
             elif path == "/api/identity":
                 # Standard MIDI Identity Request. Every compliant device answers.
                 # If this works but Hotone commands don't, the Mini uses a
