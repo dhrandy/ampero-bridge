@@ -19,4 +19,9 @@ services:
       - /dev/snd:/dev/snd
     group_add:
       - audio
+    volumes:
+      # CasaOS-style host path for app data. The bridge is currently stateless
+      # (backups save client-side), but this is here for logs/caches later.
+      # Add the same path in Dockhand if you mount it.
+      - /DATA/AppData/ampero-bridge:/data
     restart: unless-stopped
