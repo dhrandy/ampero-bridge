@@ -57,6 +57,17 @@ Todd's rule: before changing any patch, `GET /api/patch/<index>` first and
 save the dump. The Mini only has 99 user slots, so changes go back to the
 same slot and the saved dump is the restore point.
 
+## Known issue (Oct 3, 2026)
+
+The NAS's ALSA/USB MIDI driver hangs when the bridge communicates with the
+Ampero Mini. Symptoms: the pedal's MIDI port opens fine, but it never answers
+SysEx (not even standard identity requests), and the bridge process wedges in
+the kernel (D-state, unkillable without reboot). Unplugging the pedal does not
+recover it. The bridge code and deployment are fine; this is a driver/hardware
+compatibility issue between the Synology USB stack and the Mini. Possible
+alternative: talk raw USB (pyusb) instead of ALSA MIDI, but the Mini's USB
+protocol is undocumented.
+
 ## Safety
 
 - Never send `model` with a guessed category/code: a wrong category byte can
