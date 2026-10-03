@@ -242,6 +242,21 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/api/patch/save":
                 _request(am.msg_save_patch(int(data["index"]), str(data["name"])))
                 self._send_json(200, {"ok": True})
+            elif path == "/api/shutdown":
+                # Graceful stop: close MIDI ports, then stop the HTTP server.
+                # Lets Dockhand replace the container without it hanging.
+                self._send_json(200, {"ok": True, "shutting_down": True})
+                def _stop():
+                    global _pedal
+                    try:
+                        if _pedal is not None:
+                            _pedal["in"].close()
+                            _pedal["out"].close()
+                    except Exception:
+                        pass
+                    _pedal = None
+                    Handler._server.shutdown()
+                threading.Thread(target=_stop, daemon=True).start()
             else:
                 self._send_json(404, {"error": "not found"})
         except Exception as e:
@@ -254,7 +269,9 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     log.info("ampero-bridge starting on :%d", PORT)
-    ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
+    Handler._server = server
+    server.serve_forever()
 
 
 if __name__ == "__main__":
