@@ -24,3 +24,5 @@ services:
       # Add the same path in Dockhand if you mount it.
       - /DATA/AppData/ampero-bridge:/data
     restart: unless-stopped
+    # Don't wait long on stop: the bridge exits immediately on SIGTERM.
+    stop_grace_period: 10s
