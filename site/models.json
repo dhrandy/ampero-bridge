@@ -19,7 +19,8 @@
   "based_on": "real-world equivalent as listed by the manufacturer (null if none listed or unknown)",
   "based_on_status": "listed | none-listed (original model) | unknown (not in the manufacturer's list)",
   "renamed": "note where the editor's name differs from the manufacturer's list",
-  "notes": "tone, known_for and tip are written by the project in its own words about the real-world gear. Present only where the equivalent is confidently identified (null otherwise). Cab notes are general: size, speaker and typical use. General background, not measurements."
+  "notes": "tone, known_for and tip are written by the project in its own words about the real-world gear. Present only where the equivalent is confidently identified (null otherwise). Cab notes are general: size, speaker and typical use. General background, not measurements.",
+  "caveat": "known problem seen on a real pedal, present only where one was confirmed"
  },
  "notes": [
   "FX1, FX2 and FX3 share many names but store different codes. Always use the code for the slot you are writing.",
@@ -2982,7 +2983,8 @@
      "based_on_status": "unknown",
      "id": null,
      "category": null,
-     "notes": null
+     "notes": null,
+     "caveat": "No sound on the pedal (confirmed on a real pedal)."
     },
     {
      "screen": 57,
@@ -2994,7 +2996,8 @@
      "based_on_status": "unknown",
      "id": null,
      "category": null,
-     "notes": null
+     "notes": null,
+     "caveat": "No sound on the pedal (confirmed on a real pedal)."
     },
     {
      "screen": 58,
@@ -3006,7 +3009,8 @@
      "based_on_status": "unknown",
      "id": null,
      "category": null,
-     "notes": null
+     "notes": null,
+     "caveat": "No sound on the pedal (confirmed on a real pedal)."
     },
     {
      "screen": 59,
@@ -3018,7 +3022,8 @@
      "based_on_status": "unknown",
      "id": null,
      "category": null,
-     "notes": null
+     "notes": null,
+     "caveat": "No sound on the pedal (confirmed on a real pedal)."
     },
     {
      "screen": 60,
@@ -3030,7 +3035,8 @@
      "based_on_status": "unknown",
      "id": null,
      "category": null,
-     "notes": null
+     "notes": null,
+     "caveat": "No sound on the pedal (confirmed on a real pedal)."
     }
    ]
   },

@@ -283,7 +283,7 @@ Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 ### AMP models
 
-The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly and three (screens 22, 28 and 36) are inferred from the codes on either side. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M.
+The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly and three (screens 22, 28 and 36) are inferred from the codes on either side. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. Sound Clone 6 to 10 (screens 56 to 60) produce no sound on the pedal; this was confirmed on a real pedal.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -342,11 +342,11 @@ The editor's AMP list has 60 models, in this screen order. All 60 were stepped t
 | 53 | Acoustic Preamp 1 | 192 |
 | 54 | Acoustic Preamp 2 | 193 |
 | 55 | Match 30 Clean | 194 |
-| 56 | Sound Clone 6 | 195 |
-| 57 | Sound Clone 7 | 196 |
-| 58 | Sound Clone 8 | 197 |
-| 59 | Sound Clone 9 | 198 |
-| 60 | Sound Clone 10 | 199 |
+| 56 | Sound Clone 6 | 195 (no sound on the pedal) |
+| 57 | Sound Clone 7 | 196 (no sound on the pedal) |
+| 58 | Sound Clone 8 | 197 (no sound on the pedal) |
+| 59 | Sound Clone 9 | 198 (no sound on the pedal) |
+| 60 | Sound Clone 10 | 199 (no sound on the pedal) |
 
 ### FX1, FX2 and FX3 models
 

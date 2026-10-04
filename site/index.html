@@ -133,7 +133,7 @@ function score(m,q,qt){
 function build(){
  data.blocks.forEach(function(b){b.models.forEach(function(m){
   m.block=b.block;m._n=norm(m.name);m._ba=norm(m.based_on);
-  m._h=norm([m.block,m.name,m.based_on,m.category,m.status,m.firmware_added?'firmware added':'',m.renamed,m.notes?[m.notes.tone,m.notes.known_for,m.notes.tip].join(' '):''].join(' '));
+  m._h=norm([m.block,m.name,m.based_on,m.category,m.status,m.firmware_added?'firmware added':'',m.renamed,m.caveat,m.notes?[m.notes.tone,m.notes.known_for,m.notes.tip].join(' '):''].join(' '));
   m._t=tri(m._n);m._w=m._h.split(' ');all.push(m)})});
  var chips=$('chips');
  function chip(id,label,n){var b=document.createElement('button');b.className='chip';b.type='button';b.setAttribute('aria-pressed',id===block);b.innerHTML=label+'<small>'+n+'</small>';b.onclick=function(){block=id;render()};b.dataset.id=id;chips.appendChild(b)}
@@ -152,6 +152,7 @@ function card(m){
  if(m.firmware_added)h+='<span class="tag new">firmware-added</span>';
  if(m.renamed)h+='<span class="tag">'+esc(m.renamed)+'</span>';
  h+='</div>';
+ if(m.caveat)h+='<div class="based"><span>Heads up</span> '+esc(m.caveat)+'</div>';
  if(m.notes){h+='<details class="exp"><summary>Details</summary><dl><dt>Tone</dt><dd>'+esc(m.notes.tone)+'</dd><dt>Known for</dt><dd>'+esc(m.notes.known_for)+'</dd><dt>Worth knowing</dt><dd>'+esc(m.notes.tip)+'</dd></dl></details>'}
  return h+'</div>'}
 function render(){
