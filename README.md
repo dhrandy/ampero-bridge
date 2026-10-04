@@ -359,6 +359,22 @@ up to about two seconds for its turn. Polling pauses while the pedal is unplugge
 The log lives in memory and starts empty after a restart. Set
 `AMPERO_HISTORY_POLL_S=0` to switch it off. `/api/health` shows the history status.
 
+## Model library
+
+A searchable list of every Ampero Mini model on firmware V2.2 is at
+https://dhrandy.github.io/ampero-bridge/ (beta). Use it to find a model fast, see the
+code the pedal stores for it, and see what real-world gear it is based on. A tap on an
+amp opens short notes on its tone and what it is known for. Codes that have been read
+back from a real pedal are marked; the rest follow the list order and should be checked
+before you rely on them.
+
+The same data is in `site/models.json`, for tools and agents: block, screen, code, name,
+what it is based on, and how well the code is verified. Fetch it from
+https://dhrandy.github.io/ampero-bridge/models.json or the raw file at
+https://raw.githubusercontent.com/dhrandy/ampero-bridge/main/site/models.json. An agent
+building a preset can use it to pick models by name or by what they imitate, then use
+only the pedal-proven codes without a read-back. The page is not indexed by search engines.
+
 ## API
 
 Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
@@ -419,7 +435,7 @@ captured from the editor and the pedal.
 
 * `docs/protocol.md`: the USB and SysEx protocol, record layout, order of a preset write
 * `docs/models.md`: model numbers checked on a real pedal
-* `site/`: a searchable model library (beta) and `site/models.json`, the same data for tools and agents. Served with GitHub Pages when it is switched on for the repo
+* `site/`: the model library page and `site/models.json` (see Model library above)
 * `docs/usb-lockups.md`: USB stability notes and the less common settings
 
 Credits: this was built for the Ampero Mini from scratch. The Mini speaks a
