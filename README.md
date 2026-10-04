@@ -2,13 +2,20 @@
 
 ![ampero-bridge: an AI builds presets on the Hotone Ampero Mini](docs/banner.svg)
 
-A small web service that lets an AI agent (or any script) build presets on a
-Hotone Ampero Mini. The pedal plugs into a computer over USB. This service runs
-on that computer and turns plain HTTP calls into what the Hotone editor would
-send: pick a patch, switch blocks on and off, choose models, set parameters,
-read a patch back, and save it.
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![REST API](https://img.shields.io/badge/REST-API-FFB020)
+![USB MIDI](https://img.shields.io/badge/USB-MIDI-555555)
 
-Hotone's own editor is point and click. This gives an AI the same hands.
+A small REST API in a Docker container that lets an AI agent, an LLM or any script
+build presets on a Hotone Ampero Mini guitar effects pedal. The pedal plugs into a
+computer over USB. This service runs on that computer and turns plain HTTP calls
+into the USB MIDI messages the Hotone editor would send: pick a patch, switch
+blocks on and off, choose amp, cab and effect models, set parameters, read a
+preset back, and save it.
+
+Hotone's own editor is point and click. This gives an AI the same hands, a preset
+manager you can script.
 
 ## What it is for
 
