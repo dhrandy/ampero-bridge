@@ -306,3 +306,37 @@ def test_history_endpoint_needs_key_and_reads_no_pedal(monkeypatch):
     assert call(base, "/api/health")[1]["history"]["entries"] == 1
     assert Fake.sent == []
     srv.shutdown()
+
+
+def test_models_endpoint_needs_key_and_reads_no_pedal(monkeypatch):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "_models_cache", None)
+    assert call(base, "/api/models", key="")[0] == 401
+    code, out = call(base, "/api/models")
+    assert code == 200 and out["status"] == "beta" and len(out["blocks"]) == 9
+    assert sum(b["count"] for b in out["blocks"]) == sum(len(b["models"]) for b in out["blocks"]) > 300
+    code, amp = call(base, "/api/models?block=amp")
+    assert code == 200 and [b["block"] for b in amp["blocks"]] == ["AMP"] and amp["counts"] == {"AMP": 60}
+    marshell = [m for m in amp["blocks"][0]["models"] if m["name"] == "Marshell 50"][0]
+    assert marshell["code"] == 55 and marshell["status"] == "pedal-proven" and "Marshall" in marshell["based_on"]
+    code, hit = call(base, "/api/models?q=tube%20screamer")
+    assert code == 200 and {m["name"] for b in hit["blocks"] for m in b["models"]} == {"Green Drive"}
+    assert call(base, "/api/models?block=nope")[0] == 400
+    assert Fake.sent == []
+    srv.shutdown()
+
+
+def test_models_endpoint_is_404_when_the_library_is_not_bundled(monkeypatch):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "_models_cache", None)
+    monkeypatch.setattr(server, "MODELS_FILES", ["/nonexistent/models.json"])
+    assert call(base, "/api/models")[0] == 404
+    srv.shutdown()
+
+
+def test_every_proven_model_code_matches_the_library():
+    data = server.load_models()
+    proven = {(b["block"].lower(), m["code"]) for b in data["blocks"] for m in b["models"] if m["status"] == "pedal-proven"}
+    for slot, codes in server.PROVEN_MODELS.items():
+        for c in codes:
+            assert (slot, c) in proven, (slot, c)

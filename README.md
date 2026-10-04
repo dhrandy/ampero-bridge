@@ -244,9 +244,12 @@ A prompt that works for any of those:
 > last. To see what is in a patch, decode `record_hex` from `GET /api/patch/current`
 > using "Reading what is in a patch" in README.md and docs/protocol.md; the server
 > only decodes the name. To find a patch by name, check GET /api/patches/known
-> first: it is free and does not touch the pedal. Use docs/models.md for model
-> numbers and docs/knobs.md for which knob is which. Never guess either: if a model is not
-> listed as checked, say so and read the record to find out.
+> first: it is free and does not touch the pedal. For models, call GET /api/models
+> (every model with its code, what it is based on, and short notes; add `?block=AMP` or
+> `?q=text` to narrow it). If that is not available, fetch
+> https://dhrandy.github.io/ampero-bridge/models.json, or read docs/models.md. Use
+> docs/knobs.md for which knob is which. Never guess a model code or a knob: if a code
+> is not marked pedal-proven, say so and read the record to find out.
 
 The agent should follow this order. It is the order that keeps the pedal safe:
 
@@ -374,11 +377,13 @@ back from a real pedal are marked; the rest follow the list order and should be 
 before you rely on them.
 
 The same data is in `site/models.json`, for tools and agents: block, screen, code, name,
-what it is based on, and how well the code is verified. Fetch it from
+what it is based on, how well the code is verified, and short notes. The bridge serves
+that file at `GET /api/models` (needs the API key, reads no pedal), so an agent can get it
+from one server without going online. Without the bridge, fetch it from
 https://dhrandy.github.io/ampero-bridge/models.json or the raw file at
 https://raw.githubusercontent.com/dhrandy/ampero-bridge/main/site/models.json. An agent
-building a preset can use it to pick models by name or by what they imitate, then use
-only the pedal-proven codes without a read-back. The page is not indexed by search engines.
+building a preset can use it to pick models by name or by what they imitate, then send
+only pedal-proven codes without a read-back. The page is not indexed by search engines.
 
 ## API
 
@@ -392,6 +397,7 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `GET /api/patch/current` | | read the patch the pedal has selected: `index`, `label`, `name`, `record_hex` |
 | `GET /api/patch/<index>` | | same, but 409 (with `current_index`, `current_name`) unless `<index>` is the selected patch. Select it first |
 | `GET /api/patches/known` | | slot, label, name and when it was last seen, for every patch the bridge has read so far. Answers from memory, never touches the pedal |
+| `GET /api/models` | | the model library: every model with block, screen, code, name, what it is based on, how well the code is verified, and short notes. Optional `?block=AMP` (one of fx1 fx2 amp nr cab eq fx3 dly rvb) and `?q=text` (matches name or based-on). Same data as `site/models.json`. Reads no pedal |
 | `GET /api/history` | | the last few minutes of the pedal's edit buffer, one entry per change, with the byte offsets that changed. Optional `?since=<epoch seconds>` and `?hex=0` (leave out `record_hex`). Answers from memory, see "Catching a state that went by" |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
@@ -422,6 +428,7 @@ Set these in `.env` (or Dockhand's Environment tab).
 | `API_KEY` | required | the key clients send in `X-Api-Key` |
 | `PORT` | 8080 | port inside the container |
 | `DATA_DIR` | `./data` | host folder for the remembered patch names (compose setting, mounted at `/data`) |
+| `AMPERO_MODELS_FILE` | bundled | path to a different `models.json` for `/api/models`; the image ships the one from `site/` |
 | `AMPERO_HISTORY_POLL_S` | 2 | seconds between the background reads that feed `/api/history`. `0` turns the history off |
 | `AMPERO_HISTORY_WINDOW_S` | 600 | how many seconds of history to keep (also capped at 400 entries) |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |

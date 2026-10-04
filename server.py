@@ -8,6 +8,7 @@ Auth: X-Api-Key header, except GET /health (liveness only).
 
   GET  /health                     {"ok": true}, open, for the Docker healthcheck
   GET  /api/health                 pedal presence, request counters, USB device counts
+  GET  /api/models                 the model library (names, codes, what each is based on); ?block=AMP, ?q=text
   GET  /api/usb                    interfaces and endpoints the pedal reports, plus every USB device this process sees
   GET  /api/patch/current          read the patch the pedal has selected (name + raw record)
   GET  /api/patch/<index>          same, but 409 unless <index> is the selected patch
@@ -49,6 +50,11 @@ MAX_THREADS = 64     # simultaneous connections; more get a quick 503
 MIN_KEY_LEN = 24
 PLACEHOLDER_KEYS = {"change-me-to-a-long-random-string"}
 ALLOW_UNPROVEN = os.environ.get("AMPERO_ALLOW_UNPROVEN_MODELS") == "1"
+_HERE = os.path.dirname(os.path.abspath(__file__))
+MODELS_FILES = [p for p in (os.environ.get("AMPERO_MODELS_FILE"),
+                            os.path.join(_HERE, "models.json"),
+                            os.path.join(_HERE, "site", "models.json")) if p]
+_models_cache = None
 
 # Model codes that were set on the real pedal and read back (docs/models.md).
 # An unproven code can crash the pedal, so /api/model only takes these unless
@@ -346,7 +352,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.2.0"
+    server_version = "ampero-bridge/2.3.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
@@ -415,6 +421,8 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, known.listing())
         elif path == "/api/history":
             self._run(lambda: history_view(urlparse(self.path).query))
+        elif path == "/api/models":
+            self._run(lambda: models_view(urlparse(self.path).query))
         elif path == "/api/usb":
             self._run(usb.describe)
         elif path == "/api/patch/current":
@@ -433,6 +441,46 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         log.info("%s", fmt % args)
+
+
+def load_models() -> dict | None:
+    """The model library (same file as the website's models.json). Read once, kept in memory."""
+    global _models_cache
+    if _models_cache is None:
+        for p in MODELS_FILES:
+            try:
+                with open(p, encoding="utf-8") as f:
+                    _models_cache = json.load(f)
+                break
+            except (OSError, ValueError):
+                continue
+    return _models_cache
+
+
+def models_view(query: str) -> dict:
+    data = load_models()
+    if data is None:
+        raise LookupError("model library is not bundled in this build")
+    q = parse_qs(query)
+    block = (q.get("block") or [""])[0].strip().upper()
+    text = (q.get("q") or [""])[0].strip().lower()
+    names = [b["block"] for b in data["blocks"]]
+    if block and block not in names:
+        raise am.ProtocolError("unknown block %r, use one of %s" % (block, " ".join(names)))
+    if not block and not text:
+        return data
+    out = {k: v for k, v in data.items() if k not in ("blocks", "counts")}
+    blocks = []
+    for b in data["blocks"]:
+        if block and b["block"] != block:
+            continue
+        ms = b["models"]
+        if text:
+            ms = [m for m in ms if text in " ".join(str(m.get(k) or "") for k in ("name", "based_on", "category")).lower()]
+        blocks.append({**b, "count": len(ms), "models": ms})
+    out["blocks"] = blocks
+    out["counts"] = {b["block"]: b["count"] for b in blocks}
+    return out
 
 
 def history_view(query: str) -> dict:
