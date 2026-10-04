@@ -2,7 +2,7 @@
 
 Hotone Ampero Mini bridge, so any AI can build presets from a script: select a
 patch, switch blocks, pick models, set parameters, read a stored patch, save. The
-pedal plugs into the NAS over USB. The service talks to it with libusb and a
+pedal plugs into the server over USB. The service talks to it with libusb and a
 small JSON API.
 
 ## Status
@@ -17,7 +17,7 @@ small JSON API.
 
 Details and the captured bytes: `docs/protocol.md`.
 
-## Why it will not lock up the NAS again
+## Why it will not lock up the server again
 
 The first version held an ALSA MIDI port. When the Mini stalled, the Dell's
 kernel waited forever on it and only a reboot helped. This version has no ALSA
