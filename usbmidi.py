@@ -141,9 +141,28 @@ def _usb():
     return usb.core, usb.util
 
 
+def _fresh_backend():
+    """A libusb backend with a new context.
+
+    libusb lists devices from a cache that only hotplug events update, and a
+    container never gets those events. pyusb keeps one context for the life of
+    the process, so after a replug the cache stays stale. Dropping that context
+    makes the next get_backend() call libusb_init again, which rescans the bus.
+    """
+    try:
+        import usb.backend.libusb1 as lb
+        lb._lib_object = None
+        return lb.get_backend()
+    except Exception:
+        return None
+
+
 def find_device():
     core, _ = _usb()
-    return core.find(idVendor=VID, idProduct=PID)
+    backend = _fresh_backend()
+    if backend is None:
+        return core.find(idVendor=VID, idProduct=PID)
+    return core.find(idVendor=VID, idProduct=PID, backend=backend)
 
 
 def is_present() -> bool:
@@ -158,8 +177,10 @@ def visible_devices() -> list[dict]:
     """Every USB device libusb can see from inside this process. Enumerate only."""
     try:
         core, _ = _usb()
+        backend = _fresh_backend()
+        kw = {"backend": backend} if backend is not None else {}
         return [{"id": f"{d.idVendor:04x}:{d.idProduct:04x}", "bus": d.bus, "address": d.address}
-                for d in core.find(find_all=True)]
+                for d in core.find(find_all=True, **kw)]
     except Exception:
         return []
 

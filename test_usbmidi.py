@@ -46,3 +46,36 @@ def test_visible_devices_never_raises(monkeypatch):
     monkeypatch.setattr(u, "_usb", lambda: (_ for _ in ()).throw(RuntimeError("no libusb")))
     assert u.visible_devices() == []
     assert u.seen() == {"libusb_devices": 0, "dev_nodes": u.dev_node_count()}
+
+
+def test_fresh_backend_drops_cached_context(monkeypatch):
+    import usb.backend.libusb1 as lb
+    made = []
+
+    def fake_get_backend(*a, **k):
+        if lb._lib_object is None:
+            lb._lib_object = object()
+            made.append(lb._lib_object)
+        return lb._lib_object
+
+    monkeypatch.setattr(lb, "_lib_object", object())
+    monkeypatch.setattr(lb, "get_backend", fake_get_backend)
+    first = u._fresh_backend()
+    second = u._fresh_backend()
+    assert first is not second
+    assert len(made) == 2
+
+
+def test_find_device_uses_fresh_backend(monkeypatch):
+    seen = {}
+
+    class FakeCore:
+        @staticmethod
+        def find(**kw):
+            seen.update(kw)
+            return "dev"
+
+    monkeypatch.setattr(u, "_usb", lambda: (FakeCore, None))
+    monkeypatch.setattr(u, "_fresh_backend", lambda: "fresh")
+    assert u.find_device() == "dev"
+    assert seen["backend"] == "fresh"

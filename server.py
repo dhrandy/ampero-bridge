@@ -152,7 +152,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.0"
+    server_version = "ampero-bridge/2.0.1"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def _send(self, code: int, obj: dict):
