@@ -226,3 +226,103 @@ def test_read_by_index_only_when_it_is_the_selected_patch(monkeypatch):
     assert code == 409 and out["current_index"] == 75 and out["asked_index"] == 74
     assert out["current_name"] == "WADE"
     srv.shutdown()
+
+
+def _wait_backup(base, secs=5):
+    import time
+    end = time.time() + secs
+    while time.time() < end:
+        out = call(base, "/api/backups")[1]
+        if not out["running"] and out["last"]:
+            return out
+        time.sleep(0.02)
+    raise AssertionError("backup did not finish")
+
+
+def _fake_pedal(monkeypatch, bad=()):
+    state = {"idx": 75, "sent": []}
+
+    def send_midi(msg, name):
+        if msg[0] & 0xF0 == 0xC0:
+            state["idx"] = msg[1]
+        state["sent"].append(name)
+
+    def read():
+        if state["idx"] in bad:
+            return {"index": 0, "label": "x", "name": "WRONG", "record_hex": ""}
+        i = state["idx"]
+        return {"index": i, "label": am.patch_label(i), "name": f"P{i}", "record_hex": f"{i:02x}"}
+
+    monkeypatch.setattr(server, "send_midi", send_midi)
+    monkeypatch.setattr(server, "read_current_patch", read)
+    monkeypatch.setattr(server, "SETTLE", 0)
+    return state
+
+
+def test_backup_writes_one_file_with_every_patch_and_restores_selection(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "BACKUP_DIR", str(tmp_path))
+    monkeypatch.setattr(server, "BACKUP_SLOTS", 5)
+    state = _fake_pedal(monkeypatch)
+    assert call(base, "/api/backups", {})[1]["started"] is True
+    out = _wait_backup(base)
+    assert out["last"]["ok"] and out["last"]["patches"] == 5 and out["last"]["errors"] == 0
+    name = out["last"]["file"]
+    assert out["files"] == [name]
+    doc = json.loads((tmp_path / name).read_text())
+    assert [p["index"] for p in doc["patches"]] == [0, 1, 2, 3, 4]
+    assert doc["index"][2] == {"index": 2, "label": am.patch_label(2), "name": "P2"}
+    assert doc["selected_before"]["index"] == 75
+    assert state["idx"] == 75                       # selection put back
+    assert not any("save" in n for n in state["sent"])   # reads and selects only
+    assert not [f for f in os.listdir(tmp_path) if f.endswith(".tmp")]
+    # download
+    req = urllib.request.Request(base + "/api/backups/" + name, headers={"X-Api-Key": "k"})
+    assert json.loads(urllib.request.urlopen(req).read())["patches"][0]["name"] == "P0"
+    srv.shutdown()
+
+
+def test_backup_keeps_going_when_one_slot_fails(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "BACKUP_DIR", str(tmp_path))
+    monkeypatch.setattr(server, "BACKUP_SLOTS", 4)
+    _fake_pedal(monkeypatch, bad={2})
+    call(base, "/api/backups", {})
+    out = _wait_backup(base)
+    assert out["last"]["patches"] == 3 and out["last"]["errors"] == 1
+    doc = json.loads((tmp_path / out["last"]["file"]).read_text())
+    assert doc["errors"][0]["index"] == 2
+    srv.shutdown()
+
+
+def test_backup_needs_key_and_rejects_bad_file_names(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "BACKUP_DIR", str(tmp_path))
+    for path in ("/api/backups", "/api/backups/ampero-backup-20260101-000000.json"):
+        try:
+            urllib.request.urlopen(base + path)
+            raise AssertionError("expected 401")
+        except HTTPError as e:
+            assert e.code == 401
+    for bad in ("../../etc/passwd", "x.json", "ampero-backup-1.json"):
+        req = urllib.request.Request(base + "/api/backups/" + bad, headers={"X-Api-Key": "k"})
+        try:
+            urllib.request.urlopen(req)
+            raise AssertionError("expected 404")
+        except HTTPError as e:
+            assert e.code == 404
+    srv.shutdown()
+
+
+def test_writes_are_refused_while_a_backup_runs_and_bad_folder_is_503(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server.backup, "running", True)
+    code, out = call(base, "/api/patch/select", {"index": 1})
+    assert code == 409 and Fake.sent == []
+    assert call(base, "/api/backups", {})[0] == 409          # already running
+    monkeypatch.setattr(server.backup, "running", False)
+    monkeypatch.setattr(server, "BACKUP_DIR", str(tmp_path / "f" / "x"))
+    (tmp_path / "f").write_text("a file, not a folder")
+    code, out = call(base, "/api/backups", {})
+    assert code == 503 and "backup folder" in out["error"]
+    srv.shutdown()
