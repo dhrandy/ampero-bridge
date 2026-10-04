@@ -18,6 +18,24 @@ preset back, and save it.
 Hotone's own editor is point and click. This gives an AI the same hands, a preset
 manager you can script.
 
+**Contents**
+
+* [Beta](#beta)
+* [What it is for](#what-it-is-for)
+* [What you need](#what-you-need)
+* [Run it](#run-it)
+  * [Dockhand](#dockhand)
+  * [Putting it on the internet: reverse proxy (Synology example)](#putting-it-on-the-internet-reverse-proxy-synology-example)
+* [Using it with your AI agent](#using-it-with-your-ai-agent)
+  * [Reading what is in a patch](#reading-what-is-in-a-patch)
+  * [Models](#models)
+  * [Example calls](#example-calls)
+* [API](#api)
+* [Safety](#safety)
+* [Settings](#settings)
+* [Develop](#develop)
+* [Docs](#docs)
+
 ## Beta
 
 This is a beta. It works on the one Ampero Mini it was built and tested on, but
