@@ -73,10 +73,15 @@ nothing here is shared with those.
 
 ## What you need
 
-* An Ampero Mini plugged into the same computer that runs the Docker container.
-  The bridge talks to the pedal over that computer's USB bus, so it cannot reach
-  a pedal on another machine. The computer must be Linux.
-* Docker with Compose.
+* An Ampero Mini plugged into the same computer that runs the bridge. The bridge
+  talks to the pedal over that computer's USB bus, so it cannot reach a pedal on
+  another machine. Linux is the only system it has been run on (inside Docker, on
+  one machine).
+* Docker with Compose, or Python 3.12 with libusb to run it directly
+  (`pip install -r requirements.txt`, then `python server.py` with `API_KEY` set; not
+  tried yet). macOS and Windows are untested: Docker Desktop cannot pass USB devices
+  through by itself, and a direct run would need libusb access to a device the OS
+  normally claims.
 * About ten minutes.
 
 ## Run it
