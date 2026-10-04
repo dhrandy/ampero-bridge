@@ -93,3 +93,41 @@ Names are from the manual where the parameter count and order match; `?` means n
 | 58 | 132 | 5 | ? |
 | 59 | 133 | 5 | ? |
 | 60 | 134 | 5 | ? |
+
+## FX3 list (screen number, code, name)
+
+FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). The Hotone manual gives the names in groups, in the order the pedal shows them: the modulation group first, then the special effects. Screen 03, 07, 17, 26, 27 and 29 were checked on a real pedal. Codes are screen minus 1 for screens 1 to 17 and screen plus 46 for 18 onwards, which fits all the codes read so far (2, 6, 16, 72, 73, 75). Only the rows marked "pedal-read" had their code read back; the other rows come from the pattern and are not proven. The list may continue past 29 (Pitch Shift and others); that part is not mapped. `/api/model` still only accepts the codes in the proven table above.
+
+| Screen | Code | Name | Source |
+| --- | --- | --- | --- |
+| 01 | 0 | Aozora Chorus | manual order, code from the pattern |
+| 02 | 1 | Grand Choruium | manual order, code from the pattern |
+| 03 | 2 | Liquid C | pedal-read (screen and code) |
+| 04 | 3 | Choruium B | manual order, code from the pattern |
+| 05 | 4 | Detune | name seen on screen, code from the pattern |
+| 06 | 5 | Jetter | manual order, code from the pattern |
+| 07 | 6 | Jetter B | pedal-read (screen and code) |
+| 08 | 7 | Jetter N | manual order, code from the pattern |
+| 09 | 8 | Trem Jet | manual order, code from the pattern |
+| 10 | 9 | Pulser | manual order, code from the pattern |
+| 11 | 10 | Grand Vibrato | manual order, code from the pattern |
+| 12 | 11 | Shiver T | manual order, code from the pattern |
+| 13 | 12 | 90 Phaser | manual order, code from the pattern |
+| 14 | 13 | Green Phaser | manual order, code from the pattern |
+| 15 | 14 | Revolver | manual order, code from the pattern |
+| 16 | 15 | Helicopter | manual order, code from the pattern |
+| 17 | 16 | Custom Trem | pedal-read (screen and code) |
+| 18 | 64 | Acoustic Refiner | manual order, code from the pattern |
+| 19 | 65 | AC Sim | manual order, code from the pattern |
+| 20 | 66 | Toucher | manual order, code from the pattern |
+| 21 | 67 | Crier | manual order, code from the pattern |
+| 22 | 68 | Clean Octa | manual order, code from the pattern |
+| 23 | 69 | Harmony | manual order, code from the pattern |
+| 24 | 70 | Telephone Line | manual order, code from the pattern |
+| 25 | 71 | Satisfaction | manual order, code from the pattern |
+| 26 | 72 | Path Filter | pedal-read (screen and code) |
+| 27 | 73 | Bit Krusher | pedal-read (screen and code) |
+| 28 | 74 | Ring Mod | manual order, code from the pattern |
+| 29 | 75 | Sweller | pedal-read (screen and code) |
+
+The screen read "Bit Crusher" and the manual spells it "Bit Krusher". Knobs for the FX3 models checked so far are in `docs/knobs.md`.
