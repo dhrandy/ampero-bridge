@@ -87,29 +87,50 @@ chunks and `00 02 16 00 01 <idx> 00 05` (trailer). The chunk data is nibble spli
 Only the index and the name are decoded. Models, parameters and block states are
 in the rest of the record and are returned raw (`record_hex`).
 
-### Record layout found on the real pedal (P26-1, tested live)
+### Record layout (460 bytes), tested live on P26-1
 
-Byte offsets in the 460-byte record, confirmed by changing one thing and diffing:
+Name at offset 4 (18 bytes). Then nine block records, 33 bytes apart, in slot order. Each is
+`<state> <model hi> <model lo> <param 0 hi> <param 0 lo> <param 1 hi> <param 1 lo> ...` with
+state 01 = on, 00 = off, model = hi * 128 + lo, and param i value at `state offset + 4 + 2 * i`.
 
-| What | Offset | Values |
+| Slot | State offset | Block |
 | --- | --- | --- |
-| FX1 block state | 95 | 01 on, 00 off |
-| FX2 block state | 128 | 01 on |
-| FX2 model code | 130 | on-screen model number minus 1 (05 Big Pi = 04, 08 Black Tail = 07, 10 Governor = 09) |
-| EQ block state | 260 | 01 on, 00 off |
-| RVB block state | 359 | 01 on, 00 off |
-| last byte | 459 | checksum, changes with every edit; the pedal recomputes it |
+| 01 | 95 | FX1 |
+| 02 | 128 | FX2 |
+| 03 | 161 | AMP |
+| 04 | 194 | NR |
+| 05 | 227 | CAB |
+| 06 | 260 | EQ |
+| 07 | 293 | FX3 |
+| 08 | 326 | DLY |
+| 09 | 359 | RVB |
 
-When the FX2 model changes, eight copies of the model code at offsets 41, 48, 55, 62,
-69, 76, 83 and 90 change with it, and FX2's parameters reset to the new model's
-defaults. A host `POST /api/model` (`10 02 00 01 00 NN`, NN = number minus 1) gave a
-record identical to picking the model on the pedal. The pedal sends no reply to the
-write, so read the record back to check it.
+The last byte (459) is a checksum. The pedal recomputes it when you change anything, so do not write it.
+When a model changes, the pedal resets that block's params to the model's defaults and updates copies
+of the model code elsewhere in the record (FX2: offsets 41 to 90; AMP: 401 to 407). Those copies are
+read-only state, not something to write.
+
+Proven codes are in `docs/models.md`.
+
+### Param write
+
+`10 <slot> 00 02 <model hi> <model lo> <param> <value hi> <value lo>` is the editor's frame.
+Through the bridge, `POST /api/param {slot, model_code, param, value}` (value 0-127) was checked on the
+real pedal: FX2 Governor, Marshell 50, Slapback and Spring params all read back exactly. The model code in
+the frame must be the one the block holds now. Slapback's time is 14 bits (130 ms was its default), so
+values above 127 would need a wider write that the bridge does not send yet.
 
 ### Order of a preset write
 
 1. Select the patch (Program Change) and wait about 300 ms.
 2. Set every block on or off. Turn off whatever the preset does not use.
-3. Set models and parameters.
-4. Read the record back and check each change.
-5. Save, last. Never save before the checks pass.
+3. Set models, then params (a model change resets its params).
+4. Read the record back and check every change.
+5. Save, last. Never save before the checks pass. A save stores whatever is in the edit buffer.
+
+### Example: "TREATY OAK" on P26-1
+
+FX1, EQ, FX3 off. FX2 Governor (gain 35, volume 55, bass 50, mid 60, treble 55). AMP Marshell 50
+(volume 55, presence 50, master 55, bass 45, mid 60, treble 55). CAB UK Black 4x12 (defaults).
+DLY Slapback (mix 25, feedback 15, time 110). RVB Spring (mix 20, decay 35, tone 55). Every byte
+read back as written, then one save.
