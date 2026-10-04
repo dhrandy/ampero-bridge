@@ -141,7 +141,7 @@ A full list of the model names, in the manufacturer's order, with an ID per mode
 
 ### CAB models
 
-The editor's CAB list, in screen order, read off screenshots. The manufacturer's ID list only has generic names for cabs (Guitar Cab 1x12 and so on), so the names here are the editor's. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. Rule: code = screen - 1. Checked at UK Black 4x12 (screen 35, code 34). The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
+The editor's CAB list, in screen order, read off screenshots. The names here are the editor's. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. Rule: code = screen - 1. Checked at UK Black 4x12 (screen 35, code 34). The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |

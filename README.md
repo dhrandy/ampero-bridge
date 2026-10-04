@@ -419,6 +419,7 @@ captured from the editor and the pedal.
 
 * `docs/protocol.md`: the USB and SysEx protocol, record layout, order of a preset write
 * `docs/models.md`: model numbers checked on a real pedal
+* `site/`: a searchable model library (beta) and `site/models.json`, the same data for tools and agents. Served with GitHub Pages when it is switched on for the repo
 * `docs/usb-lockups.md`: USB stability notes and the less common settings
 
 Credits: this was built for the Ampero Mini from scratch. The Mini speaks a

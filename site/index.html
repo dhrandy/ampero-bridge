@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<title>Ampero Mini model library (beta)</title>
+<style>
+:root{--bg:#0f1115;--panel:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#9aa3b2;--acc:#f0b429;--ok:#3ecf8e;--warn:#e5a13a;--bad:#8b93a3}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+header h1{font-size:22px;margin:8px 0 4px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.beta{font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--acc);color:#111;border-radius:4px;padding:2px 6px;font-weight:700}
+header p{margin:4px 0;color:var(--mute)}
+.links a{color:var(--acc);margin-right:14px}
+#q{width:100%;font:inherit;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);margin:14px 0 10px}
+#q:focus{outline:2px solid var(--acc);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:5px 11px;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);color:#111;border-color:var(--acc)}
+.chip small{color:var(--mute);margin-left:4px}
+.chip[aria-pressed=true] small{color:#333}
+.opts{display:flex;flex-wrap:wrap;gap:14px;color:var(--mute);font-size:13px;margin:6px 0 12px}
+.opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
+#count{color:var(--mute);font-size:13px;margin:4px 0 8px}
+.list{display:grid;gap:8px;grid-template-columns:1fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+.name{font-weight:600;font-size:16px}
+.blk{font-size:11px;font-weight:700;color:#111;background:var(--mute);border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:1px}
+.codebox{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.code{font-size:20px;font-weight:700}
+.sub{color:var(--mute);font-size:12px}
+.based{grid-column:1/-1;color:var(--text);font-size:13px;margin-top:4px}
+.based span{color:var(--mute)}
+.meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:11px;border-radius:4px;padding:1px 7px;border:1px solid var(--line);color:var(--mute)}
+.tag.ok{color:var(--ok);border-color:var(--ok)}
+.tag.warn{color:var(--warn);border-color:var(--warn)}
+.tag.new{color:var(--acc);border-color:var(--acc)}
+.empty{padding:30px;text-align:center;color:var(--mute)}
+footer{margin:28px 0 12px;color:var(--mute);font-size:12px;border-top:1px solid var(--line);padding-top:12px}
+details{margin:8px 0;color:var(--mute);font-size:13px}
+details summary{cursor:pointer;color:var(--text)}
+details dl{margin:8px 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+details dt{font-weight:600;color:var(--text)}details dd{margin:0}
+@media(min-width:720px){.list{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.card{grid-template-columns:1fr}.codebox{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Ampero Mini model library <span class="beta">beta</span></h1>
+<p>Every model on the Hotone Ampero Mini (firmware V2.2) with the code the pedal stores for it, and what it is based on. Unofficial, made from the pedal's editor and live reads.</p>
+<p class="links"><a href="models.json">models.json</a><a href="https://github.com/dhrandy/ampero-bridge">Source on GitHub</a></p>
+<details><summary>How to read this</summary>
+<dl>
+<dt>Screen</dt><dd>position in the editor's list for that block, starting at 1.</dd>
+<dt>Code</dt><dd>the number stored in the preset record for the model. FX1, FX2 and FX3 use different codes even for the same name.</dd>
+<dt>pedal-proven</dt><dd>code set on a real pedal and read back from the record.</dd>
+<dt>scroll-derived</dt><dd>FX2 codes seen while scrolling the list; not read back.</dd>
+<dt>list order</dt><dd>code follows from the list order and a rule that held where it was checked. Not checked itself.</dd>
+<dt>code unknown</dt><dd>name known from the editor, code not read yet.</dd>
+<dt>firmware-added</dt><dd>in the editor's list, not in the manufacturer's effect list.</dd>
+</dl></details>
+</header>
+<input id="q" type="search" placeholder="Search models, e.g. tube screamer, fender" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search models">
+<div class="chips" id="chips" role="group" aria-label="Filter by block"></div>
+<div class="opts">
+<label><input type="checkbox" id="proven"> pedal-proven only</label>
+<label><input type="checkbox" id="added"> firmware-added only</label>
+</div>
+<div id="count" aria-live="polite"></div>
+<div class="list" id="list"></div>
+<footer>
+Beta. Not affiliated with or endorsed by Hotone. Product and brand names belong to their owners and appear only to say which real-world gear a model is based on. Codes marked list order or code unknown can be wrong, so read a record back before relying on one. MIT licensed, copyright dhrandy.
+</footer>
+</div>
+<script>
+(function(){
+var data=null,all=[],block='ALL';
+var $=function(i){return document.getElementById(i)};
+var STAT={'pedal-proven':['pedal-proven','ok'],'scroll-derived':['scroll-derived','warn'],'list-order':['list order','warn'],'code-unknown':['code unknown','']};
+function norm(s){return (s||'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim()}
+function subseq(q,t){var i=0;for(var j=0;j<t.length&&i<q.length;j++)if(t[j]===q[i])i++;return i===q.length}
+function lev(a,b,max){if(Math.abs(a.length-b.length)>max)return max+1;var p=[],i,j;for(j=0;j<=b.length;j++)p[j]=j;for(i=1;i<=a.length;i++){var c=[i],mn=i;for(j=1;j<=b.length;j++){c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));if(c[j]<mn)mn=c[j]}if(mn>max)return max+1;p=c}return p[b.length]}
+function tri(s){var o={};s=' '+s+' ';for(var i=0;i<s.length-2;i++)o[s.substr(i,3)]=1;return o}
+function score(m,q,qt){
+ var name=m._n,hay=m._h,s=0;
+ if(name===q)return 1000;
+ for(var k=0;k<qt.length;k++){
+  var t=qt[k],best=0,words=name.split(' ');
+  if(name.indexOf(t)===0)best=100;
+  else if(words.some(function(w){return w.indexOf(t)===0}))best=80;
+  else if(name.indexOf(t)>=0)best=60;
+  else if(m._ba.indexOf(t)>=0)best=40;
+  else if(hay.indexOf(t)>=0)best=25;
+  else if(t.length>=3&&subseq(t,name.replace(/ /g,'')))best=15;
+  else if(t.length>=4&&m._w.some(function(w){return lev(t,w,t.length>=7?2:1)<=(t.length>=7?2:1)}))best=12
+  else if(t.length>=4){var a=tri(t),b=m._t,c=0,n=0;for(var x in a){n++;if(b[x])c++}if(n&&c/n>=.6)best=10}
+  if(!best)return 0;s+=best}
+ return s}
+function build(){
+ data.blocks.forEach(function(b){b.models.forEach(function(m){
+  m.block=b.block;m._n=norm(m.name);m._ba=norm(m.based_on);
+  m._h=norm([m.block,m.name,m.based_on,m.category,m.status,m.firmware_added?'firmware added':'',m.renamed].join(' '));
+  m._t=tri(m._n);m._w=m._h.split(' ');all.push(m)})});
+ var chips=$('chips');
+ function chip(id,label,n){var b=document.createElement('button');b.className='chip';b.type='button';b.setAttribute('aria-pressed',id===block);b.innerHTML=label+'<small>'+n+'</small>';b.onclick=function(){block=id;render()};b.dataset.id=id;chips.appendChild(b)}
+ chip('ALL','All',all.length);data.blocks.forEach(function(b){chip(b.block,b.block,b.count)});
+ render()}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function card(m){
+ var st=STAT[m.status]||[m.status,''];
+ var code=m.code===null||m.code===undefined?'?':m.code;
+ var h='<div class="card"><div><span class="blk">'+esc(m.block)+'</span><span class="name">'+esc(m.name)+'</span></div>'+
+ '<div class="codebox"><div class="code">'+esc(code)+'</div><div class="sub">code</div></div>';
+ var b=m.based_on?'<div class="based"><span>Based on</span> '+esc(m.based_on)+'</div>':
+  '<div class="based"><span>Based on</span> <span>'+(m.based_on_status==='unknown'?'unknown':'none listed')+'</span></div>';
+ h+=b+'<div class="meta"><span class="tag '+st[1]+'">'+esc(st[0])+'</span><span class="tag">screen '+m.screen+'</span>';
+ if(m.id)h+='<span class="tag">list ID '+m.id+'</span>';
+ if(m.firmware_added)h+='<span class="tag new">firmware-added</span>';
+ if(m.renamed)h+='<span class="tag">'+esc(m.renamed)+'</span>';
+ return h+'</div></div>'}
+function render(){
+ [].forEach.call($('chips').children,function(c){c.setAttribute('aria-pressed',c.dataset.id===block)});
+ var qraw=$('q').value,q=norm(qraw),qt=q?q.split(' '):[];
+ var pr=$('proven').checked,ad=$('added').checked;
+ var res=all.filter(function(m){return (block==='ALL'||m.block===block)&&(!pr||m.status==='pedal-proven')&&(!ad||m.firmware_added)});
+ if(q){res=res.map(function(m){return [score(m,q,qt),m]}).filter(function(x){return x[0]>0}).sort(function(a,b){return b[0]-a[0]}).map(function(x){return x[1]})}
+ $('count').textContent=res.length+' of '+all.length+' models';
+ $('list').innerHTML=res.length?res.slice(0,400).map(card).join(''):'<div class="empty">No match.</div>';
+ try{history.replaceState(null,'',(q||block!=='ALL')?'#'+encodeURIComponent(block)+'/'+encodeURIComponent(qraw):location.pathname+location.search)}catch(e){}}
+function init(){
+ var h=decodeURIComponent((location.hash||'').slice(1)).split('/');
+ if(h[0]&&h[0]!=='ALL')block=h[0];if(h[1])$('q').value=h.slice(1).join('/');
+ var t;$('q').addEventListener('input',function(){clearTimeout(t);t=setTimeout(render,80)});
+ $('proven').onchange=render;$('added').onchange=render;
+ fetch('models.json').then(function(r){return r.json()}).then(function(d){data=d;build()}).catch(function(){$('list').innerHTML='<div class="empty">Could not load models.json.</div>'})}
+init();
+})();
+</script>
+</body>
+</html>
