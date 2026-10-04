@@ -12,12 +12,16 @@ screen-minus-1 rule is not a straight count for every slot: read the code from t
 | FX2 | 05 | Big Pi | 4 |
 | FX2 | 08 | Black Tail | 7 |
 | FX2 | 10 | Governor | 9 |
+| FX2 | 01 | Green Drive (TS-808) | 0 (set from the bridge; not checked on the screen) |
+| FX1 | 47 | 90 Phaser | 137 (params: Rate, Sync) |
 | CAB | 35 | UK Black 4x12 | 34 |
 | AMP | - | Marshell 50 (normal channel) | 55 |
 | DLY | 10 | Slapback | 9 |
 | RVB | 05 | Spring | 4 |
 
 Writing a model from the bridge (`POST /api/model`) gave the same record as picking it on the pedal (checked for FX2).
+
+FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1's default was code 76, which the FX2 list does not contain. Read FX1 codes from the record after picking the model on the pedal.
 
 ## FX2 code list (from a listen-only scroll, 60 models)
 
