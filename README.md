@@ -364,6 +364,17 @@ entry before it:
 It only reads, like `/api/patch/current`. The cost is that each background read
 uses the USB link for about a second and a half, so a request from a client can wait
 up to about two seconds for its turn. Polling pauses while the pedal is unplugged.
+
+The poller eases off by itself so it does not crowd the pedal. Only one read is ever
+open at a time, and the wait before the next one is never shorter than the last read
+took. While the patch keeps changing (you are editing or stepping through models) the
+wait doubles, then doubles again, up to `AMPERO_HISTORY_BUSY_MAX_S`, and goes back to
+the base after two quiet reads. After a failed read, for example an incomplete patch
+dump, it waits 4 times the base and doubles each time up to 30 seconds. The price is
+that you catch fewer states while you step quickly: give each stop about ten seconds if
+you want every one recorded. `/api/health` shows `current_poll_s` and `pace`
+(`idle`, `busy` or `errors`).
+
 The log lives in memory and starts empty after a restart. Set
 `AMPERO_HISTORY_POLL_S=0` to switch it off. `/api/health` shows the history status.
 
@@ -429,7 +440,8 @@ Set these in `.env` (or Dockhand's Environment tab).
 | `PORT` | 8080 | port inside the container |
 | `DATA_DIR` | `./data` | host folder for the remembered patch names (compose setting, mounted at `/data`) |
 | `AMPERO_MODELS_FILE` | bundled | path to a different `models.json` for `/api/models`; the image ships the one from `site/` |
-| `AMPERO_HISTORY_POLL_S` | 2 | seconds between the background reads that feed `/api/history`. `0` turns the history off |
+| `AMPERO_HISTORY_POLL_S` | 2 | base seconds between the background reads that feed `/api/history`. `0` turns the history off. The wait grows on its own while the patch is changing or reads fail |
+| `AMPERO_HISTORY_BUSY_MAX_S` | 10 | longest wait while the patch keeps changing |
 | `AMPERO_HISTORY_WINDOW_S` | 600 | how many seconds of history to keep (also capped at 400 entries) |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 

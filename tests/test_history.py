@@ -94,3 +94,75 @@ def test_poller_stops_on_the_event(monkeypatch):
     stop.set()
     monkeypatch.setattr(server, "HISTORY_POLL", 0.01)
     server.poll_history(stop)   # returns at once, does not read
+
+
+def test_pacer_backs_off_while_changing_and_recovers(monkeypatch):
+    monkeypatch.setattr(server, "HISTORY_BUSY_MAX", 10.0)
+    p = server.Pacer(2.0)
+    assert p.ok(False) == 2.0 and p.mode() == "idle"
+    assert p.ok(True) == 4.0 and p.mode() == "busy"
+    assert p.ok(True) == 8.0
+    assert p.ok(True) == 8.0                      # capped at x4 and at the busy max
+    assert p.ok(False) == 8.0                     # one quiet read is not enough yet
+    assert p.ok(False) == 2.0 and p.mode() == "idle"
+
+
+def test_pacer_busy_wait_never_passes_the_cap(monkeypatch):
+    monkeypatch.setattr(server, "HISTORY_BUSY_MAX", 5.0)
+    p = server.Pacer(2.0)
+    p.ok(True)
+    assert p.ok(True) == 5.0
+
+
+def test_pacer_waits_at_least_as_long_as_the_read_took():
+    p = server.Pacer(2.0)
+    assert p.ok(False, took=3.5) == 3.5
+
+
+def test_pacer_doubles_after_errors_and_resets():
+    p = server.Pacer(2.0)
+    assert [p.failed() for _ in range(3)] == [8.0, 16.0, 30.0]
+    assert p.mode() == "errors"
+    assert p.ok(False) == 2.0 and p.mode() == "idle"
+
+
+def test_poller_waits_longer_after_a_change_and_after_an_error(monkeypatch):
+    h = server.History(600, 50)
+    monkeypatch.setattr(server, "history", h)
+    monkeypatch.setattr(server, "HISTORY_POLL", 2.0)
+    monkeypatch.setattr(server, "HISTORY_BUSY_MAX", 10.0)
+    monkeypatch.setattr(usb, "is_present", lambda: True)
+    replies = iter([got("01"), got("02"), RuntimeError("patch dump incomplete"), got("02"), got("02")])
+
+    def fake_read():
+        r = next(replies)
+        if isinstance(r, Exception):
+            raise r
+        return r
+    monkeypatch.setattr(server, "read_current_patch", fake_read)
+    waits = []
+    monkeypatch.setattr(server.time, "sleep", waits.append)
+    server.poll_history(rounds=5)
+    # the first wait is the base, then: changed, changed, error, quiet
+    assert waits == [2.0, 4.0, 8.0, 8.0, 2.0]
+    assert h.errors == 1 and "incomplete" in h.last_error
+    st = h.status()
+    assert st["pace"] == "idle" and st["current_poll_s"] == 2.0
+
+
+def test_poller_never_overlaps_reads(monkeypatch):
+    h = server.History(600, 50)
+    monkeypatch.setattr(server, "history", h)
+    monkeypatch.setattr(server, "HISTORY_POLL", 0.0)
+    monkeypatch.setattr(usb, "is_present", lambda: True)
+    open_reads, worst = [0], [0]
+
+    def fake_read():
+        open_reads[0] += 1
+        worst[0] = max(worst[0], open_reads[0])
+        open_reads[0] -= 1
+        return got("01")
+    monkeypatch.setattr(server, "read_current_patch", fake_read)
+    monkeypatch.setattr(server.time, "sleep", lambda s: None)
+    server.poll_history(rounds=5)
+    assert worst[0] == 1

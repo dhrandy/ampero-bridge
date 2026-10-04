@@ -73,6 +73,7 @@ GAP = 0.15           # pause between frames, the pacing the pedal was tested wit
 DATA_DIR = os.environ.get("AMPERO_DATA_DIR", "/data")
 HISTORY_POLL = float(os.environ.get("AMPERO_HISTORY_POLL_S", "2"))      # pause between polls; 0 turns history off
 HISTORY_WINDOW = float(os.environ.get("AMPERO_HISTORY_WINDOW_S", "600"))  # how far back to keep states
+HISTORY_BUSY_MAX = float(os.environ.get("AMPERO_HISTORY_BUSY_MAX_S", "10"))  # longest wait while the patch keeps changing
 HISTORY_MAX = 400     # states kept at most, whatever the window
 KNOWN_REFRESH = 3600  # seconds between disk writes for a patch whose name did not change
 
@@ -177,6 +178,8 @@ class History:
         self.errors = 0
         self.last_poll = None     # wall clock of the last good poll
         self.last_error = None
+        self.delay = HISTORY_POLL  # seconds the poller is waiting between reads right now
+        self.mode = "idle"         # idle, busy (the patch keeps changing) or errors
 
     def add(self, got: dict, now: float | None = None):
         now = time.time() if now is None else now
@@ -184,7 +187,8 @@ class History:
             self.polls += 1
             self.last_poll = now
             last = self.entries[-1] if self.entries else None
-            if last and last["record_hex"] == got["record_hex"]:
+            changed = not (last and last["record_hex"] == got["record_hex"])
+            if not changed:
                 last["last_seen"] = now
             else:
                 self.entries.append({"t": now, "last_seen": now, "index": got["index"], "label": got["label"],
@@ -193,16 +197,22 @@ class History:
             cutoff = now - self.window
             while len(self.entries) > 1 and (self.entries[0]["last_seen"] < cutoff or len(self.entries) > self.limit):
                 self.entries.pop(0)
+            return changed
 
     def fail(self, exc: Exception):
         with self.lock:
             self.errors += 1
             self.last_error = f"{type(exc).__name__}: {exc}"
 
+    def pace(self, delay: float, mode: str):
+        with self.lock:
+            self.delay, self.mode = delay, mode
+
     def status(self) -> dict:
         with self.lock:
             return {"enabled": HISTORY_POLL > 0, "poll_s": HISTORY_POLL, "window_s": self.window,
                     "entries": len(self.entries), "polls": self.polls, "poll_errors": self.errors,
+                    "current_poll_s": self.delay, "pace": self.mode,
                     "last_poll": self.last_poll, "last_error": self.last_error}
 
     def listing(self, since: float = 0.0, with_hex: bool = True) -> dict:
@@ -224,28 +234,72 @@ def _diff(a: str, b: str):
 history = History(HISTORY_WINDOW, HISTORY_MAX)
 
 
+class Pacer:
+    """How long the background poller waits before its next read.
+
+    Every read uses the USB link for a second or two, and a pedal that is being
+    stepped through models or edited does not like that. So the wait grows while the
+    patch keeps changing (x2, then x4, never more than HISTORY_BUSY_MAX_S) and goes
+    back to the base after two quiet reads in a row. After an error it doubles up to
+    30 seconds and resets on the next good read. The wait is never shorter than the
+    last read took, so the pedal gets at least as much rest as work.
+    """
+
+    def __init__(self, base: float):
+        self.base = base
+        self.level = 0      # 0 idle, 1 and 2 busy
+        self.quiet = 0
+        self.errors = 0     # failed reads in a row
+
+    def ok(self, changed: bool, took: float = 0.0) -> float:
+        self.errors = 0
+        if changed:
+            self.level, self.quiet = min(self.level + 1, 2), 0
+        else:
+            self.quiet += 1
+            if self.quiet >= 2:
+                self.level = 0
+        d = min(self.base * 2 ** self.level, max(self.base, HISTORY_BUSY_MAX))
+        return max(d, took)
+
+    def failed(self) -> float:
+        self.errors += 1
+        self.level = 0
+        return min(30.0, max(self.base * 4, 4.0 if self.base else 0.0) * 2 ** (self.errors - 1))
+
+    def mode(self) -> str:
+        return "errors" if self.errors else ("busy" if self.level else "idle")
+
+
 def poll_history(stop: threading.Event | None = None, rounds: int | None = None):
     """Read the pedal now and then and keep what it says. Never raises, never writes.
 
-    Skips a round while the pedal is unplugged. A busy bridge is not a problem:
-    a client request that arrives during a poll waits for it (about two seconds).
+    One read at a time: the next wait starts only after the read has finished. The wait
+    adapts, see Pacer. Skips a round while the pedal is unplugged. A client request that
+    arrives during a poll waits for it (about two seconds).
     """
     n = 0
+    pacer = Pacer(HISTORY_POLL)
+    delay = HISTORY_POLL
     while rounds is None or n < rounds:
         n += 1
-        if stop is not None and stop.wait(HISTORY_POLL):
+        if stop is not None and stop.wait(delay):
             return
         if stop is None:
-            time.sleep(HISTORY_POLL)
+            time.sleep(delay)
         try:
             if not usb.is_present():
+                delay = HISTORY_POLL
                 continue
-            history.add(read_current_patch())
+            t0 = time.monotonic()
+            changed = history.add(read_current_patch())
+            delay = pacer.ok(changed, time.monotonic() - t0)
         except Exception as e:
             history.fail(e)
             if history.errors in (1, 10, 100):
                 log.warning("history poll failed (%d so far): %s", history.errors, e)
-            time.sleep(min(30.0, HISTORY_POLL * 4))
+            delay = pacer.failed()
+        history.pace(delay, pacer.mode())
 
 
 def read_current_patch() -> dict:
@@ -352,7 +406,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.3.0"
+    server_version = "ampero-bridge/2.4.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
