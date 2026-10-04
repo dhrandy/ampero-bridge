@@ -37,11 +37,16 @@ Slot AA: 01 FX1, 02 FX2, 03 AMP, 05 CAB, 06 EQ, 08 DLY, 09 probably RVB
 EQ slot (06) model codes: 0 Guitar EQ1, 1 Guitar EQ2, 2 Bass EQ1, 3 Bass EQ2,
 4 Para EQ (15 params), 5 Graphic EQ (11), 6 V-EQ (5).
 
-**Save is unconfirmed.** The editor sends A and B in the same millisecond. A
-pedal save (footswitch/screen) makes the pedal broadcast
-`10 00 00 00 01 <idx> <name>` then `00 02 06 07 01 <idx+1>`, `00 02 06 05 00 00 00 78`,
-`00 02 06 04 01 <idx+1>`. Sending A+B from the bridge has not produced that
-broadcast. Whether it saved is only visible on the pedal's screen.
+**Save works from the host.** The editor sends A and B in the same millisecond.
+Sending both in one USB transfer (72 bytes) with the name TEST to index 75 made
+the pedal show TEST on P26-1 after hopping patches (Oct 3, 2026, 9:11 PM EDT).
+The pedal sends nothing back for a host save, so only its screen confirms it. A
+save made on the pedal itself does broadcast
+`10 00 00 00 01 <idx> <name>` then `00 02 06 07 01 <idx+1>`,
+`00 02 06 05 00 00 00 78`, `00 02 06 04 01 <idx+1>`.
+Earlier tries that sent B alone, or A and B one second apart, were not
+distinguishable (they used the name already on the slot), so use the one-transfer
+form. It saves the pedal's current edit buffer under that name.
 
 **Never write** `10 06 00 00 00` (the enable-state marker the pedal broadcasts):
 a host write of it crashed the pedal ("OFFON <= 1"). Use CC for block on/off.

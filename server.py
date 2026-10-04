@@ -106,7 +106,8 @@ def handle_post(path: str, data: dict) -> dict:
         if data.get("confirm") != want:
             raise am.ProtocolError(f'saving overwrites a stored patch: send "confirm": "{want}"')
         send_sysex(am.save_patch(idx, str(data.get("name", ""))), f"save {idx}")
-        # The pedal sends nothing back for a save. Only its screen shows the result.
+        # The pedal sends nothing back for a save. Only its screen shows the result,
+        # so the reply says written, not confirmed.
         return {"ok": True, "label": am.patch_label(idx), "verified": False,
                 "note": "no reply exists for save; read the patch back to check"}
     raise LookupError(path)

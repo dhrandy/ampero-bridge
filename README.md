@@ -12,7 +12,7 @@ libusb and a small JSON API.
 | Patch select, block on/off (CC) | verified on the pedal's screen |
 | Model select, parameter set (SysEx) | verified for the EQ slot; other slots follow the same frame |
 | Read patch (name, raw record) | works; only the name and index are decoded |
-| Save | **unconfirmed.** The editor's two frames are sent, the pedal replies with nothing, and no save has been seen from the bridge yet |
+| Save | **verified on the pedal.** The editor's two frames, sent together in one USB transfer, saved the name TEST into P26-1 (seen on the screen after hopping patches). The pedal sends no reply, so only its screen confirms it |
 | Lock (CC 77), all-off (CC 78) | not isolated on the Mini |
 
 Details and the captured bytes: `docs/protocol.md`.

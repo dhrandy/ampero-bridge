@@ -142,9 +142,9 @@ def save_patch(index: int, name: str) -> list[bytes]:
     A  00 02 06 07 01 <idx>        opener
     B  10 00 00 00 01 <idx> <name18>  index and name
 
-    Captured from the official editor. Whether the Mini accepts this from a
-    host that did not just read the patch is the open question: the pedal sends
-    nothing back for a save, so only the pedal's screen shows the result.
+    Captured from the official editor. Verified on the pedal: both frames in
+    one USB transfer saved the name TEST into P26-1. The pedal sends nothing
+    back for a save, so only its screen shows the result.
     """
     _check7(index, "patch index")
     a = frame(KIND_DATA, bytes([0x00, 0x02, 0x06, 0x07, 0x01, index]))
