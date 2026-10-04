@@ -217,5 +217,7 @@ captured from the editor and the pedal.
 * `docs/models.md`: model numbers checked on a real pedal
 * `docs/usb-lockups.md`: USB stability notes and the less common settings
 
-Credits: the Ampero II Stage work by jpfaria (github.com/jpfaria/hotone-ampero-2)
-started this, but the Mini uses a different header, so none of its frames are used here.
+Credits: this was built for the Ampero Mini from scratch. The Mini speaks a
+different USB-MIDI protocol from the Ampero II Stage, so no frames or code are
+shared. jpfaria's Stage work (github.com/jpfaria/hotone-ampero-2) was a useful
+reference for what is possible on the Stage.
