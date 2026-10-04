@@ -7,6 +7,8 @@ screen-minus-1 rule is not a straight count for every slot: read the code from t
 
 Which knob is which for each model is in `docs/knobs.md`.
 
+Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorder models in an update, and the codes may move with them. Check a code with a read-back before relying on it after a firmware change.
+
 ## Proven live (set on the pedal, read back from the record)
 
 | Slot | Screen | Name | Code |
