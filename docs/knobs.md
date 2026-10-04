@@ -115,7 +115,7 @@ FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in 
 | 2 | Liquid C (03) | 0 Mode (stored as the shown mode minus 1; mode 3 read as 2) | Checked for one value |
 | 6 | Jetter B (07) | 0 Depth, 1 Rate, 2 Pre Delay, 3 Feedback, 4 Sync (Off/On) | Checked |
 | 16 | Custom Trem (17) | 6 slots read [70, 20, 80, 50, 0, 50]; knob labels not mapped | Code checked, knobs not mapped |
-| 73 | Bit Crusher (27) | 0 Mix, 1 Krush, 2 Bit, 3 Hi Cut, 4 Lo Cut | Checked |
+| 73 | Bit Krusher (27) | 0 Mix, 1 Krush, 2 Bit, 3 Hi Cut, 4 Lo Cut | Checked |
 | 75 | Sweller (29) | Attack (14 bits, see below), 1 Curve (0 Line, 1 Exp, 2 Log) | Checked |
 
 Jetter B: all ranges 0-100 raw. Rate read 20 before Sync was turned on and 40 after, with no knob turn recorded. That change is observed but unexplained. Other FX3 models were not checked.
