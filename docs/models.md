@@ -1,7 +1,7 @@
 # Ampero Mini model codes
 
 Code = what the pedal stores in the record and what `POST /api/model` sends. For the models checked live,
-code = on-screen number minus 1 (FX2: Big Pi 05 -> 4, Black Tail 08 -> 7, Governor 10 -> 9; CAB: UK Black 4x12 35 -> 34;
+code = on-screen number minus 1 (FX2: Big Pie 05 -> 4, Black Tail 08 -> 7, Governor 10 -> 9; CAB: UK Black 4x12 35 -> 34;
 DLY: Slapback 10 -> 9; RVB: Spring 05 -> 4). The FX2 codes below jump (0-15, 48-54, 80-93, 112-134), so the
 screen-minus-1 rule is not a straight count for every slot: read the code from the record, do not compute it.
 
@@ -14,10 +14,10 @@ Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorde
 | Slot | Screen | Name | Code |
 | --- | --- | --- | --- |
 | FX1 | 47 | 90 Phaser | 137 (params: Rate, Sync) |
-| FX2 | 05 | Big Pi | 4 |
+| FX2 | 05 | Big Pie | 4 |
 | FX2 | 08 | Black Tail | 7 |
 | FX2 | 10 | Governor | 9 |
-| FX2 | 01 | Green Drive (TS-808) | 0 (set from the bridge; not checked on the screen) |
+| FX2 | 01 | Green Drive (TS-808) | 0 (set from the bridge) |
 | AMP | - | Marshell 50 (normal channel) | 55 |
 | CAB | 35 | UK Black 4x12 | 34 |
 | DLY | 10 | Slapback | 9 |
@@ -29,9 +29,9 @@ Writing a model from the bridge (`POST /api/model`) gave the same record as pick
 
 FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1's default was code 76, which the FX2 list does not contain. Read FX1 codes from the record after picking the model on the pedal.
 
-## FX2 code list (from a listen-only scroll, 60 models)
+## FX2 models (60)
 
-The order was confirmed end to end against screenshots of the editor's FX2 list (60 models). Names follow the editor's FX1 list order (see the FX1 list below): screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60. Codes and parameter counts come from a scroll of the pedal. Names are matched by that order and by parameter counts (for example screens 17 to 23 have 2, 7, 4, 4, 3, 1 and 2 parameters, as the manual gives Comprosso to Fast Gate). The code of each row is from the pedal scroll; only the rows in the proven table above were read back on the pedal, so treat the other codes as likely, not proven.
+The FX2 list has 60 models, in the editor's order. The codes jump in groups (0-15, 48-54, 80-93, 112-134). Only the rows in the proven table above were read back on a real pedal; treat the other codes as likely, not proven. The names match the FX1 list below: FX2 screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60.
 
 | Screen | Code | Params (defaults) | Name |
 | --- | --- | --- | --- |
@@ -98,40 +98,40 @@ The order was confirmed end to end against screenshots of the editor's FX2 list 
 
 ## FX3 list (screen number, code, name)
 
-FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). The Hotone manual gives the names in groups, in the order the pedal shows them: the modulation group first, then the special effects. Screen 03, 07, 17, 26, 27 and 29 were checked on a real pedal. Codes are screen minus 1 for screens 1 to 17 and screen plus 46 for 18 onwards, which fits all the codes read so far (2, 6, 16, 72, 73, 75). Only the rows marked "pedal-read" had their code read back; the other rows come from the pattern and are not proven. The list has 30 models; the order was checked against screenshots of the editor's FX3 list, which ends at Classic PS. Screen 30 is the only row whose code was not read. `/api/model` still only accepts the codes in the proven table above.
+FX3 has its own list of 30 models, in the editor's order. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). Codes are screen minus 1 for screens 1 to 17 and screen plus 46 from 18 onwards. That fits every code read from a real pedal (2, 6, 16, 72, 73, 75), but only the rows marked pedal-proven were read back; the rest follow the pattern. `/api/model` accepts only the codes in the proven table above.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
-| 01 | 0 | Aozora Chorus | manual order, code from the pattern |
-| 02 | 1 | Grand Choruium | manual order, code from the pattern |
-| 03 | 2 | Liquid C | pedal-read (screen and code) |
-| 04 | 3 | Choruium B | manual order, code from the pattern |
-| 05 | 4 | Detune | name seen on screen, code from the pattern |
-| 06 | 5 | Jetter | manual order, code from the pattern |
-| 07 | 6 | Jetter B | pedal-read (screen and code) |
-| 08 | 7 | Jetter N | manual order, code from the pattern |
-| 09 | 8 | Trem Jet | manual order, code from the pattern |
-| 10 | 9 | Pulser | manual order, code from the pattern |
-| 11 | 10 | Grand Vibrato | manual order, code from the pattern |
-| 12 | 11 | Shiver T | manual order, code from the pattern |
-| 13 | 12 | 90 Phaser | manual order, code from the pattern |
-| 14 | 13 | Green Phaser | manual order, code from the pattern |
-| 15 | 14 | Revolver | manual order, code from the pattern |
-| 16 | 15 | Helicopter | manual order, code from the pattern |
-| 17 | 16 | Custom Trem | pedal-read (screen and code) |
-| 18 | 64 | Acoustic Refiner | manual order, code from the pattern |
-| 19 | 65 | AC Sim | manual order, code from the pattern |
-| 20 | 66 | Toucher | manual order, code from the pattern |
-| 21 | 67 | Crier | manual order, code from the pattern |
-| 22 | 68 | Clean Octa | manual order, code from the pattern |
-| 23 | 69 | Harmony | manual order, code from the pattern |
-| 24 | 70 | Telephone Line | manual order, code from the pattern |
-| 25 | 71 | Satisfaction | manual order, code from the pattern |
-| 26 | 72 | Path Filter | pedal-read (screen and code) |
-| 27 | 73 | Bit Krusher | pedal-read (screen and code) |
-| 28 | 74 | Ring Mod | manual order, code from the pattern |
-| 29 | 75 | Sweller | pedal-read (screen and code) |
-| 30 | 76 | Classic PS | name from the editor list, code from the pattern (not read) |
+| 01 | 0 | Aozora Chorus | list order, not checked |
+| 02 | 1 | Grand Choruium | list order, not checked |
+| 03 | 2 | Liquid C | pedal-proven |
+| 04 | 3 | Choruium B | list order, not checked |
+| 05 | 4 | Detune | list order, not checked |
+| 06 | 5 | Jetter | list order, not checked |
+| 07 | 6 | Jetter B | pedal-proven |
+| 08 | 7 | Jetter N | list order, not checked |
+| 09 | 8 | Trem Jet | list order, not checked |
+| 10 | 9 | Pulser | list order, not checked |
+| 11 | 10 | Grand Vibrato | list order, not checked |
+| 12 | 11 | Shiver T | list order, not checked |
+| 13 | 12 | 90 Phaser | list order, not checked |
+| 14 | 13 | Green Phaser | list order, not checked |
+| 15 | 14 | Revolver | list order, not checked |
+| 16 | 15 | Helicopter | list order, not checked |
+| 17 | 16 | Custom Trem | pedal-proven |
+| 18 | 64 | Acoustic Refiner | list order, not checked |
+| 19 | 65 | AC Sim | list order, not checked |
+| 20 | 66 | Toucher | list order, not checked |
+| 21 | 67 | Crier | list order, not checked |
+| 22 | 68 | Clean Octa | list order, not checked |
+| 23 | 69 | Harmony | list order, not checked |
+| 24 | 70 | Telephone Line | list order, not checked |
+| 25 | 71 | Satisfaction | list order, not checked |
+| 26 | 72 | Path Filter | pedal-proven |
+| 27 | 73 | Bit Krusher | pedal-proven |
+| 28 | 74 | Ring Mod | list order, not checked |
+| 29 | 75 | Sweller | pedal-proven |
+| 30 | 76 | Classic PS | list order, not checked |
 
 Knobs for the FX3 models checked so far are in `docs/knobs.md`.
 
@@ -141,7 +141,7 @@ A full list of the model names, in the manufacturer's order, with an ID per mode
 
 ### CAB models
 
-The editor's CAB list, in screen order, read off screenshots. The names here are the editor's. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. Rule: code = screen - 1. Checked at UK Black 4x12 (screen 35, code 34). The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
+The editor's CAB list, in screen order. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. Rule: code = screen - 1. Checked at UK Black 4x12 (screen 35, code 34). The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
@@ -283,7 +283,7 @@ Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 ### AMP models
 
-The editor's AMP list has 60 models, in this screen order (checked against screenshots, read straight through). Only one code is known: Marshell 50 (screen 18) reads as code 55. The codes for the other amps are not known, and they do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. If the codes run in screen order from some start, screen 1 would be code 38; that is a guess from a single point and needs reads at screen 1 and screen 60 before it is used.
+The editor's AMP list has 60 models, in this screen order. Only one code is known: Marshell 50 (screen 18) reads as code 55. The codes for the other amps are not known, and they do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. If the codes run in screen order from some start, screen 1 would be code 38; that is a guess from a single point and needs reads at screen 1 and screen 60 before it is used.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -415,7 +415,7 @@ FX2 and FX1 are in their own tables (FX2 above, FX1 below). Both have 60 models.
 
 ## FX1 list (screen order)
 
-From the editor software's list, read off screenshots; 60 models, which matches the count the pedal shows. The codes are not known yet except for one: 90 Phaser (screen 47) reads as code 137. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
+The editor's FX1 list has 60 models, which matches the count the pedal shows. Only one code is known: 90 Phaser (screen 47) reads as code 137. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
 
 | Screen | Name |
 | --- | --- |

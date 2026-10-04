@@ -37,7 +37,7 @@ The first table is Checked or Manual. The remaining FX2 models, with their param
 | 3 | Zen Garden | 0 Gain, 1 Tone, 2 Volume, 3 Voice | Manual |
 | 4 | Big Pie | 0 Sustain, 1 Tone, 2 Volume | Checked |
 | 5 | Face Fuzz | 0 Fuzz, 1 Volume | Manual |
-| 7 | Black-Rat-style distortion | 0 Gain, 1 Filter, 2 Volume | Manual |
+| 7 | Black Tail | 0 Gain, 1 Filter, 2 Volume | Manual |
 | 8 | Smooth Dist | 0 Gain, 1 Tone, 2 Volume | Manual |
 | 9 | Governor | 0 Gain, 1 Volume, 2 Bass, 3 Middle, 4 Treble | Manual (the values in a record read back fit this order) |
 | 10 | Crunchist | 0 Gain, 1 Tone, 2 Volume | Manual |
@@ -96,7 +96,7 @@ The first byte of the block is the on/off switch (1 on, 0 off).
 | Code | Model | Knobs in order | Status |
 | --- | --- | --- | --- |
 | 0 | Smart Gate (screen 01) | 0 Threshold (0-100) | Checked |
-| 1 | Fast Gate (screen 02) | 0 Threshold (0-100), 1 Mode (0 = I, 1 = II) | Checked (Mode I read as 0 only inferred from ending on II) |
+| 1 | Fast Gate (screen 02) | 0 Threshold (0-100), 1 Mode (0 = I, 1 = II) | Checked (Mode II = 1 read; Mode I = 0 inferred) |
 
 ## EQ
 
