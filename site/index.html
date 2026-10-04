@@ -87,7 +87,8 @@ details dt{font-weight:600;color:var(--text)}details dd{margin:0}
 <dl>
 <dt>Screen</dt><dd>position in the editor's list for that block, starting at 1.</dd>
 <dt>Code</dt><dd>the number stored in the preset record for the model. FX1, FX2 and FX3 use different codes even for the same name.</dd>
-<dt>pedal-proven</dt><dd>code set on a real pedal and read back from the record.</dd>
+<dt>pedal-proven</dt><dd>code read from the record on a real pedal with that model selected.</dd>
+<dt>inferred</dt><dd>sits between two codes that were read, in an unbroken run of the list; not read itself.</dd>
 <dt>Codes without a tag</dt><dd>follow from the list order and a rule that held everywhere it was checked (FX2 codes come from scrolling the list). Treat them as likely, and read a record back before relying on one. Only the green pedal-proven tag means a read-back on a real pedal.</dd>
 <dt>Dash</dt><dd>the code has not been read yet.</dd>
 <dt>firmware-added</dt><dd>in the editor's list, not in the manufacturer's effect list.</dd>
@@ -109,7 +110,7 @@ Beta. Not affiliated with or endorsed by Hotone. Product and brand names belong 
 (function(){
 var data=null,all=[],block='ALL';
 var $=function(i){return document.getElementById(i)};
-var STAT={'pedal-proven':['pedal-proven','ok'],'scroll-derived':['scroll-derived','warn'],'list-order':['list order','warn'],'code-unknown':['code unknown','']};
+var STAT={'pedal-proven':['pedal-proven','ok'],'scroll-derived':['scroll-derived','warn'],'inferred':['inferred','warn'],'list-order':['list order','warn'],'code-unknown':['code unknown','']};
 function norm(s){return (s||'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim()}
 function subseq(q,t){var i=0;for(var j=0;j<t.length&&i<q.length;j++)if(t[j]===q[i])i++;return i===q.length}
 function lev(a,b,max){if(Math.abs(a.length-b.length)>max)return max+1;var p=[],i,j;for(j=0;j<=b.length;j++)p[j]=j;for(i=1;i<=a.length;i++){var c=[i],mn=i;for(j=1;j<=b.length;j++){c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));if(c[j]<mn)mn=c[j]}if(mn>max)return max+1;p=c}return p[b.length]}

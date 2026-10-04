@@ -27,7 +27,7 @@ Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorde
 
 Writing a model from the bridge (`POST /api/model`) gave the same record as picking it on the pedal (checked for FX2).
 
-FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1's default was code 76, which the FX2 list does not contain. Read FX1 codes from the record after picking the model on the pedal.
+FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1's default was code 76, which the FX2 list does not contain. The full FX1 and AMP code tables further down come from stepping through the pedal's lists and reading the record; only the rows in the table above were also set from the bridge, and only those are accepted by `POST /api/model`.
 
 ## FX2 models (60)
 
@@ -283,60 +283,60 @@ Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 ### AMP models
 
-The editor's AMP list has 60 models, in this screen order. Only one code is known: Marshell 50 (screen 18) reads as code 55. The codes for the other amps are not known, and they do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. If the codes run in screen order from some start, screen 1 would be code 38; that is a guess from a single point and needs reads at screen 1 and screen 60 before it is used.
+The editor's AMP list has 60 models, in this screen order. Screens 1 to 50 were stepped through on the pedal and the record read at each stop: 47 codes were read directly and three (screens 22, 28 and 36) are inferred from the codes on either side. Screens 51 to 60 have not been read yet and show "not read". The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113 and 48-50 are 160-162. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M.
 
 | Screen | Name | Code |
 | --- | --- | --- |
-| 1 | Tweed Lux | not read |
-| 2 | Baseman Norm | not read |
-| 3 | Black Twin | not read |
-| 4 | Voxy 30HW Norm | not read |
-| 5 | Jazz Clean | not read |
-| 6 | Emperor Clean | not read |
-| 7 | Superstar Clean | not read |
-| 8 | Glacian Clean | not read |
-| 9 | Tweed Prince | not read |
-| 10 | Black Prince | not read |
-| 11 | Baseman Bright | not read |
-| 12 | Voxy 30HW TB | not read |
-| 13 | Emperor Drive | not read |
-| 14 | Superstar Drive | not read |
-| 15 | Marshell 45 | not read |
-| 16 | Marshell 45+ | not read |
-| 17 | Marshell 45 Jump | not read |
-| 18 | Marshell 50 | 55 (pedal-proven) |
-| 19 | Marshell 50+ | not read |
-| 20 | Marshell 50 Jump | not read |
-| 21 | Hot Kitty Drive | not read |
-| 22 | Messe IIC+ 1 | not read |
-| 23 | Messe IIC+ 2 | not read |
-| 24 | Messe IIC+ 3 | not read |
-| 25 | Soloist 100 Crunch | not read |
-| 26 | Marshell 800 | not read |
-| 27 | Fryman B1 | not read |
-| 28 | Fryman B2 | not read |
-| 29 | Glacian Drive | not read |
-| 30 | Marshell 900 | not read |
-| 31 | Dizzle VH B | not read |
-| 32 | Dizzle VH S | not read |
-| 33 | Engle Saga 1 | not read |
-| 34 | Engle Saga 2 | not read |
-| 35 | Fryman HB | not read |
-| 36 | Fryman HB+ | not read |
-| 37 | Eddie 51 | not read |
-| 38 | Soloist 100 Lead | not read |
-| 39 | Messe IV Lead 1 | not read |
-| 40 | Messe IV Lead 2 | not read |
-| 41 | Messe IV Lead 3 | not read |
-| 42 | Tangerine R100 | not read |
-| 43 | Rector Dual V | not read |
-| 44 | Rector Dual M | not read |
-| 45 | Dizzle VH+ B | not read |
-| 46 | Dizzle VH+ S | not read |
-| 47 | Boger XT Blue M | not read |
-| 48 | Alchemy Pre | not read |
-| 49 | Ampage Classic | not read |
-| 50 | Ampage Flip | not read |
+| 1 | Tweed Lux | 0 |
+| 2 | Baseman Norm | 1 |
+| 3 | Black Twin | 2 |
+| 4 | Voxy 30HW Norm | 3 |
+| 5 | Jazz Clean | 4 |
+| 6 | Emperor Clean | 5 |
+| 7 | Superstar Clean | 6 |
+| 8 | Glacian Clean | 7 |
+| 9 | Tweed Prince | 8 |
+| 10 | Black Prince | 9 |
+| 11 | Baseman Bright | 48 |
+| 12 | Voxy 30HW TB | 49 |
+| 13 | Emperor Drive | 50 |
+| 14 | Superstar Drive | 51 |
+| 15 | Marshell 45 | 52 |
+| 16 | Marshell 45+ | 53 |
+| 17 | Marshell 45 Jump | 54 |
+| 18 | Marshell 50 | 55 |
+| 19 | Marshell 50+ | 56 |
+| 20 | Marshell 50 Jump | 57 |
+| 21 | Hot Kitty Drive | 58 |
+| 22 | Messe IIC+ 1 | 59 (inferred) |
+| 23 | Messe IIC+ 2 | 60 |
+| 24 | Messe IIC+ 3 | 61 |
+| 25 | Soloist 100 Crunch | 62 |
+| 26 | Marshell 800 | 63 |
+| 27 | Fryman B1 | 64 |
+| 28 | Fryman B2 | 65 (inferred) |
+| 29 | Glacian Drive | 66 |
+| 30 | Marshell 900 | 96 |
+| 31 | Dizzle VH B | 97 |
+| 32 | Dizzle VH S | 98 |
+| 33 | Engle Saga 1 | 99 |
+| 34 | Engle Saga 2 | 100 |
+| 35 | Fryman HB | 101 |
+| 36 | Fryman HB+ | 102 (inferred) |
+| 37 | Eddie 51 | 103 |
+| 38 | Soloist 100 Lead | 104 |
+| 39 | Messe IV Lead 1 | 105 |
+| 40 | Messe IV Lead 2 | 106 |
+| 41 | Messe IV Lead 3 | 107 |
+| 42 | Tangerine R100 | 108 |
+| 43 | Rector Dual V | 109 |
+| 44 | Rector Dual M | 110 |
+| 45 | Dizzle VH+ B | 111 |
+| 46 | Dizzle VH+ S | 112 |
+| 47 | Boger XT Blue M | 113 |
+| 48 | Alchemy Pre | 160 |
+| 49 | Ampage Classic | 161 |
+| 50 | Ampage Flip | 162 |
 | 51 | Voxy Bass | not read |
 | 52 | Messe Bass 400 | not read |
 | 53 | Acoustic Preamp 1 | not read |
@@ -415,67 +415,67 @@ FX2 and FX1 are in their own tables (FX2 above, FX1 below). Both have 60 models.
 
 ## FX1 list (screen order)
 
-The editor's FX1 list has 60 models, which matches the count the pedal shows. Only one code is known: 90 Phaser (screen 47) reads as code 137. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
+The editor's FX1 list has 60 models, which matches the count the pedal shows. All 60 codes below come from stepping through the pedal's FX1 list and reading the record at each stop. 54 were read directly. The six marked inferred (screens 3, 7, 11, 17, 26 and 51) were stepped past too fast to catch; each sits between two read codes in an unbroken run, and screen 47 (90 Phaser, code 137) was proven earlier by setting it. The codes run in four groups: screens 1-7 are 0-6, 8-21 are 32-45, 22-37 are 64-79 and 38-60 are 128-150. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
 
-| Screen | Name |
-| --- | --- |
-| 1 | Comprosso |
-| 2 | Squeezer |
-| 3 | Affinity Boost |
-| 4 | FET Boost |
-| 5 | Enhancer |
-| 6 | Smart Gate |
-| 7 | Fast Gate |
-| 8 | AC Sim |
-| 9 | Toucher |
-| 10 | Crier |
-| 11 | Voxy Wah |
-| 12 | Cry Wah |
-| 13 | Bass Press |
-| 14 | Clean Octa |
-| 15 | Harmony |
-| 16 | Telephone Line |
-| 17 | Satisfaction |
-| 18 | Path Filter |
-| 19 | Bit Krusher |
-| 20 | Ring Mod |
-| 21 | Classic PS |
-| 22 | Green Drive |
-| 23 | Super Drive |
-| 24 | Screamood |
-| 25 | Zen Garden |
-| 26 | Big Pie |
-| 27 | Face Fuzz |
-| 28 | Bend Fuzz |
-| 29 | Black Tail |
-| 30 | Smooth Dist |
-| 31 | Governor |
-| 32 | Crunchist |
-| 33 | Bass Crusher |
-| 34 | Solid Steel |
-| 35 | Magic T |
-| 36 | Blues Butter |
-| 37 | Dr. Blues |
-| 38 | Aozora Chorus |
-| 39 | Grand Choruium |
-| 40 | Liquid C |
-| 41 | Choruium B |
-| 42 | Detune |
-| 43 | Jetter |
-| 44 | Jetter B |
-| 45 | Pulser |
-| 46 | Grand Vibrato |
-| 47 | 90 Phaser |
-| 48 | Green Phaser |
-| 49 | Revolver |
-| 50 | Helicopter |
-| 51 | Custom Trem |
-| 52 | Sweller |
-| 53 | Gated Boost |
-| 54 | Pitch Shift |
-| 55 | Precise Attack |
-| 56 | Sound Clone 1 |
-| 57 | Sound Clone 2 |
-| 58 | Sound Clone 3 |
-| 59 | Sound Clone 4 |
-| 60 | Sound Clone 5 |
+| Screen | Name | Code |
+| --- | --- | --- |
+| 1 | Comprosso | 0 |
+| 2 | Squeezer | 1 |
+| 3 | Affinity Boost | 2 (inferred) |
+| 4 | FET Boost | 3 |
+| 5 | Enhancer | 4 |
+| 6 | Smart Gate | 5 |
+| 7 | Fast Gate | 6 (inferred) |
+| 8 | AC Sim | 32 |
+| 9 | Toucher | 33 |
+| 10 | Crier | 34 |
+| 11 | Voxy Wah | 35 (inferred) |
+| 12 | Cry Wah | 36 |
+| 13 | Bass Press | 37 |
+| 14 | Clean Octa | 38 |
+| 15 | Harmony | 39 |
+| 16 | Telephone Line | 40 |
+| 17 | Satisfaction | 41 (inferred) |
+| 18 | Path Filter | 42 |
+| 19 | Bit Krusher | 43 |
+| 20 | Ring Mod | 44 |
+| 21 | Classic PS | 45 |
+| 22 | Green Drive | 64 |
+| 23 | Super Drive | 65 |
+| 24 | Screamood | 66 |
+| 25 | Zen Garden | 67 |
+| 26 | Big Pie | 68 (inferred) |
+| 27 | Face Fuzz | 69 |
+| 28 | Bend Fuzz | 70 |
+| 29 | Black Tail | 71 |
+| 30 | Smooth Dist | 72 |
+| 31 | Governor | 73 |
+| 32 | Crunchist | 74 |
+| 33 | Bass Crusher | 75 |
+| 34 | Solid Steel | 76 |
+| 35 | Magic T | 77 |
+| 36 | Blues Butter | 78 |
+| 37 | Dr. Blues | 79 |
+| 38 | Aozora Chorus | 128 |
+| 39 | Grand Choruium | 129 |
+| 40 | Liquid C | 130 |
+| 41 | Choruium B | 131 |
+| 42 | Detune | 132 |
+| 43 | Jetter | 133 |
+| 44 | Jetter B | 134 |
+| 45 | Pulser | 135 |
+| 46 | Grand Vibrato | 136 |
+| 47 | 90 Phaser | 137 |
+| 48 | Green Phaser | 138 |
+| 49 | Revolver | 139 |
+| 50 | Helicopter | 140 |
+| 51 | Custom Trem | 141 (inferred) |
+| 52 | Sweller | 142 |
+| 53 | Gated Boost | 143 |
+| 54 | Pitch Shift | 144 |
+| 55 | Precise Attack | 145 |
+| 56 | Sound Clone 1 | 146 |
+| 57 | Sound Clone 2 | 147 |
+| 58 | Sound Clone 3 | 148 |
+| 59 | Sound Clone 4 | 149 |
+| 60 | Sound Clone 5 | 150 |
