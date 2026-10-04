@@ -1,8 +1,9 @@
 # ampero-bridge
 
-Hotone Ampero Mini bridge, so any AI can build presets from a script: select a patch, switch blocks, pick models, set parameters, read a stored
-patch, save. The pedal plugs into the NAS over USB. The service talks to it with
-libusb and a small JSON API.
+Hotone Ampero Mini bridge, so any AI can build presets from a script: select a
+patch, switch blocks, pick models, set parameters, read a stored patch, save. The
+pedal plugs into the NAS over USB. The service talks to it with libusb and a
+small JSON API.
 
 ## Status
 
