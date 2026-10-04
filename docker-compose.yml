@@ -25,6 +25,23 @@ services:
       # (backups save client-side), but this is here for logs/caches later.
       # Add the same path in Dockhand if you mount it.
       - /DATA/AppData/ampero-bridge:/data
+    # The bridge exits itself (code 70) if a USB request outlives its deadline,
+    # so this brings it back clean. See docs/usb-lockups.md.
     restart: unless-stopped
-    # Don't wait long on stop: the bridge exits immediately on SIGTERM.
-    stop_grace_period: 10s
+    # Tiny init so signals reach the bridge and no zombies pile up.
+    init: true
+    # Docker only marks a wedged container unhealthy. The restart policy above
+    # needs the process to exit, which the in-process watchdog does.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8080/health', timeout=4)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+    # The bridge exits immediately on SIGTERM, there is nothing to flush.
+    stop_grace_period: 5s

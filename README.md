@@ -1,100 +1,89 @@
 # ampero-bridge
 
-HTTP bridge for the Hotone Ampero Mini. The pedal plugs into the NAS over USB
-when Randy wants changes; this service speaks its SysEx protocol over USB MIDI
-and exposes a small key-gated HTTP API so Todd can read patches and push effect
-settings without the Hotone editor.
+HTTP bridge to Randy's Hotone Ampero Mini, so Todd can build presets from a
+script: select a patch, switch blocks, pick models, set parameters, read a stored
+patch, save. The pedal plugs into the NAS over USB. The service talks to it with
+libusb and a small JSON API.
 
-## Transport and protocol
+## Status
 
-The bridge talks to the pedal over raw USB with libusb (pyusb). It does not use
-ALSA, the sequencer or rtmidi. Every request opens the device, claims one
-interface, transfers with a hard timeout, and releases it. Nothing holds the
-pedal between requests, so replugging it or stopping the container is safe.
+| Piece | State |
+| --- | --- |
+| Patch select, block on/off (CC) | verified on the pedal's screen |
+| Model select, parameter set (SysEx) | verified for the EQ slot; other slots follow the same frame |
+| Read patch (name, raw record) | works; only the name and index are decoded |
+| Save | **unconfirmed.** The editor's two frames are sent, the pedal replies with nothing, and no save has been seen from the bridge yet |
+| Lock (CC 77), all-off (CC 78) | not isolated on the Mini |
 
-Why: on the Dell (Debian, kernel 6.1) the ALSA path wedged the whole machine.
-A sequencer port held by the bridge never finished a write to the Mini, the
-kernel sat in `snd_use_lock_sync_helper` forever (uninterruptible), and the USB
-hub worker and `docker stop` blocked behind it until a reboot.
+Details and the captured bytes: `docs/protocol.md`.
 
-**Unverified:** which USB interface carries the Mini's SysEx. The Mini enumerates
-as vendor 84ef, product 0080, and the kernel logs `interface 3 ... bulk endpoint
-0x83 has invalid maxpacket 64` and `endpoint 0x3 ... maxpacket 256`. Look at
-`GET /api/usb` (read-only, opens nothing) to see the interfaces. Auto-detect only
-uses a standard MIDIStreaming interface (class 1, subclass 3). If the pedal uses
-a vendor interface, set `AMPERO_USB_INTERFACE` and `AMPERO_USB_MODE` on purpose.
+## Why it will not lock up the NAS again
 
-The SysEx frame format in `ampero_mini.py` is adapted from the Ampero II Stage
-work at github.com/jpfaria/hotone-ampero-2 (MIT). It has not been confirmed on
-a Mini. The Mini may use something else; if so, capture the official editor
-with USBPcap.
-
-## What the Mini actually sends (captured Oct 3, 2026)
-
-Interface 3 is a standard USB-MIDI 1.0 MIDIStreaming interface (bulk OUT 0x03
-maxpacket 256, bulk IN 0x83 maxpacket 64, one cable). The pedal does not answer
-a Universal Identity Request, but it sends SysEx on its own while it is used.
-Every frame seen (298) has the same prefix and a plain, not nibble-split, body:
-
-    F0 21 25 7F 4D 50 2D 32 12 <body> F7
-
-This is not the header in `ampero_mini.py` (`F0 21 25 4D 50 00 00 <ck> <cmd> ...`),
-so the II Stage frames written there will be ignored by the Mini. Observed body
-shapes (meaning partly guessed):
-
-- `00 02 06 05 00 00 00 78` heartbeat/status, repeated
-- `00 02 06 04 01 NN` rolling event counter
-- `10 AA 00 02 00 BB 00 00 VV` parameter change, VV is a 0-100 value
-  (a slider dragged on screen produced a smooth 0x26 -> 0x64 -> 0x15 run)
-- a burst with `06` then `07` on patch change (probably the patch number)
-
-No host-to-pedal command has been captured yet. Until one is, treat every frame
-builder in `ampero_mini.py` as wrong.
+The first version held an ALSA MIDI port. When the Mini stalled, the Dell's
+kernel waited forever on it and only a reboot helped. This version has no ALSA
+anywhere: libusb only, a timeout on every transfer, one request at a time,
+the pedal found fresh by vendor/product on every request (replugging just works),
+a watchdog that exits the process if a request outlives its deadline, a Docker
+healthcheck and `restart: unless-stopped`. What was researched, and what can
+not be fixed in app code, is in `docs/usb-lockups.md`.
 
 ## Deploy (CasaOS / Dockhand, compose only)
 
-1. In Dockhand, create a stack from `docker-compose.yml` (builds from the git
-   URL, `#main`).
-2. Set `API_KEY` in Dockhand's Environment tab (same key Todd uses).
-3. The container needs `/dev/bus/usb` (mounted in the compose file) and the
-   cgroup rule for USB devices (`c 189:*`). No `/dev/snd`.
+1. In Dockhand, create a stack from `docker-compose.yml` (builds from this repo,
+   `#main`).
+2. Set `API_KEY` in Dockhand's Environment tab.
+3. The container gets `/dev/bus/usb` and the cgroup rule for USB char devices
+   (major 189). No `/dev/snd`.
 
-The pedal only needs to be plugged in when changes are wanted. `/health`
-reports `pedal_connected` (enumeration only, nothing is opened).
+The pedal only has to be plugged in when changes are wanted. `GET /health` says
+whether it is there.
 
 ## API
 
-All endpoints except `/health` require the `X-Api-Key` header.
+Send `X-Api-Key`. Only `/health` is open.
 
-| Method | Path | Body | Notes |
-|---|---|---|---|
-| GET | /health | - | bridge + pedal status |
-| GET | /api/patches | - | all patch names |
-| GET | /api/patch/`<index>` | - | full patch dump (this is the backup) |
-| POST | /api/patch/load | `{"index"}` | load into edit buffer |
-| POST | /api/patch/param | `{"slot","param","value"}` | set knob (slot 0-8, value float) |
-| POST | /api/patch/block | `{"scene","powers":[0/1 x9]}` | block on/off bitmap |
-| POST | /api/patch/model | `{"slot","category","code"}` | set effect model (use catalog codes only) |
-| POST | /api/patch/clear | `{"slot"}` | clear a slot |
-| POST | /api/patch/volume | `{"volume"}` | 0-100 |
-| POST | /api/patch/save | `{"index","name"}` | save edit buffer to slot |
-| GET | /api/firmware | - | firmware string |
+| Call | Body | What it does |
+| --- | --- | --- |
+| `GET /health` | | liveness, `pedal_connected`, request counters |
+| `GET /api/usb` | | interfaces and endpoints the pedal reports |
+| `GET /api/patch/<index>` | | read a stored patch: `name`, `label`, `record_hex` |
+| `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
+| `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
+| `POST /api/model` | `{"slot": "eq", "code": 4}` | pick a model for a slot |
+| `POST /api/param` | `{"slot": "eq", "model_code": 4, "param": 3, "value": 30}` | set one parameter (0-127) |
+| `POST /api/patch/save` | `{"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}` | save to a slot; needs the exact confirm text |
 
-## Workflow
+Errors come back as `{"error", "kind"}`: 400 bad input, 401 key, 503 pedal not
+connected or busy, 504 pedal silent, 502 other USB error.
 
-Todd's rule: before changing any patch, `GET /api/patch/<index>` first and
-save the dump. The Mini only has 99 user slots, so changes go back to the
-same slot and the saved dump is the restore point.
+The pedal never echoes a write. Only its screen shows that a write applied. Before
+overwriting a patch, `GET /api/patch/<index>` first and keep the record as the
+restore point.
 
-## Known issue history (Oct 3, 2026)
+## Env
 
-The old ALSA/rtmidi transport hung the host kernel when the bridge talked to the
-Mini (see "Transport and protocol"). It was replaced with the libusb transport
-above. Whether the pedal answers SysEx at all is still unconfirmed on hardware.
+| Var | Default | |
+| --- | --- | --- |
+| `API_KEY` | required | |
+| `PORT` | 8080 | |
+| `AMPERO_USB_TIMEOUT_MS` | 1000 | per transfer |
+| `AMPERO_HARD_DEADLINE_S` | 20 | a request longer than this makes the bridge exit and restart |
+| `AMPERO_USB_REATTACH` | unset | `1` gives the interface back to snd-usb-audio after each request |
+| `AMPERO_USB_INTERFACE`, `AMPERO_USB_MODE` | auto | only after checking `/api/usb` |
+
+## Develop
+
+    pip install pyusb pytest
+    python -m pytest
+
+Tests use a fake pedal. Frames are checked byte for byte against the ones
+captured from the editor and the pedal.
 
 ## Safety
 
-- Never send `model` with a guessed category/code: a wrong category byte can
-  hang the pedal's SysEx until power-cycle.
-- Writes go to the edit buffer; nothing is permanent until `save`.
-- If the pedal stops responding to SysEx, power-cycle it (USB replug is not enough).
+* Hardware writes go through one function that sends exactly the captured frames.
+* A save needs `confirm`. Block on/off uses CC, never SysEx: a SysEx write of the
+  enable marker crashed the pedal once.
+* Credits: the Ampero II Stage work by jpfaria (github.com/jpfaria/hotone-ampero-2)
+  started this, but the Mini uses a different header, so none of its frames are
+  used here.
