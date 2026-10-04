@@ -15,12 +15,15 @@ and it does the work on the real pedal: it reads what is there, changes the
 blocks, picks models, sets the knobs, checks its work by reading the patch back,
 and saves. It can also back up a patch before touching it.
 
-It only works with the Ampero Mini. The Mini's USB-MIDI protocol differs from
-the Ampero II Stage, so nothing here is shared with those.
+It has only been tested on the Ampero Mini, and that is the only pedal it
+supports. The Mini's USB-MIDI protocol differs from the Ampero II Stage, so
+nothing here is shared with those.
 
 ## What you need
 
-* An Ampero Mini on a USB port of a Linux machine that runs Docker.
+* An Ampero Mini plugged into the same computer that runs the Docker container.
+  The bridge talks to the pedal over that computer's USB bus, so it cannot reach
+  a pedal on another machine. The computer must be Linux.
 * Docker with Compose.
 * About ten minutes.
 
@@ -41,7 +44,9 @@ the Ampero II Stage, so nothing here is shared with those.
 
 The container gets `/dev/bus/usb` and a cgroup rule for USB devices (major 189).
 It does not get `/dev/snd`, on purpose. The pedal only has to be plugged in when
-you want to change something, and replugging it is fine.
+you want to change something, and replugging it is fine. Any USB port works:
+the bridge finds the pedal by its USB vendor and product ID (`84ef:0080`), not by
+port, so moving it to another port is fine.
 
 ### Dockhand
 
