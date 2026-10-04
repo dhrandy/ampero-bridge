@@ -52,13 +52,24 @@ it in when it deploys. Do not paste the key into the compose file.
 ## Using it with your AI agent
 
 Give the agent three things: the bridge's address, the `X-Api-Key` value, and
-this file (or `docs/models.md`). Then ask in plain words. A prompt that works:
+this file (or `docs/models.md`). Then ask in plain words. It can do any of these:
+
+* Build a preset from scratch: pick the blocks and models, set the knobs, name it, save it.
+* Tweak a preset that already exists: read it, change a few parameters, save.
+* Swap a model in one block (a different drive, amp or reverb) and keep the rest.
+* Turn blocks on or off, or clean up a preset so it only uses what it needs.
+* Check a patch: read it back and say what is in it.
+* Back up a patch before changing it, and put it back if you do not like the result.
+
+A prompt that works for any of those:
 
 > You can control my Hotone Ampero Mini through a web API at http://SERVER:28551.
 > Send the key in the `X-Api-Key` header. Read README.md in the ampero-bridge repo
-> first. Build a patch in slot P26-1 for a bright clean tone with light spring
-> reverb. Read the patch before changing anything and keep it as a backup. Make
-> every change first, read it back to check, and save last.
+> first. Here is what I want: [for example "a bright clean tone with light spring
+> reverb in P26-1", or "on the patch that is selected now, lower the drive and
+> swap the delay for a slapback"]. Read the patch before you change anything and
+> keep it as a backup. Make every change first, read it back to check, and save
+> last.
 
 The agent should follow this order. It is the order that keeps the pedal safe:
 
