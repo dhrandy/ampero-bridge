@@ -148,23 +148,28 @@ Create a stack from `docker-compose.yml`. Set `API_KEY` in the stack's
 **Environment** tab instead of a `.env` file. Dockhand fills in the `${API_KEY}`
 when it deploys. Do not paste the key into the compose file.
 
-### Behind a reverse proxy (Synology example)
+### Putting it on the internet: reverse proxy (Synology example)
 
-The port speaks plain HTTP, so put TLS in front of it. On a Synology NAS: Control
-Panel, Login Portal, Advanced, Reverse Proxy, Create. Source: HTTPS, your
-hostname, port 443. Destination: HTTP, the IP of the computer running the
-container, port 28551. Add a certificate for the hostname under Security, Certificate.
+The bridge speaks plain HTTP, so put TLS in front of it with a reverse proxy.
 
-That is the whole setup. Without any firewall rule, this is what you have: the
-container's port is open on the computer's LAN address (plain HTTP), the proxy is
-the only thing meant to talk to it, and every `/api` call still needs the key. A
-wrong or missing key gets a 401 and changes nothing. Keep the key long and
-random, and do not forward port 28551 on your router.
+**Layout 1: one port, 443, through the proxy.** This is the tested example. Your
+router forwards only port 443 to the NAS. The proxy is the only way in from
+outside, and the bridge's own port (28551) is never forwarded, so it is only
+reachable from your home network. Every `/api` call still needs the key: a wrong
+or missing key gets a 401 and changes nothing.
 
-Optional hardening: if you do run a firewall on the container host, limit port
-28551 to the proxy's address. Docker's published ports skip the usual `ufw`
-rules, so the rule has to go in the `DOCKER-USER` chain. Skip this if you do not
-use firewall rules; the key is what protects the API.
+On a Synology NAS: Control Panel, Login Portal, Advanced, Reverse Proxy, Create.
+Source: HTTPS, your hostname, port 443. Destination: HTTP, the IP of the computer
+running the container, port 28551. Add a certificate for the hostname under
+Security, Certificate. Keep the key long and random.
+
+**Layout 2: you expose more than that.** If you forward other ports, run the
+bridge somewhere other devices on your network can reach, or do not trust
+everything on your LAN, also limit port 28551 on the container host to the
+proxy's address. This is recommended there. Docker's published ports skip the
+usual `ufw` rules, so the rule goes in the `DOCKER-USER` chain. If the proxy runs
+on the same computer as the container, you can instead publish the port on
+loopback only: change the compose line to `"127.0.0.1:28551:8080"`.
 
 ## Using it with your AI agent
 
