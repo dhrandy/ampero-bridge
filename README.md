@@ -130,54 +130,24 @@ connected or busy, 504 pedal silent, 502 other USB error.
 The record is 460 bytes: the name, then nine blocks (fx1, fx2, amp, nr, cab, eq,
 fx3, dly, rvb) with their model and parameters. The layout is in `docs/protocol.md`.
 
-## Status
-
-| Piece | State |
-| --- | --- |
-| Patch select, block on/off | verified on the pedal |
-| Model select | verified live through the bridge, read back from the record |
-| Parameter set (0-127) | verified live through the bridge, read back from the record |
-| Read the selected patch | works. It reads the patch the pedal has selected, not any index |
-| Save | verified on the pedal. The pedal sends no reply, so read the patch back to check |
-| Lock and all-off CCs | not isolated on the Mini |
-
-Not every model's number is known yet. Details and captured bytes are in
-`docs/protocol.md`.
-
 ## Safety
 
 * **Save is always the last step.** A save stores whatever is in the pedal's edit
   buffer at that moment. Make every change, read it back, then save.
 * A save needs the exact `confirm` text, so a stray call cannot overwrite a patch.
-* Hardware writes go through one function that sends exactly the frames captured
-  from the editor. Block on/off uses Control Change, never SysEx: a SysEx write of
-  the enable marker crashed the pedal once.
-* A bad write can crash the pedal. Do not send a model number you have not read
-  off the pedal.
+* Do not send a model number you have not read off the pedal.
 * Keep `API_KEY` private and do not expose the port to the internet.
-
-## Why it will not lock up the machine
-
-The first version held an ALSA MIDI port. When the Mini stalled, the host's kernel
-waited forever on it and only a reboot helped. This version has no ALSA anywhere:
-libusb only, a timeout on every transfer, one request at a time, the pedal found
-fresh by vendor/product on every request (replugging just works), a watchdog that
-exits the process if a request outlives its deadline, a Docker healthcheck and
-`restart: unless-stopped`. What was researched, and what cannot be fixed in app
-code, is in `docs/usb-lockups.md`.
 
 ## Settings
 
-Set these in `.env` (or Dockhand's Environment tab) only if you need them.
+Set these in `.env` (or Dockhand's Environment tab).
 
 | Var | Default | |
 | --- | --- | --- |
-| `API_KEY` | required | |
-| `PORT` | 8080 | |
-| `AMPERO_USB_TIMEOUT_MS` | 1000 | per transfer |
-| `AMPERO_HARD_DEADLINE_S` | 20 | a request longer than this makes the bridge exit and restart |
-| `AMPERO_USB_REATTACH` | unset | `1` gives the interface back to snd-usb-audio after each request |
-| `AMPERO_USB_INTERFACE`, `AMPERO_USB_MODE` | auto | only after checking `/api/usb` |
+| `API_KEY` | required | the key clients send in `X-Api-Key` |
+| `PORT` | 8080 | port inside the container |
+
+More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.
 
 ## Develop
 
@@ -191,7 +161,7 @@ captured from the editor and the pedal.
 
 * `docs/protocol.md`: the USB and SysEx protocol, record layout, order of a preset write
 * `docs/models.md`: model numbers checked on a real pedal
-* `docs/usb-lockups.md`: why the first version locked up and what stops it now
+* `docs/usb-lockups.md`: USB stability notes and the less common settings
 
 Credits: the Ampero II Stage work by jpfaria (github.com/jpfaria/hotone-ampero-2)
 started this, but the Mini uses a different header, so none of its frames are used here.
