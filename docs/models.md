@@ -29,7 +29,7 @@ FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1
 
 ## FX2 code list (from a listen-only scroll, 60 models)
 
-Names are from the manual where the parameter count and order match; `?` means not named yet. Only the rows above were checked on the pedal.
+Names follow the editor's FX1 list order (see the FX1 list below): screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60. Codes and parameter counts come from a scroll of the pedal. Names are matched by that order and by parameter counts (for example screens 17 to 23 have 2, 7, 4, 4, 3, 1 and 2 parameters, as the manual gives Comprosso to Fast Gate). Only the rows in the proven table above were read back on the pedal, so treat the rest as likely, not proven.
 
 | Screen | Code | Params (defaults) | Name |
 | --- | --- | --- | --- |
@@ -40,59 +40,59 @@ Names are from the manual where the parameter count and order match; `?` means n
 | 5 | 4 | 3 | Big Pie |
 | 6 | 5 | 2 | Face Fuzz |
 | 7 | 6 | 2 | Bend Fuzz |
-| 8 | 7 | 3 | ? (Black-Rat-style distortion) |
+| 8 | 7 | 3 | Black Tail |
 | 9 | 8 | 3 | Smooth Dist |
 | 10 | 9 | 5 | Governor |
 | 11 | 10 | 3 | Crunchist |
 | 12 | 11 | 5 | Bass Crusher |
-| 13 | 12 | 5 | ? |
-| 14 | 13 | 5 | ? |
-| 15 | 14 | 3 | ? |
-| 16 | 15 | 3 | ? |
-| 17 | 48 | 2 | ? |
-| 18 | 49 | 7 | ? |
-| 19 | 50 | 4 | ? |
-| 20 | 51 | 4 | ? |
-| 21 | 52 | 3 | ? |
-| 22 | 53 | 1 | ? |
-| 23 | 54 | 2 | ? |
-| 24 | 80 | 4 | ? |
-| 25 | 81 | 5 | ? |
-| 26 | 82 | 7 | ? |
-| 27 | 83 | 3 | ? |
-| 28 | 84 | 3 | ? |
-| 29 | 85 | 3 | ? |
-| 30 | 86 | 3 | ? |
-| 31 | 87 | 5 | ? |
-| 32 | 88 | 2 | ? |
+| 13 | 12 | 5 | Solid Steel |
+| 14 | 13 | 5 | Magic T |
+| 15 | 14 | 3 | Blues Butter |
+| 16 | 15 | 3 | Dr. Blues |
+| 17 | 48 | 2 | Comprosso |
+| 18 | 49 | 7 | Squeezer |
+| 19 | 50 | 4 | Affinity Boost |
+| 20 | 51 | 4 | FET Boost |
+| 21 | 52 | 3 | Enhancer |
+| 22 | 53 | 1 | Smart Gate |
+| 23 | 54 | 2 | Fast Gate |
+| 24 | 80 | 4 | AC Sim |
+| 25 | 81 | 5 | Toucher |
+| 26 | 82 | 7 | Crier |
+| 27 | 83 | 3 | Voxy Wah |
+| 28 | 84 | 3 | Cry Wah |
+| 29 | 85 | 3 | Bass Press |
+| 30 | 86 | 3 | Clean Octa |
+| 31 | 87 | 5 | Harmony |
+| 32 | 88 | 2 | Telephone Line |
 | 33 | 89 | 4 | Satisfaction |
-| 34 | 90 | 6 | ? |
+| 34 | 90 | 6 | Path Filter |
 | 35 | 91 | 5 | Bit Krusher |
-| 36 | 92 | 4 | ? |
-| 37 | 93 | 4 | ? |
+| 36 | 92 | 4 | Ring Mod |
+| 37 | 93 | 4 | Classic PS |
 | 38 | 112 | 4 | Aozora Chorus |
 | 39 | 113 | 4 | Grand Choruium |
 | 40 | 114 | 1 | Liquid C |
 | 41 | 115 | 4 | Choruium B |
-| 42 | 116 | 3 | ? |
-| 43 | 117 | 5 | ? |
-| 44 | 118 | 5 | ? |
-| 45 | 119 | 3 | ? |
-| 46 | 120 | 4 | ? |
-| 47 | 121 | 2 | ? |
-| 48 | 122 | 3 | ? |
-| 49 | 123 | 5 | ? |
-| 50 | 124 | 3 | ? |
-| 51 | 125 | 7 | ? |
-| 52 | 126 | 2 | ? |
-| 53 | 127 | 3 | ? |
-| 54 | 128 | 4 | ? |
-| 55 | 129 | 5 | ? |
-| 56 | 130 | 5 | ? |
-| 57 | 131 | 5 | ? |
-| 58 | 132 | 5 | ? |
-| 59 | 133 | 5 | ? |
-| 60 | 134 | 5 | ? |
+| 42 | 116 | 3 | Detune |
+| 43 | 117 | 5 | Jetter |
+| 44 | 118 | 5 | Jetter B |
+| 45 | 119 | 3 | Pulser |
+| 46 | 120 | 4 | Grand Vibrato |
+| 47 | 121 | 2 | 90 Phaser |
+| 48 | 122 | 3 | Green Phaser |
+| 49 | 123 | 5 | Revolver |
+| 50 | 124 | 3 | Helicopter |
+| 51 | 125 | 7 | Custom Trem |
+| 52 | 126 | 2 | Sweller |
+| 53 | 127 | 3 | Gated Boost |
+| 54 | 128 | 4 | Pitch Shift |
+| 55 | 129 | 5 | Precise Attack |
+| 56 | 130 | 5 | Sound Clone 1 |
+| 57 | 131 | 5 | Sound Clone 2 |
+| 58 | 132 | 5 | Sound Clone 3 |
+| 59 | 133 | 5 | Sound Clone 4 |
+| 60 | 134 | 5 | Sound Clone 5 |
 
 ## FX3 list (screen number, code, name)
 
@@ -332,9 +332,7 @@ These models share one list, but each block stores its own codes, and each shows
 
 FX3 is in the table above (screens 1 to 29). Its screens 1 to 17 are IDs 38 to 54 in order (code = ID - 38), then IDs 9, 10, 11, 12, 17, 18, 20, 21, 16, 22, 23 and 24 as screens 18 to 29 (codes 64 to 75).
 
-FX2 (60 screens): screens 1 to 13 are IDs 25 to 37 (code = ID - 25; Green Drive, Big Pie, Black Tail and Governor read back). Screens 38 to 54 are IDs 38 to 54 (code = ID + 74; screens 38 to 41 match by name only). The other 30 screens (14 to 37 and 55 to 60) are not matched to names yet: the list has 24 models (IDs 1 to 24) that fit screens 14 to 37, but their order on the pedal is not the ID order (Satisfaction is screen 33, Bit Krusher screen 35).
-
-FX1: only 90 Phaser (ID 50) is known: screen 47, code 137. The codes are not the FX2 ones.
+FX2 and FX1 are in their own tables (FX2 above, FX1 below). Both have 60 models.
 
 | ID | Name | Group |
 | --- | --- | --- |
@@ -392,3 +390,70 @@ FX1: only 90 Phaser (ID 50) is known: screen 47, code 137. The codes are not the
 | 52 | Revolver | Uni-Vibe |
 | 53 | Helicopter | Tremolo |
 | 54 | Custom Trem | Tremolo |
+
+## FX1 list (screen order)
+
+From the editor software's list, read off screenshots; 60 models, which matches the count the pedal shows. The codes are not known yet except for one: 90 Phaser (screen 47) reads as code 137. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
+
+| Screen | Name |
+| --- | --- |
+| 1 | Comprosso |
+| 2 | Squeezer |
+| 3 | Affinity Boost |
+| 4 | FET Boost |
+| 5 | Enhancer |
+| 6 | Smart Gate |
+| 7 | Fast Gate |
+| 8 | AC Sim |
+| 9 | Toucher |
+| 10 | Crier |
+| 11 | Voxy Wah |
+| 12 | Cry Wah |
+| 13 | Bass Press |
+| 14 | Clean Octa |
+| 15 | Harmony |
+| 16 | Telephone Line |
+| 17 | Satisfaction |
+| 18 | Path Filter |
+| 19 | Bit Krusher |
+| 20 | Ring Mod |
+| 21 | Classic PS |
+| 22 | Green Drive |
+| 23 | Super Drive |
+| 24 | Screamood |
+| 25 | Zen Garden |
+| 26 | Big Pie |
+| 27 | Face Fuzz |
+| 28 | Bend Fuzz |
+| 29 | Black Tail |
+| 30 | Smooth Dist |
+| 31 | Governor |
+| 32 | Crunchist |
+| 33 | Bass Crusher |
+| 34 | Solid Steel |
+| 35 | Magic T |
+| 36 | Blues Butter |
+| 37 | Dr. Blues |
+| 38 | Aozora Chorus |
+| 39 | Grand Choruium |
+| 40 | Liquid C |
+| 41 | Choruium B |
+| 42 | Detune |
+| 43 | Jetter |
+| 44 | Jetter B |
+| 45 | Pulser |
+| 46 | Grand Vibrato |
+| 47 | 90 Phaser |
+| 48 | Green Phaser |
+| 49 | Revolver |
+| 50 | Helicopter |
+| 51 | Custom Trem |
+| 52 | Sweller |
+| 53 | Gated Boost |
+| 54 | Pitch Shift |
+| 55 | Precise Attack |
+| 56 | Sound Clone 1 |
+| 57 | Sound Clone 2 |
+| 58 | Sound Clone 3 |
+| 59 | Sound Clone 4 |
+| 60 | Sound Clone 5 |
