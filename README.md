@@ -153,9 +153,18 @@ when it deploys. Do not paste the key into the compose file.
 The port speaks plain HTTP, so put TLS in front of it. On a Synology NAS: Control
 Panel, Login Portal, Advanced, Reverse Proxy, Create. Source: HTTPS, your
 hostname, port 443. Destination: HTTP, the IP of the computer running the
-container, port 28551. Add a certificate for the hostname under Security,
-Certificate. Then limit port 28551 on the container host to the NAS's address with
-a firewall rule, so only the proxy can reach it.
+container, port 28551. Add a certificate for the hostname under Security, Certificate.
+
+That is the whole setup. Without any firewall rule, this is what you have: the
+container's port is open on the computer's LAN address (plain HTTP), the proxy is
+the only thing meant to talk to it, and every `/api` call still needs the key. A
+wrong or missing key gets a 401 and changes nothing. Keep the key long and
+random, and do not forward port 28551 on your router.
+
+Optional hardening: if you do run a firewall on the container host, limit port
+28551 to the proxy's address. Docker's published ports skip the usual `ufw`
+rules, so the rule has to go in the `DOCKER-USER` chain. Skip this if you do not
+use firewall rules; the key is what protects the API.
 
 ## Using it with your AI agent
 
