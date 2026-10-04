@@ -14,7 +14,7 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   GET  /api/patch/<index>          same, but 409 unless <index> is the selected patch
   POST /api/patch/select           {"index": 75}            Program Change
   POST /api/block                  {"block": "rvb", "on": true}
-  POST /api/midi/cc                {"cc": 22}   one Control Change, only CC 22-25 (arrow buttons, untested)
+  POST /api/midi/cc                {"cc": 22}   one Control Change, any CC 0-127 (22-25 = patch navigation)
   POST /api/model                  {"slot": "eq", "code": 4}
   POST /api/param                  {"slot": "eq", "model_code": 4, "param": 3, "value": 30}
   POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
@@ -368,7 +368,7 @@ def handle_post(path: str, data: dict) -> dict:
     if path == "/api/midi/cc":
         cc = _int(data, "cc")
         value = _int(data, "value") if "value" in data else 127
-        send_midi(am.scroll_cc(cc, value), f"cc {cc}")
+        send_midi(am.raw_cc(cc, value), f"cc {cc}")
         return {"ok": True, "cc": cc, "value": value,
                 "note": "no reply exists; read /api/history to see what the pedal did"}
     if path == "/api/model":
@@ -416,7 +416,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.6.0"
+    server_version = "ampero-bridge/2.7.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):

@@ -37,8 +37,8 @@ CC_ALL_OFF_UNPROVEN = 78
 # From the TouchOSC-Hotone-Ampero-template repo (no license, Feb 2024, model not
 # stated): its FX1/FX2/EQ/FX3/DLY buttons use 48/49/53/54/55, which matches the
 # map above. It also sends CC 22-25 (arrow buttons, pairing unknown) and CC 72
-# (Tuner, probably). Not tried on this Mini yet.
-CC_TEMPLATE_ARROWS_UNPROVEN = (22, 23, 24, 25)
+# (Tuner, probably). 22-25 are proven patch navigation; 72 is not tried.
+CC_TEMPLATE_ARROWS = (22, 23, 24, 25)
 CC_TEMPLATE_TUNER_UNPROVEN = 72
 
 # EQ slot model codes, in the manual's order, with parameter counts.
@@ -95,14 +95,14 @@ def control_change(cc: int, value: int, channel: int = 0) -> bytes:
     return bytes([0xB0 | channel, _check7(cc, "cc"), _check7(value, "value")])
 
 
-# Control Changes the endpoint /api/midi/cc may send. 22-25 are listed as the arrow
-# buttons in a third-party TouchOSC template; their effect on the Mini is not proven.
-SCROLL_CC = (22, 23, 24, 25)
+# Control Changes the endpoint /api/midi/cc may send: any CC 0-127. Proven on the Mini:
+# 22 bank down, 23 bank up, 24 patch down, 25 patch up (patch navigation). The rest are
+# for exploring what the pedal answers to; always read /api/history after sending.
 
 
-def scroll_cc(cc: int, value: int = 127) -> bytes:
-    if isinstance(cc, bool) or cc not in SCROLL_CC:
-        raise ProtocolError(f"cc {cc!r} is not allowed here; use one of {list(SCROLL_CC)}")
+def raw_cc(cc: int, value: int = 127) -> bytes:
+    if isinstance(cc, bool) or not isinstance(cc, int) or not 0 <= cc <= 127:
+        raise ProtocolError(f"cc {cc!r} is not allowed here; use an integer 0-127")
     return control_change(cc, value)
 
 
