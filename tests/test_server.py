@@ -340,3 +340,23 @@ def test_every_proven_model_code_matches_the_library():
     for slot, codes in server.PROVEN_MODELS.items():
         for c in codes:
             assert (slot, c) in proven, (slot, c)
+
+
+def test_midi_cc_only_the_arrow_ccs(monkeypatch):
+    srv, base = start(monkeypatch)
+    code, out = call(base, "/api/midi/cc", {"cc": 22})
+    assert code == 200 and out["cc"] == 22 and out["value"] == 127
+    assert Fake.sent == [("midi", bytes([0xB0, 22, 127]))]
+    assert call(base, "/api/midi/cc", {"cc": 25, "value": 0})[0] == 200
+    assert Fake.sent[1] == ("midi", bytes([0xB0, 25, 0]))
+    srv.shutdown()
+
+
+def test_midi_cc_refuses_everything_else(monkeypatch):
+    srv, base = start(monkeypatch)
+    for body in ({"cc": 21}, {"cc": 48}, {"cc": 77}, {"cc": 26}, {"cc": True}, {}, {"cc": 22, "value": 200},
+                 {"cc": "x"}, {"cc": 22, "value": -1}):
+        assert call(base, "/api/midi/cc", body)[0] == 400, body
+    assert call(base, "/api/midi/cc", {"cc": 22}, key="wrong")[0] == 401
+    assert Fake.sent == []
+    srv.shutdown()

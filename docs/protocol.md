@@ -59,7 +59,7 @@ navigation, not toggles). Program Change selects a patch, 0 based: PC 75 is P26-
 
 Cross-check: the TouchOSC-Hotone-Ampero-template repo (no license, model not
 stated) uses 48/49/53/54/55 for FX1/FX2/EQ/FX3/DLY, same as above, plus
-CC 22-25 (arrow buttons) and CC 72 (Tuner, probably). Those are untested here.
+CC 22-25 (arrow buttons) and CC 72 (Tuner, probably). Those are untested here; `POST /api/midi/cc` can send 22 to 25 so they can be tried one at a time.
 CC 77 (lock) and 78 (all effects off) follow Hotone's Ampero II Stage list and
 are not isolated on the Mini.
 

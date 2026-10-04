@@ -412,6 +412,7 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `GET /api/history` | | the last few minutes of the pedal's edit buffer, one entry per change, with the byte offsets that changed. Optional `?since=<epoch seconds>` and `?hex=0` (leave out `record_hex`). Answers from memory, see "Catching a state that went by" |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
+| `POST /api/midi/cc` | `{"cc": 22}` | send one Control Change on channel 1. Only CC 22 to 25 are accepted (optional `value`, 0-127, default 127). A third-party template lists them as the arrow buttons; what they do on the Mini is untested, so check `/api/history` after sending. Not for AI preset building |
 | `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot. Only codes listed in `docs/models.md` as proven are accepted (see Settings) |
 | `POST /api/param` | `{"slot": "rvb", "model_code": 4, "param": 0, "value": 15}` | set one parameter (0-127) |
 | `POST /api/patch/save` | `{"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}` | save to a slot; needs the exact confirm text |

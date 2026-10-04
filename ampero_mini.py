@@ -95,6 +95,17 @@ def control_change(cc: int, value: int, channel: int = 0) -> bytes:
     return bytes([0xB0 | channel, _check7(cc, "cc"), _check7(value, "value")])
 
 
+# Control Changes the endpoint /api/midi/cc may send. 22-25 are listed as the arrow
+# buttons in a third-party TouchOSC template; their effect on the Mini is not proven.
+SCROLL_CC = (22, 23, 24, 25)
+
+
+def scroll_cc(cc: int, value: int = 127) -> bytes:
+    if isinstance(cc, bool) or cc not in SCROLL_CC:
+        raise ProtocolError(f"cc {cc!r} is not allowed here; use one of {list(SCROLL_CC)}")
+    return control_change(cc, value)
+
+
 def block_power(block: str, on: bool) -> bytes:
     if block not in BLOCK_CC:
         raise ProtocolError(f"unknown block {block!r}; use one of {sorted(BLOCK_CC)}")
