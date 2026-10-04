@@ -18,7 +18,7 @@
   "based_on": "real-world equivalent as listed by the manufacturer (null if none listed or unknown)",
   "based_on_status": "listed | none-listed (original model) | unknown (not in the manufacturer's list)",
   "renamed": "note where the editor's name differs from the manufacturer's list",
-  "notes": "AMP only. tone, known_for and tip are written by the project in its own words about the real-world amp; null where the amp is not confidently identified. General background, not measurements."
+  "notes": "tone, known_for and tip are written by the project in its own words about the real-world gear. Present only where the equivalent is confidently identified (null otherwise). Cab notes are general: size, speaker and typical use. General background, not measurements."
  },
  "notes": [
   "FX1, FX2 and FX3 share many names but store different codes. Always use the code for the slot you are writing.",
@@ -50,7 +50,12 @@
      "based_on": "Ross Compressor",
      "based_on_status": "listed",
      "id": 1,
-     "category": "Dynamic"
+     "category": "Dynamic",
+     "notes": {
+      "tone": "Squishy, smooth compression that evens out your picking and adds sustain.",
+      "known_for": "Country chicken picking, funk and clean rhythm parts.",
+      "tip": "Keep the level matched so it does not just get louder. Best in front of the amp."
+     }
     },
     {
      "screen": 2,
@@ -61,7 +66,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 2,
-     "category": "Dynamic"
+     "category": "Dynamic",
+     "notes": null
     },
     {
      "screen": 3,
@@ -72,7 +78,12 @@
      "based_on": "Xotic AC Booster",
      "based_on_status": "listed",
      "id": 3,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": {
+      "tone": "A clean boost with a little chime, in the style of a Vox-type amp boost.",
+      "known_for": "Adding sparkle and push to an amp that is already near breakup.",
+      "tip": "Put it first in the chain. Leave it on for a gentle lift."
+     }
     },
     {
      "screen": 4,
@@ -83,7 +94,12 @@
      "based_on": "legendary green clip-on FET Preamp",
      "based_on_status": "listed",
      "id": 4,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": {
+      "tone": "Clean, transparent lift with a touch of thickness.",
+      "known_for": "Level boosts for solos.",
+      "tip": "Use before the amp, and match the level."
+     }
     },
     {
      "screen": 5,
@@ -94,7 +110,12 @@
      "based_on": "Xotic EP Booster",
      "based_on_status": "listed",
      "id": 5,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": {
+      "tone": "Warm, full boost that thickens the tone without much grit.",
+      "known_for": "An always-on tone sweetener in the style of a classic tape-echo preamp.",
+      "tip": "Use it low for a bit of body, higher to push an amp."
+     }
     },
     {
      "screen": 6,
@@ -105,7 +126,12 @@
      "based_on": "ISP Decimator noise gate",
      "based_on_status": "listed",
      "id": 7,
-     "category": "Gate"
+     "category": "Gate",
+     "notes": {
+      "tone": "A tight noise gate that cuts hiss between notes.",
+      "known_for": "High-gain playing, where noise and hum show up.",
+      "tip": "Set the threshold just above the noise. Too high clips note tails."
+     }
     },
     {
      "screen": 7,
@@ -116,7 +142,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 8,
-     "category": "Gate"
+     "category": "Gate",
+     "notes": null
     },
     {
      "screen": 8,
@@ -127,7 +154,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 10,
-     "category": "Acoustic"
+     "category": "Acoustic",
+     "notes": null
     },
     {
      "screen": 9,
@@ -138,7 +166,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 11,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 10,
@@ -149,7 +178,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 12,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 11,
@@ -160,7 +190,12 @@
      "based_on": "VOX V846 wah",
      "based_on_status": "listed",
      "id": 13,
-     "category": "Wah"
+     "category": "Wah",
+     "notes": {
+      "tone": "A vocal, sweeping wah in the style of the classic Vox wah.",
+      "known_for": "1960s and 70s rock and funk wah.",
+      "tip": "Place before drive pedals for the classic sound."
+     }
     },
     {
      "screen": 12,
@@ -171,7 +206,12 @@
      "based_on": "Dunlop CryBaby wah",
      "based_on_status": "listed",
      "id": 14,
-     "category": "Wah"
+     "category": "Wah",
+     "notes": {
+      "tone": "A familiar, slightly nasal wah sweep in the style of the Cry Baby.",
+      "known_for": "Classic rock, blues and funk wah.",
+      "tip": "Place before drive pedals for the classic sound."
+     }
     },
     {
      "screen": 13,
@@ -182,7 +222,8 @@
      "based_on": "Hotone Bass Press (WAH mode)",
      "based_on_status": "listed",
      "id": 15,
-     "category": "Wah"
+     "category": "Wah",
+     "notes": null
     },
     {
      "screen": 14,
@@ -193,7 +234,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 17,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 15,
@@ -204,7 +246,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 18,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 16,
@@ -215,7 +258,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 20,
-     "category": "Lo-Fi"
+     "category": "Lo-Fi",
+     "notes": null
     },
     {
      "screen": 17,
@@ -226,7 +270,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 21,
-     "category": "Saturation"
+     "category": "Saturation",
+     "notes": null
     },
     {
      "screen": 18,
@@ -237,7 +282,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 16,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 19,
@@ -248,7 +294,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 22,
-     "category": "Bit Crusher"
+     "category": "Bit Crusher",
+     "notes": null
     },
     {
      "screen": 20,
@@ -259,7 +306,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 23,
-     "category": "Ring Mod"
+     "category": "Ring Mod",
+     "notes": null
     },
     {
      "screen": 21,
@@ -270,7 +318,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 22,
@@ -281,7 +330,12 @@
      "based_on": "Ibanez TS-808 Tube Screamer",
      "based_on_status": "listed",
      "id": 25,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": {
+      "tone": "Mid-forward overdrive that tightens the low end and pushes an amp.",
+      "known_for": "Blues and rock. Stevie Ray Vaughan is the classic user of this style of pedal.",
+      "tip": "Low gain and a high level works best as an amp booster."
+     }
     },
     {
      "screen": 23,
@@ -292,7 +346,12 @@
      "based_on": "legendary 3-knob yellow overdrive (SD-1)",
      "based_on_status": "listed",
      "id": 26,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": {
+      "tone": "Raw, slightly asymmetric yellow overdrive with a gritty mid push.",
+      "known_for": "Rock and blues rhythm and lead.",
+      "tip": "Works well as a booster into a cranked amp."
+     }
     },
     {
      "screen": 24,
@@ -303,7 +362,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 27,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": null
     },
     {
      "screen": 25,
@@ -314,7 +374,12 @@
      "based_on": "Hermida Zendrive",
      "based_on_status": "listed",
      "id": 28,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": {
+      "tone": "Touch-sensitive, amp-like overdrive with rich mids.",
+      "known_for": "Blues and rock, from light crunch to singing lead.",
+      "tip": "Responds well to guitar volume and pick attack."
+     }
     },
     {
      "screen": 26,
@@ -325,7 +390,12 @@
      "based_on": "Electro-Harmonix Big Muff Pi",
      "based_on_status": "listed",
      "id": 29,
-     "category": "Fuzz/Dist"
+     "category": "Fuzz/Dist",
+     "notes": {
+      "tone": "Thick, creamy, sustaining fuzz with a lot of saturation.",
+      "known_for": "Rock, shoegaze and grunge. David Gilmour and the Smashing Pumpkins are the usual references.",
+      "tip": "Play fewer notes and keep chords simple; it gets muddy with big chords."
+     }
     },
     {
      "screen": 27,
@@ -336,7 +406,12 @@
      "based_on": "Dallas-Arbiter Fuzz Face",
      "based_on_status": "listed",
      "id": 30,
-     "category": "Fuzz/Dist"
+     "category": "Fuzz/Dist",
+     "notes": {
+      "tone": "Warm, vintage-style fuzz that cleans up when you roll the guitar volume down.",
+      "known_for": "60s rock. Jimi Hendrix is the classic user.",
+      "tip": "Put it first in the chain for the best response."
+     }
     },
     {
      "screen": 28,
@@ -347,7 +422,12 @@
      "based_on": "Sola Sound Tone Bender MkII",
      "based_on_status": "listed",
      "id": 31,
-     "category": "Fuzz/Dist"
+     "category": "Fuzz/Dist",
+     "notes": {
+      "tone": "Raspy, sputtery 1960s British-style fuzz with a bit of gating.",
+      "known_for": "Vintage rock and psychedelic tones.",
+      "tip": "Best used at moderate settings, with single coils."
+     }
     },
     {
      "screen": 29,
@@ -358,7 +438,12 @@
      "based_on": "ProCo The Rat (LM308)",
      "based_on_status": "listed",
      "id": 32,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "Gritty, tight distortion with bite.",
+      "known_for": "Punk, alt rock and hard rock.",
+      "tip": "Good with humbuckers. Roll the tone back if it sounds harsh."
+     }
     },
     {
      "screen": 30,
@@ -369,7 +454,12 @@
      "based_on": "3-knob orange distortion late 1970s (DS-1)",
      "based_on_status": "listed",
      "id": 33,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "Bright, edgy distortion with a lot of upper mids.",
+      "known_for": "80s and 90s rock and alt rock.",
+      "tip": "Mix with a clean tone for clarity. Try with a darker amp."
+     }
     },
     {
      "screen": 31,
@@ -380,7 +470,12 @@
      "based_on": "Marshall Guv'Nor",
      "based_on_status": "listed",
      "id": 34,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "British crunch in a box, like a Marshall-style stack at a lower volume.",
+      "known_for": "Classic rock and hard rock.",
+      "tip": "Use it before a clean amp for crunch."
+     }
     },
     {
      "screen": 32,
@@ -391,7 +486,12 @@
      "based_on": "MI Audio Crunch Box - UK high gain stack",
      "based_on_status": "listed",
      "id": 35,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "Hot-rodded British crunch with a thick, saturated feel.",
+      "known_for": "Hard rock rhythm.",
+      "tip": "Back off the gain for cleaner chords."
+     }
     },
     {
      "screen": 33,
@@ -402,7 +502,8 @@
      "based_on": "yellow bass overdrive pedal",
      "based_on_status": "listed",
      "id": 36,
-     "category": "Bass Drive"
+     "category": "Bass Drive",
+     "notes": null
     },
     {
      "screen": 34,
@@ -413,7 +514,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 37,
-     "category": "Bass Drive"
+     "category": "Bass Drive",
+     "notes": null
     },
     {
      "screen": 35,
@@ -424,7 +526,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 36,
@@ -435,7 +538,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 37,
@@ -446,7 +550,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 38,
@@ -457,7 +562,12 @@
      "based_on": "Arion SCH-1 stereo chorus - 1980s tone",
      "based_on_status": "listed",
      "id": 38,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Warm, gentle chorus with a classic 80s feel.",
+      "known_for": "Clean parts and ballads.",
+      "tip": "Low rate and depth for subtle shimmer."
+     }
     },
     {
      "screen": 39,
@@ -468,7 +578,12 @@
      "based_on": "huge ensemble chorus pedal (chorus mode) - late 1970s",
      "based_on_status": "listed",
      "id": 39,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Lush, wide ensemble chorus.",
+      "known_for": "Clean and ambient parts.",
+      "tip": "Works best with slow, open chords."
+     }
     },
     {
      "screen": 40,
@@ -479,7 +594,12 @@
      "based_on": "legendary 4-button purple stereo chorus",
      "based_on_status": "listed",
      "id": 40,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Deep, wide stereo chorus.",
+      "known_for": "Clean tones and 80s style rhythm parts.",
+      "tip": "Use it after the amp for the best stereo effect."
+     }
     },
     {
      "screen": 41,
@@ -490,7 +610,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 41,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": null
     },
     {
      "screen": 42,
@@ -501,7 +622,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 42,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": null
     },
     {
      "screen": 43,
@@ -512,7 +634,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 43,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 44,
@@ -523,7 +646,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 44,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 45,
@@ -534,7 +658,12 @@
      "based_on": "BBD blue vibrato pedal",
      "based_on_status": "listed",
      "id": 47,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": {
+      "tone": "Pitch vibrato with a seasick wobble.",
+      "known_for": "Vintage and surf-style effects.",
+      "tip": "Keep depth low for a natural vibrato."
+     }
     },
     {
      "screen": 46,
@@ -545,7 +674,12 @@
      "based_on": "huge ensemble chorus pedal (vibrato mode)",
      "based_on_status": "listed",
      "id": 48,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": {
+      "tone": "Pitch wobble with the width of an ensemble effect.",
+      "known_for": "Ambient and vintage parts.",
+      "tip": "Use for a more watery sound."
+     }
     },
     {
      "screen": 47,
@@ -556,7 +690,12 @@
      "based_on": "MXR M101 Phase 90",
      "based_on_status": "listed",
      "id": 50,
-     "category": "Phaser"
+     "category": "Phaser",
+     "notes": {
+      "tone": "Smooth, classic swooshing phaser.",
+      "known_for": "70s rock. Eddie Van Halen's early tone is the typical reference.",
+      "tip": "Use before drive for a classic sound, after it for a sweeping effect."
+     }
     },
     {
      "screen": 48,
@@ -567,7 +706,12 @@
      "based_on": "legendary 2-knob green phaser",
      "based_on_status": "listed",
      "id": 51,
-     "category": "Phaser"
+     "category": "Phaser",
+     "notes": {
+      "tone": "A simple, easy-to-use phaser with a classic sweep.",
+      "known_for": "Rock and funk parts.",
+      "tip": "A fast rate gives a watery effect, slow gives a sweep."
+     }
     },
     {
      "screen": 49,
@@ -578,7 +722,12 @@
      "based_on": "Shin-ei Uni-Vibe",
      "based_on_status": "listed",
      "id": 52,
-     "category": "Uni-Vibe"
+     "category": "Uni-Vibe",
+     "notes": {
+      "tone": "Swirling, throbbing vibe in the style of the vintage Uni-Vibe.",
+      "known_for": "Psychedelic rock and blues. Jimi Hendrix and David Gilmour used this type of effect.",
+      "tip": "Works best before a dirty amp. Try slow speeds first."
+     }
     },
     {
      "screen": 50,
@@ -589,7 +738,12 @@
      "based_on": "Demeter TRM-1 Tremulator - opto tremolo",
      "based_on_status": "listed",
      "id": 53,
-     "category": "Tremolo"
+     "category": "Tremolo",
+     "notes": {
+      "tone": "Smooth, throbbing optical tremolo.",
+      "known_for": "Surf, blues and spaghetti-western sounds.",
+      "tip": "Slow settings with a clean amp sound great."
+     }
     },
     {
      "screen": 51,
@@ -600,7 +754,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 54,
-     "category": "Tremolo"
+     "category": "Tremolo",
+     "notes": null
     },
     {
      "screen": 52,
@@ -611,7 +766,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 24,
-     "category": "Swell"
+     "category": "Swell",
+     "notes": null
     },
     {
      "screen": 53,
@@ -622,7 +778,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 6,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": null
     },
     {
      "screen": 54,
@@ -633,7 +790,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 19,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 55,
@@ -644,7 +802,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 56,
@@ -655,7 +814,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 57,
@@ -666,7 +826,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 58,
@@ -677,7 +838,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 59,
@@ -688,7 +850,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 60,
@@ -699,7 +862,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   },
@@ -717,7 +881,12 @@
      "based_on": "Ibanez TS-808 Tube Screamer",
      "based_on_status": "listed",
      "id": 25,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": {
+      "tone": "Mid-forward overdrive that tightens the low end and pushes an amp.",
+      "known_for": "Blues and rock. Stevie Ray Vaughan is the classic user of this style of pedal.",
+      "tip": "Low gain and a high level works best as an amp booster."
+     }
     },
     {
      "screen": 2,
@@ -728,7 +897,12 @@
      "based_on": "legendary 3-knob yellow overdrive (SD-1)",
      "based_on_status": "listed",
      "id": 26,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": {
+      "tone": "Raw, slightly asymmetric yellow overdrive with a gritty mid push.",
+      "known_for": "Rock and blues rhythm and lead.",
+      "tip": "Works well as a booster into a cranked amp."
+     }
     },
     {
      "screen": 3,
@@ -739,7 +913,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 27,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": null
     },
     {
      "screen": 4,
@@ -750,7 +925,12 @@
      "based_on": "Hermida Zendrive",
      "based_on_status": "listed",
      "id": 28,
-     "category": "Overdrive"
+     "category": "Overdrive",
+     "notes": {
+      "tone": "Touch-sensitive, amp-like overdrive with rich mids.",
+      "known_for": "Blues and rock, from light crunch to singing lead.",
+      "tip": "Responds well to guitar volume and pick attack."
+     }
     },
     {
      "screen": 5,
@@ -761,7 +941,12 @@
      "based_on": "Electro-Harmonix Big Muff Pi",
      "based_on_status": "listed",
      "id": 29,
-     "category": "Fuzz/Dist"
+     "category": "Fuzz/Dist",
+     "notes": {
+      "tone": "Thick, creamy, sustaining fuzz with a lot of saturation.",
+      "known_for": "Rock, shoegaze and grunge. David Gilmour and the Smashing Pumpkins are the usual references.",
+      "tip": "Play fewer notes and keep chords simple; it gets muddy with big chords."
+     }
     },
     {
      "screen": 6,
@@ -772,7 +957,12 @@
      "based_on": "Dallas-Arbiter Fuzz Face",
      "based_on_status": "listed",
      "id": 30,
-     "category": "Fuzz/Dist"
+     "category": "Fuzz/Dist",
+     "notes": {
+      "tone": "Warm, vintage-style fuzz that cleans up when you roll the guitar volume down.",
+      "known_for": "60s rock. Jimi Hendrix is the classic user.",
+      "tip": "Put it first in the chain for the best response."
+     }
     },
     {
      "screen": 7,
@@ -783,7 +973,12 @@
      "based_on": "Sola Sound Tone Bender MkII",
      "based_on_status": "listed",
      "id": 31,
-     "category": "Fuzz/Dist"
+     "category": "Fuzz/Dist",
+     "notes": {
+      "tone": "Raspy, sputtery 1960s British-style fuzz with a bit of gating.",
+      "known_for": "Vintage rock and psychedelic tones.",
+      "tip": "Best used at moderate settings, with single coils."
+     }
     },
     {
      "screen": 8,
@@ -794,7 +989,12 @@
      "based_on": "ProCo The Rat (LM308)",
      "based_on_status": "listed",
      "id": 32,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "Gritty, tight distortion with bite.",
+      "known_for": "Punk, alt rock and hard rock.",
+      "tip": "Good with humbuckers. Roll the tone back if it sounds harsh."
+     }
     },
     {
      "screen": 9,
@@ -805,7 +1005,12 @@
      "based_on": "3-knob orange distortion late 1970s (DS-1)",
      "based_on_status": "listed",
      "id": 33,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "Bright, edgy distortion with a lot of upper mids.",
+      "known_for": "80s and 90s rock and alt rock.",
+      "tip": "Mix with a clean tone for clarity. Try with a darker amp."
+     }
     },
     {
      "screen": 10,
@@ -816,7 +1021,12 @@
      "based_on": "Marshall Guv'Nor",
      "based_on_status": "listed",
      "id": 34,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "British crunch in a box, like a Marshall-style stack at a lower volume.",
+      "known_for": "Classic rock and hard rock.",
+      "tip": "Use it before a clean amp for crunch."
+     }
     },
     {
      "screen": 11,
@@ -827,7 +1037,12 @@
      "based_on": "MI Audio Crunch Box - UK high gain stack",
      "based_on_status": "listed",
      "id": 35,
-     "category": "Distortion"
+     "category": "Distortion",
+     "notes": {
+      "tone": "Hot-rodded British crunch with a thick, saturated feel.",
+      "known_for": "Hard rock rhythm.",
+      "tip": "Back off the gain for cleaner chords."
+     }
     },
     {
      "screen": 12,
@@ -838,7 +1053,8 @@
      "based_on": "yellow bass overdrive pedal",
      "based_on_status": "listed",
      "id": 36,
-     "category": "Bass Drive"
+     "category": "Bass Drive",
+     "notes": null
     },
     {
      "screen": 13,
@@ -849,7 +1065,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 37,
-     "category": "Bass Drive"
+     "category": "Bass Drive",
+     "notes": null
     },
     {
      "screen": 14,
@@ -860,7 +1077,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 15,
@@ -871,7 +1089,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 16,
@@ -882,7 +1101,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 17,
@@ -893,7 +1113,12 @@
      "based_on": "Ross Compressor",
      "based_on_status": "listed",
      "id": 1,
-     "category": "Dynamic"
+     "category": "Dynamic",
+     "notes": {
+      "tone": "Squishy, smooth compression that evens out your picking and adds sustain.",
+      "known_for": "Country chicken picking, funk and clean rhythm parts.",
+      "tip": "Keep the level matched so it does not just get louder. Best in front of the amp."
+     }
     },
     {
      "screen": 18,
@@ -904,7 +1129,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 2,
-     "category": "Dynamic"
+     "category": "Dynamic",
+     "notes": null
     },
     {
      "screen": 19,
@@ -915,7 +1141,12 @@
      "based_on": "Xotic AC Booster",
      "based_on_status": "listed",
      "id": 3,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": {
+      "tone": "A clean boost with a little chime, in the style of a Vox-type amp boost.",
+      "known_for": "Adding sparkle and push to an amp that is already near breakup.",
+      "tip": "Put it first in the chain. Leave it on for a gentle lift."
+     }
     },
     {
      "screen": 20,
@@ -926,7 +1157,12 @@
      "based_on": "legendary green clip-on FET Preamp",
      "based_on_status": "listed",
      "id": 4,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": {
+      "tone": "Clean, transparent lift with a touch of thickness.",
+      "known_for": "Level boosts for solos.",
+      "tip": "Use before the amp, and match the level."
+     }
     },
     {
      "screen": 21,
@@ -937,7 +1173,12 @@
      "based_on": "Xotic EP Booster",
      "based_on_status": "listed",
      "id": 5,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": {
+      "tone": "Warm, full boost that thickens the tone without much grit.",
+      "known_for": "An always-on tone sweetener in the style of a classic tape-echo preamp.",
+      "tip": "Use it low for a bit of body, higher to push an amp."
+     }
     },
     {
      "screen": 22,
@@ -948,7 +1189,12 @@
      "based_on": "ISP Decimator noise gate",
      "based_on_status": "listed",
      "id": 7,
-     "category": "Gate"
+     "category": "Gate",
+     "notes": {
+      "tone": "A tight noise gate that cuts hiss between notes.",
+      "known_for": "High-gain playing, where noise and hum show up.",
+      "tip": "Set the threshold just above the noise. Too high clips note tails."
+     }
     },
     {
      "screen": 23,
@@ -959,7 +1205,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 8,
-     "category": "Gate"
+     "category": "Gate",
+     "notes": null
     },
     {
      "screen": 24,
@@ -970,7 +1217,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 10,
-     "category": "Acoustic"
+     "category": "Acoustic",
+     "notes": null
     },
     {
      "screen": 25,
@@ -981,7 +1229,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 11,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 26,
@@ -992,7 +1241,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 12,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 27,
@@ -1003,7 +1253,12 @@
      "based_on": "VOX V846 wah",
      "based_on_status": "listed",
      "id": 13,
-     "category": "Wah"
+     "category": "Wah",
+     "notes": {
+      "tone": "A vocal, sweeping wah in the style of the classic Vox wah.",
+      "known_for": "1960s and 70s rock and funk wah.",
+      "tip": "Place before drive pedals for the classic sound."
+     }
     },
     {
      "screen": 28,
@@ -1014,7 +1269,12 @@
      "based_on": "Dunlop CryBaby wah",
      "based_on_status": "listed",
      "id": 14,
-     "category": "Wah"
+     "category": "Wah",
+     "notes": {
+      "tone": "A familiar, slightly nasal wah sweep in the style of the Cry Baby.",
+      "known_for": "Classic rock, blues and funk wah.",
+      "tip": "Place before drive pedals for the classic sound."
+     }
     },
     {
      "screen": 29,
@@ -1025,7 +1285,8 @@
      "based_on": "Hotone Bass Press (WAH mode)",
      "based_on_status": "listed",
      "id": 15,
-     "category": "Wah"
+     "category": "Wah",
+     "notes": null
     },
     {
      "screen": 30,
@@ -1036,7 +1297,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 17,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 31,
@@ -1047,7 +1309,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 18,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 32,
@@ -1058,7 +1321,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 20,
-     "category": "Lo-Fi"
+     "category": "Lo-Fi",
+     "notes": null
     },
     {
      "screen": 33,
@@ -1069,7 +1333,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 21,
-     "category": "Saturation"
+     "category": "Saturation",
+     "notes": null
     },
     {
      "screen": 34,
@@ -1080,7 +1345,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 16,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 35,
@@ -1091,7 +1357,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 22,
-     "category": "Bit Crusher"
+     "category": "Bit Crusher",
+     "notes": null
     },
     {
      "screen": 36,
@@ -1102,7 +1369,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 23,
-     "category": "Ring Mod"
+     "category": "Ring Mod",
+     "notes": null
     },
     {
      "screen": 37,
@@ -1113,7 +1381,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 38,
@@ -1124,7 +1393,12 @@
      "based_on": "Arion SCH-1 stereo chorus - 1980s tone",
      "based_on_status": "listed",
      "id": 38,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Warm, gentle chorus with a classic 80s feel.",
+      "known_for": "Clean parts and ballads.",
+      "tip": "Low rate and depth for subtle shimmer."
+     }
     },
     {
      "screen": 39,
@@ -1135,7 +1409,12 @@
      "based_on": "huge ensemble chorus pedal (chorus mode) - late 1970s",
      "based_on_status": "listed",
      "id": 39,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Lush, wide ensemble chorus.",
+      "known_for": "Clean and ambient parts.",
+      "tip": "Works best with slow, open chords."
+     }
     },
     {
      "screen": 40,
@@ -1146,7 +1425,12 @@
      "based_on": "legendary 4-button purple stereo chorus",
      "based_on_status": "listed",
      "id": 40,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Deep, wide stereo chorus.",
+      "known_for": "Clean tones and 80s style rhythm parts.",
+      "tip": "Use it after the amp for the best stereo effect."
+     }
     },
     {
      "screen": 41,
@@ -1157,7 +1441,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 41,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": null
     },
     {
      "screen": 42,
@@ -1168,7 +1453,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 42,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": null
     },
     {
      "screen": 43,
@@ -1179,7 +1465,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 43,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 44,
@@ -1190,7 +1477,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 44,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 45,
@@ -1201,7 +1489,12 @@
      "based_on": "BBD blue vibrato pedal",
      "based_on_status": "listed",
      "id": 47,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": {
+      "tone": "Pitch vibrato with a seasick wobble.",
+      "known_for": "Vintage and surf-style effects.",
+      "tip": "Keep depth low for a natural vibrato."
+     }
     },
     {
      "screen": 46,
@@ -1212,7 +1505,12 @@
      "based_on": "huge ensemble chorus pedal (vibrato mode)",
      "based_on_status": "listed",
      "id": 48,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": {
+      "tone": "Pitch wobble with the width of an ensemble effect.",
+      "known_for": "Ambient and vintage parts.",
+      "tip": "Use for a more watery sound."
+     }
     },
     {
      "screen": 47,
@@ -1223,7 +1521,12 @@
      "based_on": "MXR M101 Phase 90",
      "based_on_status": "listed",
      "id": 50,
-     "category": "Phaser"
+     "category": "Phaser",
+     "notes": {
+      "tone": "Smooth, classic swooshing phaser.",
+      "known_for": "70s rock. Eddie Van Halen's early tone is the typical reference.",
+      "tip": "Use before drive for a classic sound, after it for a sweeping effect."
+     }
     },
     {
      "screen": 48,
@@ -1234,7 +1537,12 @@
      "based_on": "legendary 2-knob green phaser",
      "based_on_status": "listed",
      "id": 51,
-     "category": "Phaser"
+     "category": "Phaser",
+     "notes": {
+      "tone": "A simple, easy-to-use phaser with a classic sweep.",
+      "known_for": "Rock and funk parts.",
+      "tip": "A fast rate gives a watery effect, slow gives a sweep."
+     }
     },
     {
      "screen": 49,
@@ -1245,7 +1553,12 @@
      "based_on": "Shin-ei Uni-Vibe",
      "based_on_status": "listed",
      "id": 52,
-     "category": "Uni-Vibe"
+     "category": "Uni-Vibe",
+     "notes": {
+      "tone": "Swirling, throbbing vibe in the style of the vintage Uni-Vibe.",
+      "known_for": "Psychedelic rock and blues. Jimi Hendrix and David Gilmour used this type of effect.",
+      "tip": "Works best before a dirty amp. Try slow speeds first."
+     }
     },
     {
      "screen": 50,
@@ -1256,7 +1569,12 @@
      "based_on": "Demeter TRM-1 Tremulator - opto tremolo",
      "based_on_status": "listed",
      "id": 53,
-     "category": "Tremolo"
+     "category": "Tremolo",
+     "notes": {
+      "tone": "Smooth, throbbing optical tremolo.",
+      "known_for": "Surf, blues and spaghetti-western sounds.",
+      "tip": "Slow settings with a clean amp sound great."
+     }
     },
     {
      "screen": 51,
@@ -1267,7 +1585,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 54,
-     "category": "Tremolo"
+     "category": "Tremolo",
+     "notes": null
     },
     {
      "screen": 52,
@@ -1278,7 +1597,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 24,
-     "category": "Swell"
+     "category": "Swell",
+     "notes": null
     },
     {
      "screen": 53,
@@ -1289,7 +1609,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 6,
-     "category": "Boost"
+     "category": "Boost",
+     "notes": null
     },
     {
      "screen": 54,
@@ -1300,7 +1621,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 19,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 55,
@@ -1311,7 +1633,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 56,
@@ -1322,7 +1645,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 57,
@@ -1333,7 +1657,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 58,
@@ -1344,7 +1669,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 59,
@@ -1355,7 +1681,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 60,
@@ -1366,7 +1693,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   },
@@ -1384,7 +1712,12 @@
      "based_on": "Arion SCH-1 stereo chorus - 1980s tone",
      "based_on_status": "listed",
      "id": 38,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Warm, gentle chorus with a classic 80s feel.",
+      "known_for": "Clean parts and ballads.",
+      "tip": "Low rate and depth for subtle shimmer."
+     }
     },
     {
      "screen": 2,
@@ -1395,7 +1728,12 @@
      "based_on": "huge ensemble chorus pedal (chorus mode) - late 1970s",
      "based_on_status": "listed",
      "id": 39,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Lush, wide ensemble chorus.",
+      "known_for": "Clean and ambient parts.",
+      "tip": "Works best with slow, open chords."
+     }
     },
     {
      "screen": 3,
@@ -1406,7 +1744,12 @@
      "based_on": "legendary 4-button purple stereo chorus",
      "based_on_status": "listed",
      "id": 40,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": {
+      "tone": "Deep, wide stereo chorus.",
+      "known_for": "Clean tones and 80s style rhythm parts.",
+      "tip": "Use it after the amp for the best stereo effect."
+     }
     },
     {
      "screen": 4,
@@ -1417,7 +1760,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 41,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": null
     },
     {
      "screen": 5,
@@ -1428,7 +1772,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 42,
-     "category": "Chorus"
+     "category": "Chorus",
+     "notes": null
     },
     {
      "screen": 6,
@@ -1439,7 +1784,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 43,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 7,
@@ -1450,7 +1796,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 44,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 8,
@@ -1461,7 +1808,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 45,
-     "category": "Flanger"
+     "category": "Flanger",
+     "notes": null
     },
     {
      "screen": 9,
@@ -1472,7 +1820,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 46,
-     "category": "Flanger/Trem"
+     "category": "Flanger/Trem",
+     "notes": null
     },
     {
      "screen": 10,
@@ -1483,7 +1832,12 @@
      "based_on": "BBD blue vibrato pedal",
      "based_on_status": "listed",
      "id": 47,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": {
+      "tone": "Pitch vibrato with a seasick wobble.",
+      "known_for": "Vintage and surf-style effects.",
+      "tip": "Keep depth low for a natural vibrato."
+     }
     },
     {
      "screen": 11,
@@ -1494,7 +1848,12 @@
      "based_on": "huge ensemble chorus pedal (vibrato mode)",
      "based_on_status": "listed",
      "id": 48,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": {
+      "tone": "Pitch wobble with the width of an ensemble effect.",
+      "known_for": "Ambient and vintage parts.",
+      "tip": "Use for a more watery sound."
+     }
     },
     {
      "screen": 12,
@@ -1505,7 +1864,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 49,
-     "category": "Vibrato"
+     "category": "Vibrato",
+     "notes": null
     },
     {
      "screen": 13,
@@ -1516,7 +1876,12 @@
      "based_on": "MXR M101 Phase 90",
      "based_on_status": "listed",
      "id": 50,
-     "category": "Phaser"
+     "category": "Phaser",
+     "notes": {
+      "tone": "Smooth, classic swooshing phaser.",
+      "known_for": "70s rock. Eddie Van Halen's early tone is the typical reference.",
+      "tip": "Use before drive for a classic sound, after it for a sweeping effect."
+     }
     },
     {
      "screen": 14,
@@ -1527,7 +1892,12 @@
      "based_on": "legendary 2-knob green phaser",
      "based_on_status": "listed",
      "id": 51,
-     "category": "Phaser"
+     "category": "Phaser",
+     "notes": {
+      "tone": "A simple, easy-to-use phaser with a classic sweep.",
+      "known_for": "Rock and funk parts.",
+      "tip": "A fast rate gives a watery effect, slow gives a sweep."
+     }
     },
     {
      "screen": 15,
@@ -1538,7 +1908,12 @@
      "based_on": "Shin-ei Uni-Vibe",
      "based_on_status": "listed",
      "id": 52,
-     "category": "Uni-Vibe"
+     "category": "Uni-Vibe",
+     "notes": {
+      "tone": "Swirling, throbbing vibe in the style of the vintage Uni-Vibe.",
+      "known_for": "Psychedelic rock and blues. Jimi Hendrix and David Gilmour used this type of effect.",
+      "tip": "Works best before a dirty amp. Try slow speeds first."
+     }
     },
     {
      "screen": 16,
@@ -1549,7 +1924,12 @@
      "based_on": "Demeter TRM-1 Tremulator - opto tremolo",
      "based_on_status": "listed",
      "id": 53,
-     "category": "Tremolo"
+     "category": "Tremolo",
+     "notes": {
+      "tone": "Smooth, throbbing optical tremolo.",
+      "known_for": "Surf, blues and spaghetti-western sounds.",
+      "tip": "Slow settings with a clean amp sound great."
+     }
     },
     {
      "screen": 17,
@@ -1560,7 +1940,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 54,
-     "category": "Tremolo"
+     "category": "Tremolo",
+     "notes": null
     },
     {
      "screen": 18,
@@ -1571,7 +1952,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 9,
-     "category": "Acoustic"
+     "category": "Acoustic",
+     "notes": null
     },
     {
      "screen": 19,
@@ -1582,7 +1964,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 10,
-     "category": "Acoustic"
+     "category": "Acoustic",
+     "notes": null
     },
     {
      "screen": 20,
@@ -1593,7 +1976,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 11,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 21,
@@ -1604,7 +1988,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 12,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 22,
@@ -1615,7 +2000,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 17,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 23,
@@ -1626,7 +2012,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 18,
-     "category": "Octave/Pitch"
+     "category": "Octave/Pitch",
+     "notes": null
     },
     {
      "screen": 24,
@@ -1637,7 +2024,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 20,
-     "category": "Lo-Fi"
+     "category": "Lo-Fi",
+     "notes": null
     },
     {
      "screen": 25,
@@ -1648,7 +2036,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 21,
-     "category": "Saturation"
+     "category": "Saturation",
+     "notes": null
     },
     {
      "screen": 26,
@@ -1659,7 +2048,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 16,
-     "category": "Filter"
+     "category": "Filter",
+     "notes": null
     },
     {
      "screen": 27,
@@ -1670,7 +2060,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 22,
-     "category": "Bit Crusher"
+     "category": "Bit Crusher",
+     "notes": null
     },
     {
      "screen": 28,
@@ -1681,7 +2072,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 23,
-     "category": "Ring Mod"
+     "category": "Ring Mod",
+     "notes": null
     },
     {
      "screen": 29,
@@ -1692,7 +2084,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 24,
-     "category": "Swell"
+     "category": "Swell",
+     "notes": null
     },
     {
      "screen": 30,
@@ -1703,7 +2096,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   },
@@ -2653,7 +3047,12 @@
      "based_on": "ISP Decimator - also in FX1/FX2",
      "based_on_status": "listed",
      "id": 107,
-     "category": "Noise Gate"
+     "category": "Noise Gate",
+     "notes": {
+      "tone": "A tight noise gate that cuts hiss between notes.",
+      "known_for": "High-gain playing, where noise and hum show up.",
+      "tip": "Set the threshold just above the noise. Too high clips note tails."
+     }
     },
     {
      "screen": 2,
@@ -2664,7 +3063,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 108,
-     "category": "Noise Gate"
+     "category": "Noise Gate",
+     "notes": null
     }
    ]
   },
@@ -2682,7 +3082,12 @@
      "based_on": "Supro 1x6 oval speaker",
      "based_on_status": "listed",
      "id": 109,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Small speaker, so the sound is boxy, focused and a little lo-fi with limited low end.",
+      "known_for": "Vintage character, lo-fi blues and garage tones.",
+      "tip": "Good for rhythm or a gritty tone; add low end with the amp EQ."
+     }
     },
     {
      "screen": 2,
@@ -2693,7 +3098,12 @@
      "based_on": "Vintage Fender Champ 1x8",
      "based_on_status": "listed",
      "id": 110,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Small speaker, so the sound is boxy, focused and a little lo-fi with limited low end.",
+      "known_for": "Early rock and roll and recording amps.",
+      "tip": "Works nicely with low-wattage amp models."
+     }
     },
     {
      "screen": 3,
@@ -2704,7 +3114,12 @@
      "based_on": "Vintage Fender Deluxe 1x12",
      "based_on_status": "listed",
      "id": 111,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Focused, open 1x12 sound with a clear top end and a tight low end.",
+      "known_for": "Classic clean and blues tones.",
+      "tip": "A good match for the Fender-style amp models."
+     }
     },
     {
      "screen": 4,
@@ -2715,7 +3130,12 @@
      "based_on": "Vintage Fender Vibrolux 1x12",
      "based_on_status": "listed",
      "id": 112,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Focused, open 1x12 sound with a clear top end and a tight low end.",
+      "known_for": "Classic clean and blues tones.",
+      "tip": "A good match for the Fender-style amp models."
+     }
     },
     {
      "screen": 5,
@@ -2726,7 +3146,12 @@
      "based_on": "Bogner Shiva 1x12",
      "based_on_status": "listed",
      "id": 113,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open, articulate 1x12 sound with a sweet top end.",
+      "known_for": "Boutique clean and crunch tones.",
+      "tip": "Try it with clean to mid-gain amps."
+     }
     },
     {
      "screen": 6,
@@ -2737,7 +3162,12 @@
      "based_on": "Black Cat Hot Cat 1x12",
      "based_on_status": "listed",
      "id": 114,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open, articulate 1x12 sound with a sweet top end.",
+      "known_for": "Boutique clean and crunch tones.",
+      "tip": "Try it with clean to mid-gain amps."
+     }
     },
     {
      "screen": 7,
@@ -2748,7 +3178,12 @@
      "based_on": "Vintage VOX AC15 1x12",
      "based_on_status": "listed",
      "id": 115,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Chimey 1x12 with a lively top end and a little bark.",
+      "known_for": "Jangly clean and light crunch.",
+      "tip": "Pairs naturally with the Vox-style amp models."
+     }
     },
     {
      "screen": 8,
@@ -2759,7 +3194,12 @@
      "based_on": "Fender Tweed Deluxe 1x12",
      "based_on_status": "listed",
      "id": 116,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Focused, open 1x12 sound with a clear top end and a tight low end.",
+      "known_for": "Classic clean and blues tones.",
+      "tip": "A good match for the Fender-style amp models."
+     }
     },
     {
      "screen": 9,
@@ -2770,7 +3210,12 @@
      "based_on": "Morgan AC-20 Deluxe 1x12",
      "based_on_status": "listed",
      "id": 117,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open, articulate 1x12 sound with a sweet top end.",
+      "known_for": "Boutique clean and crunch tones.",
+      "tip": "Try it with clean to mid-gain amps."
+     }
     },
     {
      "screen": 10,
@@ -2781,7 +3226,12 @@
      "based_on": "Marshall 1x12",
      "based_on_status": "listed",
      "id": 118,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Punchy 1x12 with a mid-forward British voice.",
+      "known_for": "British rock rhythm.",
+      "tip": "Good for tight, mid-focused tones at lower volume."
+     }
     },
     {
      "screen": 11,
@@ -2792,7 +3242,12 @@
      "based_on": "Vintage VOX AC30 2x12",
      "based_on_status": "listed",
      "id": 119,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Wide, chimey 2x12 with a punchy, bright voice.",
+      "known_for": "Jangly British-style clean and crunch.",
+      "tip": "Pairs naturally with the matching amp models."
+     }
     },
     {
      "screen": 12,
@@ -2803,7 +3258,12 @@
      "based_on": "Matchless Chieftain 2x12",
      "based_on_status": "listed",
      "id": 120,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Wide, chimey 2x12 with a punchy, bright voice.",
+      "known_for": "Jangly British-style clean and crunch.",
+      "tip": "Pairs naturally with the matching amp models."
+     }
     },
     {
      "screen": 13,
@@ -2814,7 +3274,12 @@
      "based_on": "Jazz Chorus 2x12",
      "based_on_status": "listed",
      "id": 121,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Clear, hi-fi 2x12 with a smooth top end.",
+      "known_for": "Clean, chorus-heavy sounds.",
+      "tip": "Brings out the clarity in clean amp models."
+     }
     },
     {
      "screen": 14,
@@ -2825,7 +3290,12 @@
      "based_on": "Vintage Fender '65 Twin Reverb 2x12",
      "based_on_status": "listed",
      "id": 122,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big, sparkly 2x12 with a lot of headroom.",
+      "known_for": "Clean tones in country, jazz and surf.",
+      "tip": "The classic partner for the Twin-style amp model."
+     }
     },
     {
      "screen": 15,
@@ -2836,7 +3306,12 @@
      "based_on": "Custom Fender Tweed 2x10",
      "based_on_status": "listed",
      "id": 123,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open 2x12 or 2x10 sound with a full midrange and a balanced top end.",
+      "known_for": "Clean to crunch tones.",
+      "tip": "A good all-round pick for combos."
+     }
     },
     {
      "screen": 16,
@@ -2847,7 +3322,12 @@
      "based_on": "Unique custom 2x12",
      "based_on_status": "listed",
      "id": 124,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open 2x12 or 2x10 sound with a full midrange and a balanced top end.",
+      "known_for": "Clean to crunch tones.",
+      "tip": "A good all-round pick for combos."
+     }
     },
     {
      "screen": 17,
@@ -2858,7 +3338,12 @@
      "based_on": "Vintage Fender Piggyback Bassman 2x12",
      "based_on_status": "listed",
      "id": 125,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Full, punchy 2x12 with a warm midrange.",
+      "known_for": "Blues and rock rhythm.",
+      "tip": "Works well with the Bassman-style amps."
+     }
     },
     {
      "screen": 18,
@@ -2869,7 +3354,12 @@
      "based_on": "Supro 1624T 2x12",
      "based_on_status": "listed",
      "id": 126,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open 2x12 or 2x10 sound with a full midrange and a balanced top end.",
+      "known_for": "Clean to crunch tones.",
+      "tip": "A good all-round pick for combos."
+     }
     },
     {
      "screen": 19,
@@ -2880,7 +3370,12 @@
      "based_on": "Mesa/Boogie Lonestar 2x12",
      "based_on_status": "listed",
      "id": 127,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open 2x12 or 2x10 sound with a full midrange and a balanced top end.",
+      "known_for": "Clean to crunch tones.",
+      "tip": "A good all-round pick for combos."
+     }
     },
     {
      "screen": 20,
@@ -2891,7 +3386,12 @@
      "based_on": "Two-Rock 2x12",
      "based_on_status": "listed",
      "id": 128,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open 2x12 or 2x10 sound with a full midrange and a balanced top end.",
+      "known_for": "Clean to crunch tones.",
+      "tip": "A good all-round pick for combos."
+     }
     },
     {
      "screen": 21,
@@ -2902,7 +3402,12 @@
      "based_on": "Custom 2x12 with Celestion Alnico Blue",
      "based_on_status": "listed",
      "id": 129,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Sweet, chimey 2x12 with a vocal midrange and a smooth top end.",
+      "known_for": "Clean to crunch in rock and pop.",
+      "tip": "Alnico-style speakers sound smoother than most modern ones."
+     }
     },
     {
      "screen": 22,
@@ -2913,7 +3418,12 @@
      "based_on": "Fender '59 Bassman 4x10",
      "based_on_status": "listed",
      "id": 130,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big, round 4x10 with a thick, boomy low end that tightens up when pushed.",
+      "known_for": "Blues and rock and roll.",
+      "tip": "The traditional cab for Bassman-style amps."
+     }
     },
     {
      "screen": 23,
@@ -2924,7 +3434,12 @@
      "based_on": "Marshall 1960AV 4x12",
      "based_on_status": "listed",
      "id": 131,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big, punchy 4x12 with a strong mid presence.",
+      "known_for": "Classic and modern rock.",
+      "tip": "A solid standard for Marshall-style amps."
+     }
     },
     {
      "screen": 24,
@@ -2936,7 +3451,12 @@
      "based_on_status": "listed",
      "id": 132,
      "category": null,
-     "renamed": "ID list calls this UK Trad 2x12"
+     "renamed": "ID list calls this UK Trad 2x12",
+     "notes": {
+      "tone": "Warm, woody late 60s-style 4x12.",
+      "known_for": "Classic rock.",
+      "tip": "A good fit for the Plexi-style amp models."
+     }
     },
     {
      "screen": 25,
@@ -2947,7 +3467,12 @@
      "based_on": "Custom modified Marshall 4x12",
      "based_on_status": "listed",
      "id": 133,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tighter, more aggressive 4x12 than a stock Marshall.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Gives more focus when you push the amp."
+     }
     },
     {
      "screen": 26,
@@ -2958,7 +3483,12 @@
      "based_on": "Vintage Marshall 4x12 Celestion Greenback",
      "based_on_status": "listed",
      "id": 134,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Warm, compressed and woody 4x12 with rounded mids.",
+      "known_for": "Classic rock and blues.",
+      "tip": "A good match for JTM and Plexi-style amps."
+     }
     },
     {
      "screen": 27,
@@ -2969,7 +3499,12 @@
      "based_on": "Peavey 6505 4x12",
      "based_on_status": "listed",
      "id": 135,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 28,
@@ -2980,7 +3515,12 @@
      "based_on": "Mesa/Boogie Rectifier 4x12",
      "based_on_status": "listed",
      "id": 136,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 29,
@@ -2991,7 +3531,12 @@
      "based_on": "Bogner 4x12",
      "based_on_status": "listed",
      "id": 137,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 30,
@@ -3002,7 +3547,12 @@
      "based_on": "ENGL 4x12",
      "based_on_status": "listed",
      "id": 138,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 31,
@@ -3013,7 +3563,12 @@
      "based_on": "Bogner Uberkab 4x12",
      "based_on_status": "listed",
      "id": 139,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 32,
@@ -3024,7 +3579,12 @@
      "based_on": "Soldano 4x12",
      "based_on_status": "listed",
      "id": 140,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 33,
@@ -3035,7 +3595,12 @@
      "based_on": "Orange PPC412 4x12",
      "based_on_status": "listed",
      "id": 141,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Thick, mid-focused 4x12 with a heavy, tight low end.",
+      "known_for": "Heavy rock, doom and stoner.",
+      "tip": "The usual partner for Orange-style amps."
+     }
     },
     {
      "screen": 34,
@@ -3046,7 +3611,12 @@
      "based_on": "Vintage Hiwatt SE4123 4x12",
      "based_on_status": "listed",
      "id": 142,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, clear 4x12 with a lot of headroom.",
+      "known_for": "Clean and crunchy rock.",
+      "tip": "A good choice when you want clarity at high gain."
+     }
     },
     {
      "screen": 35,
@@ -3057,7 +3627,12 @@
      "based_on": "1968 Marshall 4x12",
      "based_on_status": "listed",
      "id": 143,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Classic late 60s-style 4x12 with a warm, full voice.",
+      "known_for": "Classic rock.",
+      "tip": "A common standard for Marshall-style amp models."
+     }
     },
     {
      "screen": 36,
@@ -3068,7 +3643,12 @@
      "based_on": "Vintage WEM 4x12",
      "based_on_status": "listed",
      "id": 144,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Open, bright 4x12 with a British voice.",
+      "known_for": "Classic rock.",
+      "tip": "Gives lively tones from low to mid gain."
+     }
     },
     {
      "screen": 37,
@@ -3079,7 +3659,12 @@
      "based_on": "Diezel 4x12",
      "based_on_status": "listed",
      "id": 145,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 38,
@@ -3090,7 +3675,12 @@
      "based_on": "Hughes & Kettner Triamp 4x12",
      "based_on_status": "listed",
      "id": 146,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, modern 4x12 with a strong low end.",
+      "known_for": "Rock and metal.",
+      "tip": "Works well with high-gain amps."
+     }
     },
     {
      "screen": 39,
@@ -3101,7 +3691,12 @@
      "based_on": "Marshall 4x12 Celestion G12T-75",
      "based_on_status": "listed",
      "id": 147,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Brighter, tighter 4x12 with more bite and a harder edge.",
+      "known_for": "Hard rock.",
+      "tip": "Use it to cut through when the amp is dark."
+     }
     },
     {
      "screen": 40,
@@ -3112,7 +3707,12 @@
      "based_on": "Mesa/Boogie Road King 4x12",
      "based_on_status": "listed",
      "id": 148,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, heavy 4x12 with a controlled low end and a lot of weight.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Pair with high-gain amp models. Roll off the top end if it feels fizzy."
+     }
     },
     {
      "screen": 41,
@@ -3123,7 +3723,12 @@
      "based_on": "David Eden 1x15 bass",
      "based_on_status": "listed",
      "id": 149,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big, clear 1x15 with a strong low end.",
+      "known_for": "Bass for rock and funk.",
+      "tip": "Good for a focused, punchy bass tone."
+     }
     },
     {
      "screen": 42,
@@ -3134,7 +3739,12 @@
      "based_on": "SWR 1x15 bass",
      "based_on_status": "listed",
      "id": 150,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Solid, round 1x15 with a firm low end.",
+      "known_for": "Bass for rock.",
+      "tip": "Good all-round bass cab."
+     }
     },
     {
      "screen": 43,
@@ -3145,7 +3755,12 @@
      "based_on": "Ampeg PF-115HE 1x15 bass",
      "based_on_status": "listed",
      "id": 151,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Warm, round 1x15 with a punchy bass.",
+      "known_for": "Classic rock and soul bass.",
+      "tip": "Pairs well with flip-top style bass amps."
+     }
     },
     {
      "screen": 44,
@@ -3156,7 +3771,12 @@
      "based_on": "Mesa/Boogie 2x10 bass",
      "based_on_status": "listed",
      "id": 152,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Compact 2x10 with a punchy, defined low end.",
+      "known_for": "Rock and blues bass.",
+      "tip": "Great for tight lines and fingerstyle."
+     }
     },
     {
      "screen": 45,
@@ -3167,7 +3787,12 @@
      "based_on": "Mark Bass 4x10 bass (named 2x10 in manual)",
      "based_on_status": "listed",
      "id": 153,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Clear, punchy bass cab with a tight low end.",
+      "known_for": "Funk and modern bass.",
+      "tip": "The manufacturer's list says this models a 4x10 despite the name."
+     }
     },
     {
      "screen": 46,
@@ -3178,7 +3803,12 @@
      "based_on": "David Eden 4x10 bass",
      "based_on_status": "listed",
      "id": 154,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big 4x10 bass cab with a punchy, defined low end and clear mids.",
+      "known_for": "Rock, funk and soul bass.",
+      "tip": "A good all-round bass cab."
+     }
     },
     {
      "screen": 47,
@@ -3189,7 +3819,12 @@
      "based_on": "Ampeg SVT-410HE 4x10 bass",
      "based_on_status": "listed",
      "id": 155,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big 4x10 bass cab with a punchy, defined low end and clear mids.",
+      "known_for": "Rock, funk and soul bass.",
+      "tip": "A good all-round bass cab."
+     }
     },
     {
      "screen": 48,
@@ -3200,7 +3835,12 @@
      "based_on": "SWR Workingman's 4x10 bass",
      "based_on_status": "listed",
      "id": 156,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Big 4x10 bass cab with a punchy, defined low end and clear mids.",
+      "known_for": "Rock, funk and soul bass.",
+      "tip": "A good all-round bass cab."
+     }
     },
     {
      "screen": 49,
@@ -3211,7 +3851,12 @@
      "based_on": "Hartke 4x12 bass",
      "based_on_status": "listed",
      "id": 157,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Tight, modern bass 4x12 with a clear top end.",
+      "known_for": "Rock and modern bass.",
+      "tip": "Cuts well in a mix."
+     }
     },
     {
      "screen": 50,
@@ -3222,7 +3867,12 @@
      "based_on": "Ampeg SVT-810E 8x10 bass",
      "based_on_status": "listed",
      "id": 158,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Huge, deep, authoritative bass cab with a lot of low end.",
+      "known_for": "Rock bass on big stages.",
+      "tip": "Use it when you want weight and punch."
+     }
     },
     {
      "screen": 51,
@@ -3233,7 +3883,12 @@
      "based_on": "Dreadnought guitar simulation 1",
      "based_on_status": "listed",
      "id": 159,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic guitar body simulation of a dreadnought-style guitar.",
+      "known_for": "Strumming and flat picking.",
+      "tip": "Meant to give an acoustic body to a piezo pickup or direct signal."
+     }
     },
     {
      "screen": 52,
@@ -3244,7 +3899,12 @@
      "based_on": "Dreadnought guitar simulation 2",
      "based_on_status": "listed",
      "id": 160,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic guitar body simulation of a dreadnought-style guitar.",
+      "known_for": "Strumming and flat picking.",
+      "tip": "Meant to give an acoustic body to a piezo pickup or direct signal."
+     }
     },
     {
      "screen": 53,
@@ -3255,7 +3915,12 @@
      "based_on": "Simulates OM type acoustic guitar",
      "based_on_status": "listed",
      "id": 161,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic body simulation of a smaller OM-style guitar.",
+      "known_for": "Fingerstyle and recording.",
+      "tip": "Balanced and even."
+     }
     },
     {
      "screen": 54,
@@ -3266,7 +3931,12 @@
      "based_on": "Simulates jumbo acoustic guitar",
      "based_on_status": "listed",
      "id": 162,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic body simulation of a large jumbo guitar.",
+      "known_for": "Strumming and folk.",
+      "tip": "Full and big sounding."
+     }
     },
     {
      "screen": 55,
@@ -3277,7 +3947,12 @@
      "based_on": "Simulates iconic H-Bird acoustic guitar",
      "based_on_status": "listed",
      "id": 163,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic body simulation of a well-known bright, punchy acoustic shape.",
+      "known_for": "Pop and rock strumming.",
+      "tip": "Cuts through a mix."
+     }
     },
     {
      "screen": 56,
@@ -3288,7 +3963,12 @@
      "based_on": "Simulates GA type acoustic guitar",
      "based_on_status": "listed",
      "id": 164,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic body simulation of a grand auditorium guitar.",
+      "known_for": "Balanced, versatile acoustic tones.",
+      "tip": "Even and natural."
+     }
     },
     {
      "screen": 57,
@@ -3299,7 +3979,12 @@
      "based_on": "Simulates classical guitar",
      "based_on_status": "listed",
      "id": 165,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic body simulation of a nylon-string classical guitar.",
+      "known_for": "Classical and flamenco.",
+      "tip": "Use with a nylon-string guitar for the most natural result."
+     }
     },
     {
      "screen": 58,
@@ -3310,7 +3995,12 @@
      "based_on": "Simulates mandolin",
      "based_on_status": "listed",
      "id": 166,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Acoustic body simulation of a mandolin.",
+      "known_for": "Folk and bluegrass.",
+      "tip": "Bright and short in sustain."
+     }
     },
     {
      "screen": 59,
@@ -3321,7 +4011,12 @@
      "based_on": "Simulates fretless acoustic bass",
      "based_on_status": "listed",
      "id": 167,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Simulation of a fretless acoustic bass.",
+      "known_for": "Acoustic bass parts.",
+      "tip": "Round and woody."
+     }
     },
     {
      "screen": 60,
@@ -3332,7 +4027,12 @@
      "based_on": "Simulates double bass",
      "based_on_status": "listed",
      "id": 168,
-     "category": null
+     "category": null,
+     "notes": {
+      "tone": "Simulation of an upright double bass.",
+      "known_for": "Jazz and rockabilly bass.",
+      "tip": "Deep, warm and woody."
+     }
     },
     {
      "screen": 61,
@@ -3343,7 +4043,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 62,
@@ -3354,7 +4055,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 63,
@@ -3365,7 +4067,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 64,
@@ -3376,7 +4079,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 65,
@@ -3387,7 +4091,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 66,
@@ -3398,7 +4103,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 67,
@@ -3409,7 +4115,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 68,
@@ -3420,7 +4127,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 69,
@@ -3431,7 +4139,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 70,
@@ -3442,7 +4151,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   },
@@ -3460,7 +4170,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 170,
-     "category": "Graphic"
+     "category": "Graphic",
+     "notes": null
     },
     {
      "screen": 2,
@@ -3471,7 +4182,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 171,
-     "category": "Graphic"
+     "category": "Graphic",
+     "notes": null
     },
     {
      "screen": 3,
@@ -3482,7 +4194,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 172,
-     "category": "Graphic"
+     "category": "Graphic",
+     "notes": null
     },
     {
      "screen": 4,
@@ -3493,7 +4206,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 173,
-     "category": "Graphic"
+     "category": "Graphic",
+     "notes": null
     },
     {
      "screen": 5,
@@ -3504,7 +4218,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 174,
-     "category": "Parametric"
+     "category": "Parametric",
+     "notes": null
     },
     {
      "screen": 6,
@@ -3515,7 +4230,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 175,
-     "category": "Graphic"
+     "category": "Graphic",
+     "notes": null
     },
     {
      "screen": 7,
@@ -3526,7 +4242,12 @@
      "based_on": "5-band EQ module on Mesa/Boogie amps",
      "based_on_status": "listed",
      "id": 176,
-     "category": "Graphic"
+     "category": "Graphic",
+     "notes": {
+      "tone": "Five-band EQ for shaping tone.",
+      "known_for": "Shaping gain tones, such as scooping or boosting mids.",
+      "tip": "Place it after drive pedals to shape their sound."
+     }
     }
    ]
   },
@@ -3544,7 +4265,12 @@
      "based_on": "legendary 3-knob BBD analog delay with REPEAT RATE",
      "based_on_status": "listed",
      "id": 177,
-     "category": "Analog"
+     "category": "Analog",
+     "notes": {
+      "tone": "Dark, warm analog delay with repeats that soften as they fade.",
+      "known_for": "Classic analog echo for rock and ambient.",
+      "tip": "Keep repeats low for a subtle effect."
+     }
     },
     {
      "screen": 2,
@@ -3555,7 +4281,12 @@
      "based_on": "Electro-Harmonix Deluxe Memory Man",
      "based_on_status": "listed",
      "id": 178,
-     "category": "Analog"
+     "category": "Analog",
+     "notes": {
+      "tone": "Warm analog delay with built-in modulation.",
+      "known_for": "Rhythmic echo and ambient guitar. The Edge is a well-known user of this style of unit.",
+      "tip": "Increase the modulation for a shimmery tone."
+     }
     },
     {
      "screen": 3,
@@ -3566,7 +4297,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 179,
-     "category": "Digital"
+     "category": "Digital",
+     "notes": null
     },
     {
      "screen": 4,
@@ -3577,7 +4309,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 180,
-     "category": "Analog"
+     "category": "Analog",
+     "notes": null
     },
     {
      "screen": 5,
@@ -3588,7 +4321,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 181,
-     "category": "Tape"
+     "category": "Tape",
+     "notes": null
     },
     {
      "screen": 6,
@@ -3599,7 +4333,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 182,
-     "category": "Tape"
+     "category": "Tape",
+     "notes": null
     },
     {
      "screen": 7,
@@ -3610,7 +4345,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 183,
-     "category": "Reverse"
+     "category": "Reverse",
+     "notes": null
     },
     {
      "screen": 8,
@@ -3621,7 +4357,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 184,
-     "category": "Stereo"
+     "category": "Stereo",
+     "notes": {
+      "tone": "Echo that bounces between left and right.",
+      "known_for": "Wide, spacious stereo sounds.",
+      "tip": "Needs stereo output to hear the bounce."
+     }
     },
     {
      "screen": 9,
@@ -3632,7 +4373,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 185,
-     "category": "Multi-Head"
+     "category": "Multi-Head",
+     "notes": null
     },
     {
      "screen": 10,
@@ -3643,7 +4385,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 186,
-     "category": "Slap"
+     "category": "Slap",
+     "notes": {
+      "tone": "A single short echo.",
+      "known_for": "Rockabilly and country.",
+      "tip": "Short time and one repeat."
+     }
     },
     {
      "screen": 11,
@@ -3654,7 +4401,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 187,
-     "category": "Rack"
+     "category": "Rack",
+     "notes": null
     },
     {
      "screen": 12,
@@ -3665,7 +4413,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 188,
-     "category": "Modulated"
+     "category": "Modulated",
+     "notes": null
     },
     {
      "screen": 13,
@@ -3676,7 +4425,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 189,
-     "category": "Modulated"
+     "category": "Modulated",
+     "notes": null
     },
     {
      "screen": 14,
@@ -3687,7 +4437,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 190,
-     "category": "LoFi"
+     "category": "LoFi",
+     "notes": null
     },
     {
      "screen": 15,
@@ -3698,7 +4449,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 191,
-     "category": "Modulated"
+     "category": "Modulated",
+     "notes": null
     },
     {
      "screen": 16,
@@ -3709,7 +4461,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 192,
-     "category": "Combo"
+     "category": "Combo",
+     "notes": null
     },
     {
      "screen": 17,
@@ -3720,7 +4473,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   },
@@ -3738,7 +4492,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 193,
-     "category": "Room"
+     "category": "Room",
+     "notes": {
+      "tone": "Small, natural reverb.",
+      "known_for": "Adding a sense of space without washing out the sound.",
+      "tip": "Use a low mix for natural ambience."
+     }
     },
     {
      "screen": 2,
@@ -3749,7 +4508,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 194,
-     "category": "Hall"
+     "category": "Hall",
+     "notes": {
+      "tone": "Medium to large reverb.",
+      "known_for": "Spacious, polished sound for clean and lead guitar.",
+      "tip": "A long decay can blur fast playing."
+     }
     },
     {
      "screen": 3,
@@ -3760,7 +4524,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 195,
-     "category": "Hall"
+     "category": "Hall",
+     "notes": {
+      "tone": "Large, long, airy reverb.",
+      "known_for": "Ambient and cinematic sound.",
+      "tip": "Keep the mix low on busy chords."
+     }
     },
     {
      "screen": 4,
@@ -3771,7 +4540,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 196,
-     "category": "Plate"
+     "category": "Plate",
+     "notes": {
+      "tone": "Smooth, dense, bright reverb in the style of a studio plate.",
+      "known_for": "Studio vocal and guitar polish.",
+      "tip": "Good for lead guitar that needs to stay clear."
+     }
     },
     {
      "screen": 5,
@@ -3782,7 +4556,12 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 197,
-     "category": "Spring"
+     "category": "Spring",
+     "notes": {
+      "tone": "Splashy spring reverb in the style of a classic amp.",
+      "known_for": "Surf, country and blues.",
+      "tip": "Raise the mix for the splashy surf sound."
+     }
     },
     {
      "screen": 6,
@@ -3793,7 +4572,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 198,
-     "category": "Shimmer"
+     "category": "Shimmer",
+     "notes": null
     },
     {
      "screen": 7,
@@ -3804,7 +4584,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 199,
-     "category": "Shimmer"
+     "category": "Shimmer",
+     "notes": null
     },
     {
      "screen": 8,
@@ -3815,7 +4596,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 200,
-     "category": "Shimmer"
+     "category": "Shimmer",
+     "notes": null
     },
     {
      "screen": 9,
@@ -3826,7 +4608,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 201,
-     "category": "Modulated"
+     "category": "Modulated",
+     "notes": null
     },
     {
      "screen": 10,
@@ -3837,7 +4620,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 202,
-     "category": "Shimmer"
+     "category": "Shimmer",
+     "notes": null
     },
     {
      "screen": 11,
@@ -3848,7 +4632,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   }
