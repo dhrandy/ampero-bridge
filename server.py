@@ -17,6 +17,7 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   POST /api/param                  {"slot": "eq", "model_code": 4, "param": 3, "value": 30}
   POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
   GET  /api/patches/known          slot, label and name of every patch seen so far (no pedal access)
+  GET  /api/history                states the bridge saw while polling the pedal (no pedal access)
 
 Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 503 pedal
 missing or busy, 504 pedal silent, 502 other USB trouble.
@@ -30,8 +31,9 @@ import logging
 import os
 import signal
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import ampero_mini as am
 import usbmidi as usb
@@ -63,6 +65,9 @@ CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
 GAP = 0.15           # pause between frames, the pacing the pedal was tested with
 
 DATA_DIR = os.environ.get("AMPERO_DATA_DIR", "/data")
+HISTORY_POLL = float(os.environ.get("AMPERO_HISTORY_POLL_S", "2"))      # pause between polls; 0 turns history off
+HISTORY_WINDOW = float(os.environ.get("AMPERO_HISTORY_WINDOW_S", "600"))  # how far back to keep states
+HISTORY_MAX = 400     # states kept at most, whatever the window
 KNOWN_REFRESH = 3600  # seconds between disk writes for a patch whose name did not change
 
 link = usb.Link(hard_deadline=HARD_DEADLINE)
@@ -147,6 +152,94 @@ class Known:
 
 
 known = Known(DATA_DIR)
+
+
+class History:
+    """The last few minutes of the pedal's edit buffer, one entry per change.
+
+    A background thread reads the current patch every few seconds and adds it here
+    when the record is different from the last one. The point is to catch a state that
+    came and went between two reads from a client, for example while a knob is being
+    turned on the pedal. It only reads. Nothing is written to the pedal or to disk.
+    """
+
+    def __init__(self, window: float, limit: int):
+        self.window, self.limit = window, limit
+        self.lock = threading.Lock()
+        self.entries: list[dict] = []
+        self.polls = 0
+        self.errors = 0
+        self.last_poll = None     # wall clock of the last good poll
+        self.last_error = None
+
+    def add(self, got: dict, now: float | None = None):
+        now = time.time() if now is None else now
+        with self.lock:
+            self.polls += 1
+            self.last_poll = now
+            last = self.entries[-1] if self.entries else None
+            if last and last["record_hex"] == got["record_hex"]:
+                last["last_seen"] = now
+            else:
+                self.entries.append({"t": now, "last_seen": now, "index": got["index"], "label": got["label"],
+                                     "name": got["name"], "record_hex": got["record_hex"],
+                                     "changed_bytes": _diff(last["record_hex"], got["record_hex"]) if last else None})
+            cutoff = now - self.window
+            while len(self.entries) > 1 and (self.entries[0]["last_seen"] < cutoff or len(self.entries) > self.limit):
+                self.entries.pop(0)
+
+    def fail(self, exc: Exception):
+        with self.lock:
+            self.errors += 1
+            self.last_error = f"{type(exc).__name__}: {exc}"
+
+    def status(self) -> dict:
+        with self.lock:
+            return {"enabled": HISTORY_POLL > 0, "poll_s": HISTORY_POLL, "window_s": self.window,
+                    "entries": len(self.entries), "polls": self.polls, "poll_errors": self.errors,
+                    "last_poll": self.last_poll, "last_error": self.last_error}
+
+    def listing(self, since: float = 0.0, with_hex: bool = True) -> dict:
+        with self.lock:
+            rows = [dict(e) for e in self.entries if e["last_seen"] >= since]
+        if not with_hex:
+            for r in rows:
+                del r["record_hex"]
+        return {**self.status(), "now": time.time(), "states": rows}
+
+
+def _diff(a: str, b: str):
+    """Byte offsets where two record hex strings differ, or None if they are not comparable."""
+    if len(a) != len(b):
+        return None
+    return [i // 2 for i in range(0, len(a), 2) if a[i:i + 2] != b[i:i + 2]]
+
+
+history = History(HISTORY_WINDOW, HISTORY_MAX)
+
+
+def poll_history(stop: threading.Event | None = None, rounds: int | None = None):
+    """Read the pedal now and then and keep what it says. Never raises, never writes.
+
+    Skips a round while the pedal is unplugged. A busy bridge is not a problem:
+    a client request that arrives during a poll waits for it (about two seconds).
+    """
+    n = 0
+    while rounds is None or n < rounds:
+        n += 1
+        if stop is not None and stop.wait(HISTORY_POLL):
+            return
+        if stop is None:
+            time.sleep(HISTORY_POLL)
+        try:
+            if not usb.is_present():
+                continue
+            history.add(read_current_patch())
+        except Exception as e:
+            history.fail(e)
+            if history.errors in (1, 10, 100):
+                log.warning("history poll failed (%d so far): %s", history.errors, e)
+            time.sleep(min(30.0, HISTORY_POLL * 4))
 
 
 def read_current_patch() -> dict:
@@ -253,7 +346,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.1.0"
+    server_version = "ampero-bridge/2.2.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
@@ -317,9 +410,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/health":
             self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status(),
-                              "usb_seen": usb.seen()})
+                              "usb_seen": usb.seen(), "history": history.status()})
         elif path == "/api/patches/known":
             self._send(200, known.listing())
+        elif path == "/api/history":
+            self._run(lambda: history_view(urlparse(self.path).query))
         elif path == "/api/usb":
             self._run(usb.describe)
         elif path == "/api/patch/current":
@@ -338,6 +433,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         log.info("%s", fmt % args)
+
+
+def history_view(query: str) -> dict:
+    q = parse_qs(query)
+    try:
+        since = float(q.get("since", ["0"])[0])
+    except ValueError:
+        raise am.ProtocolError("since must be a number (seconds since 1970)")
+    return history.listing(since, q.get("hex", ["1"])[0] != "0")
 
 
 def _idx(text: str) -> int:
@@ -389,6 +493,9 @@ def main():
     signal.signal(signal.SIGTERM, _term)
     signal.signal(signal.SIGINT, _term)
     log.info("ampero-bridge on :%d (hard deadline %.0fs)", PORT, HARD_DEADLINE)
+    if HISTORY_POLL > 0:
+        threading.Thread(target=poll_history, daemon=True, name="history").start()
+        log.info("history on: reading the pedal every %.0fs, keeping %.0fs", HISTORY_POLL, HISTORY_WINDOW)
     Server(("0.0.0.0", PORT), Handler).serve_forever()
 
 

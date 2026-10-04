@@ -341,6 +341,24 @@ what real gear each model is based on.
 Patch `index` is the Program Change number, counting from 0. Index 75 is the
 pedal's P26-1 (three patches per bank).
 
+### Catching a state that went by
+
+A client read takes several seconds, so a state that comes and goes in between (a
+knob turned and turned back, a model flipped through) is easy to miss. The bridge
+therefore reads the pedal's current patch on its own every couple of seconds and
+keeps the last ten minutes in memory. A new entry is added only when the record
+changed. Each one has the time it first and last appeared, the patch `index`, `label`
+and `name`, `record_hex`, and `changed_bytes`, the record offsets that differ from the
+entry before it:
+
+    curl -H "X-Api-Key: $API_KEY" "http://localhost:28551/api/history?since=1759593600&hex=0"
+
+It only reads, like `/api/patch/current`. The cost is that each background read
+uses the USB link for about a second and a half, so a request from a client can wait
+up to about two seconds for its turn. Polling pauses while the pedal is unplugged.
+The log lives in memory and starts empty after a restart. Set
+`AMPERO_HISTORY_POLL_S=0` to switch it off. `/api/health` shows the history status.
+
 ## API
 
 Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
@@ -353,6 +371,7 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `GET /api/patch/current` | | read the patch the pedal has selected: `index`, `label`, `name`, `record_hex` |
 | `GET /api/patch/<index>` | | same, but 409 (with `current_index`, `current_name`) unless `<index>` is the selected patch. Select it first |
 | `GET /api/patches/known` | | slot, label, name and when it was last seen, for every patch the bridge has read so far. Answers from memory, never touches the pedal |
+| `GET /api/history` | | the last few minutes of the pedal's edit buffer, one entry per change, with the byte offsets that changed. Optional `?since=<epoch seconds>` and `?hex=0` (leave out `record_hex`). Answers from memory, see "Catching a state that went by" |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
 | `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot. Only codes listed in `docs/models.md` as proven are accepted (see Settings) |
@@ -382,6 +401,8 @@ Set these in `.env` (or Dockhand's Environment tab).
 | `API_KEY` | required | the key clients send in `X-Api-Key` |
 | `PORT` | 8080 | port inside the container |
 | `DATA_DIR` | `./data` | host folder for the remembered patch names (compose setting, mounted at `/data`) |
+| `AMPERO_HISTORY_POLL_S` | 2 | seconds between the background reads that feed `/api/history`. `0` turns the history off |
+| `AMPERO_HISTORY_WINDOW_S` | 600 | how many seconds of history to keep (also capped at 400 entries) |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.

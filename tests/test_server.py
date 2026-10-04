@@ -290,3 +290,19 @@ def test_unwritable_or_broken_store_never_breaks_a_pedal_read(monkeypatch, tmp_p
     (tmp_path / "known-patches.json").write_text("{not json")
     assert server.Known(str(tmp_path)).listing()["count"] == 0     # broken file ignored
     srv.shutdown()
+
+
+def test_history_endpoint_needs_key_and_reads_no_pedal(monkeypatch):
+    srv, base = start(monkeypatch)
+    h = server.History(600, 50)
+    monkeypatch.setattr(server, "history", h)
+    h.add({"index": 76, "label": "P26-2", "name": "X", "record_hex": "0102"}, now=50)
+    assert call(base, "/api/history", key="")[0] == 401
+    code, out = call(base, "/api/history")
+    assert code == 200 and out["states"][0]["name"] == "X" and out["entries"] == 1
+    assert call(base, "/api/history?hex=0")[1]["states"][0].get("record_hex") is None
+    assert call(base, "/api/history?since=1e12")[1]["states"] == []
+    assert call(base, "/api/history?since=abc")[0] == 400
+    assert call(base, "/api/health")[1]["history"]["entries"] == 1
+    assert Fake.sent == []
+    srv.shutdown()

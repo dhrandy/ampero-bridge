@@ -11,6 +11,7 @@ services:
       # - AMPERO_USB_INTERFACE=3
       # - AMPERO_USB_MODE=midi   (midi = USB-MIDI 4-byte packets, raw = bytes as-is)
       # - AMPERO_USB_TIMEOUT_MS=1000
+      # - AMPERO_HISTORY_POLL_S=0   (turn off the background reads behind /api/history)
       # - AMPERO_ALLOW_UNPROVEN_MODELS=1   (let /api/model send model codes not yet proven)
     ports:
       # Published on every host interface so a reverse proxy on another machine
