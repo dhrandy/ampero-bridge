@@ -31,7 +31,7 @@ FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1
 
 ## FX2 code list (from a listen-only scroll, 60 models)
 
-Names follow the editor's FX1 list order (see the FX1 list below): screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60. Codes and parameter counts come from a scroll of the pedal. Names are matched by that order and by parameter counts (for example screens 17 to 23 have 2, 7, 4, 4, 3, 1 and 2 parameters, as the manual gives Comprosso to Fast Gate). Only the rows in the proven table above were read back on the pedal, so treat the rest as likely, not proven.
+The order was confirmed end to end against screenshots of the editor's FX2 list (60 models). Names follow the editor's FX1 list order (see the FX1 list below): screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60. Codes and parameter counts come from a scroll of the pedal. Names are matched by that order and by parameter counts (for example screens 17 to 23 have 2, 7, 4, 4, 3, 1 and 2 parameters, as the manual gives Comprosso to Fast Gate). The code of each row is from the pedal scroll; only the rows in the proven table above were read back on the pedal, so treat the other codes as likely, not proven.
 
 | Screen | Code | Params (defaults) | Name |
 | --- | --- | --- | --- |
