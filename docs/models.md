@@ -283,7 +283,7 @@ Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 ### AMP models
 
-The editor's AMP list has 60 models, in this screen order. Screens 1 to 50 were stepped through on the pedal and the record read at each stop: 47 codes were read directly and three (screens 22, 28 and 36) are inferred from the codes on either side. Screens 51 to 60 have not been read yet and show "not read". The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113 and 48-50 are 160-162. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M.
+The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly and three (screens 22, 28 and 36) are inferred from the codes on either side. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -337,16 +337,16 @@ The editor's AMP list has 60 models, in this screen order. Screens 1 to 50 were 
 | 48 | Alchemy Pre | 160 |
 | 49 | Ampage Classic | 161 |
 | 50 | Ampage Flip | 162 |
-| 51 | Voxy Bass | not read |
-| 52 | Messe Bass 400 | not read |
-| 53 | Acoustic Preamp 1 | not read |
-| 54 | Acoustic Preamp 2 | not read |
-| 55 | Match 30 Clean | not read |
-| 56 | Sound Clone 6 | not read |
-| 57 | Sound Clone 7 | not read |
-| 58 | Sound Clone 8 | not read |
-| 59 | Sound Clone 9 | not read |
-| 60 | Sound Clone 10 | not read |
+| 51 | Voxy Bass | 163 |
+| 52 | Messe Bass 400 | 164 |
+| 53 | Acoustic Preamp 1 | 192 |
+| 54 | Acoustic Preamp 2 | 193 |
+| 55 | Match 30 Clean | 194 |
+| 56 | Sound Clone 6 | 195 |
+| 57 | Sound Clone 7 | 196 |
+| 58 | Sound Clone 8 | 197 |
+| 59 | Sound Clone 9 | 198 |
+| 60 | Sound Clone 10 | 199 |
 
 ### FX1, FX2 and FX3 models
 
@@ -415,7 +415,7 @@ FX2 and FX1 are in their own tables (FX2 above, FX1 below). Both have 60 models.
 
 ## FX1 list (screen order)
 
-The editor's FX1 list has 60 models, which matches the count the pedal shows. All 60 codes below come from stepping through the pedal's FX1 list and reading the record at each stop. 54 were read directly. The six marked inferred (screens 3, 7, 11, 17, 26 and 51) were stepped past too fast to catch; each sits between two read codes in an unbroken run, and screen 47 (90 Phaser, code 137) was proven earlier by setting it. The codes run in four groups: screens 1-7 are 0-6, 8-21 are 32-45, 22-37 are 64-79 and 38-60 are 128-150. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
+The editor's FX1 list has 60 models, which matches the count the pedal shows. All 60 codes below come from stepping through the pedal's FX1 list and reading the record at each stop. 55 were read directly. The five marked inferred (screens 3, 7, 11, 17 and 26) were stepped past too fast to catch; each sits between two read codes in an unbroken run, and screen 47 (90 Phaser, code 137) was proven earlier by setting it. The codes run in four groups: screens 1-7 are 0-6, 8-21 are 32-45, 22-37 are 64-79 and 38-60 are 128-150. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -469,7 +469,7 @@ The editor's FX1 list has 60 models, which matches the count the pedal shows. Al
 | 48 | Green Phaser | 138 |
 | 49 | Revolver | 139 |
 | 50 | Helicopter | 140 |
-| 51 | Custom Trem | 141 (inferred) |
+| 51 | Custom Trem | 141 |
 | 52 | Sweller | 142 |
 | 53 | Gated Boost | 143 |
 | 54 | Pitch Shift | 144 |
