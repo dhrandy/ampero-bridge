@@ -1,6 +1,6 @@
 # ampero-bridge
 
-HTTP bridge to Randy's Hotone Ampero Mini, so Todd can build presets from a
+HTTP bridge to a Hotone Ampero Mini, so any AI can build presets from a
 script: select a patch, switch blocks, pick models, set parameters, read a stored
 patch, save. The pedal plugs into the NAS over USB. The service talks to it with
 libusb and a small JSON API.

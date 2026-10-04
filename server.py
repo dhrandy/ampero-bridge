@@ -2,7 +2,7 @@
 """ampero-bridge: HTTP front for the Hotone Ampero Mini, key-gated.
 
 The pedal plugs into the NAS over USB. This service talks to it with libusb
-(no ALSA) and exposes a small JSON API so Todd can build presets from a script.
+(no ALSA) and exposes a small JSON API so any AI can build presets from a script.
 
 Auth: X-Api-Key header, except GET /health.
 
