@@ -9,7 +9,7 @@
 * `param` is the knob's position, counting from 0, in the order of the tables below. This is the order of the Hotone manual's parameter list for that model, and the same order the values appear in the record.
 * `value` is 0-127. The bridge refuses anything else, because nothing larger has been seen on the wire. A knob whose range is larger (a delay time over 127 ms) cannot be set from the bridge yet.
 
-To read a knob, take the record (`GET /api/patch/current`, field `record_hex`), go to the block's state offset (`docs/protocol.md`, "Record layout") and read two bytes at `state offset + 4 + 2 * param`, low byte first. Knob values are the same numbers the pedal shows.
+To read a knob, take the record (`GET /api/patch/current`, field `record_hex`), go to the block's state offset (`docs/protocol.md`, "Record layout") and read two bytes at `state offset + 4 + 2 * param`, low byte first. Knob values are the same numbers the pedal shows, except for the EQ bands (offset by 50) and the cab (see those sections).
 
 Switches read as 0 (Off) and 1 (On). Ranges below are from the manual: `0-100` unless noted.
 
@@ -57,6 +57,22 @@ The first table is Checked or Manual. The remaining FX2 models, with their param
 
 Other amps in the manual use the same names in one of two layouts: Volume, Presence, Master, Bass, Middle, Treble for the older style amps, or Gain, Presence, Master, Bass, Middle, Treble for the high gain ones. Treat any amp other than the one above as Manual at best until it has been read back.
 
+## CAB
+
+UK Black 4x12 (code 34) is Checked. The cab block does not use the eight 16-bit slots like the other blocks. Offsets below count from the start of the block's four-byte header (state, model hi, model lo, unused), so byte 4 is the first parameter byte.
+
+| Byte | Knob | Encoding | Status |
+| --- | --- | --- | --- |
+| 4 | Mic type | Index. 9 = Con U87, 5 = Dyn112, 3 = Dyn421. Other mics not mapped | Checked for those three |
+| 6 | Volume | 0-100, raw | Checked |
+| 8 | Position X | 0-100, raw | Checked |
+| 10 | Position Y | 0-100, raw | Checked |
+| 12 | Position Z | 0-100, raw, one byte | Checked |
+| 13, 14 | Low Cut | Two 7-bit halves, `(byte13 << 7) \| byte14`. Hz = value + 19. 0 = off | Checked |
+| 15, 16 | High Cut | Two 7-bit halves. Hz = 2000 + 10 * value. 1801 (bytes `0e 09`) = off | Checked |
+
+The cuts overlap what would be parameter slots 4 to 6 in the other blocks, which is why a cab record looks like it has values over 127. Mic, volume and the three positions fit in 0-127. Low Cut goes up to about 1900 and High Cut up to 1800, so the bridge cannot set either. Other cab models were not checked and may differ. The pedal screen splits these over three pages; the record is one flat list.
+
 ## DLY
 
 | Code | Model | Knobs in order | Status |
@@ -73,6 +89,23 @@ Other delays in the manual start with Mix, Feedback, Time (20-4000 ms) and then 
 
 Other reverbs start with Mix and then Decay (Hall and Church have Pre Delay first; Plate has High Damp). Not read back here.
 
-## CAB, NR, EQ, FX3
+## NR
 
-Not mapped yet. The Cab block has a mic type, low and high cut, volume and mic position knobs, and its record holds values larger than 127 for some of them, so reading a cab is fine but changing its knobs from the bridge is not supported. UK Black 4x12 is code 34. Pick other cabs on the pedal and read the code from the record.
+The first byte of the block is the on/off switch (1 on, 0 off).
+
+| Code | Model | Knobs in order | Status |
+| --- | --- | --- | --- |
+| 0 | Smart Gate (screen 01) | 0 Threshold (0-100) | Checked |
+| 1 | Fast Gate (screen 02) | 0 Threshold (0-100), 1 Mode (0 = I, 1 = II) | Checked (Mode I read as 0 only inferred from ending on II) |
+
+## EQ
+
+| Code | Model | Knobs in order | Status |
+| --- | --- | --- | --- |
+| 0 | Guitar EQ 1 (screen 01) | 0 125 Hz, 1 400 Hz, 2 800 Hz, 3 1.6 kHz, 4 4 kHz, 5 Volume | Checked |
+
+The five bands show -50 to +50 on the pedal and are stored as the shown value plus 50 (0 to 100, 50 is flat). Volume is stored as shown (0-100). The pedal screen splits the knobs over two pages; the record is one flat list. Other EQ models (Guitar EQ 2, Bass EQ 1 and 2, Para EQ) were not checked.
+
+## FX3
+
+Not mapped yet. Pick the model on the pedal, turn one knob, read the record, and see which position changed.
