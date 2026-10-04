@@ -272,7 +272,7 @@ Rule: code = ID - 107. Both checked.
 
 ### AMP models
 
-The editor's AMP list has 54 models, in this screen order (checked against screenshots, read straight through). Only one code is known: Marshell 50 (screen 18) reads as code 55. The codes for the other amps are not known, and they do not follow the manufacturer's ID order, because the editor has two amps the ID list lacks (Tweed Prince and Black Prince) and calls one Boger XT Blue M where the ID list says Red M. If the codes run in screen order from some start, screen 1 would be code 38; that is a guess from a single point and needs reads at screen 1 and screen 54 before it is used.
+The editor's AMP list has 60 models, in this screen order (checked against screenshots, read straight through). Only one code is known: Marshell 50 (screen 18) reads as code 55. The codes for the other amps are not known, and they do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. If the codes run in screen order from some start, screen 1 would be code 38; that is a guess from a single point and needs reads at screen 1 and screen 60 before it is used.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -330,6 +330,12 @@ The editor's AMP list has 54 models, in this screen order (checked against scree
 | 52 | Messe Bass 400 | not read |
 | 53 | Acoustic Preamp 1 | not read |
 | 54 | Acoustic Preamp 2 | not read |
+| 55 | Match 30 Clean | not read |
+| 56 | Sound Clone 6 | not read |
+| 57 | Sound Clone 7 | not read |
+| 58 | Sound Clone 8 | not read |
+| 59 | Sound Clone 9 | not read |
+| 60 | Sound Clone 10 | not read |
 
 ### FX1, FX2 and FX3 models
 
