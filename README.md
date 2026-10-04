@@ -89,7 +89,9 @@ A prompt that works for any of those:
 > keep it as a backup. Make every change first, read it back to check, and save
 > last. To see what is in a patch, decode `record_hex` from `GET /api/patch/current`
 > using "Reading what is in a patch" in README.md and docs/protocol.md; the server
-> only decodes the name. Use docs/models.md for model numbers and never guess one.
+> only decodes the name. Use docs/models.md for model numbers and
+> docs/knobs.md for which knob is which. Never guess either: if a model is not
+> listed as checked, say so and read the record to find out.
 
 The agent should follow this order. It is the order that keeps the pedal safe:
 
@@ -130,8 +132,8 @@ unpack it for you: the agent does that from the record layout in
 
 Each block is 33 bytes. The state byte is 1 for on and 0 for off. The model is a
 code, so look it up in `docs/models.md`. Knob values are two bytes each, low byte
-first, and the first five cover most models. Which knob is which for a given model
-is on the pedal and in Hotone's manual, not in this repo. Reading never changes
+first, and the first five cover most models. Which knob is which for a model is in
+`docs/knobs.md`, with how sure each entry is. Reading never changes
 the pedal; it also needs no select first if the patch you want is the one on the
 screen.
 

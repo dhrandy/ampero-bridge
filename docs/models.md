@@ -5,6 +5,8 @@ code = on-screen number minus 1 (FX2: Big Pi 05 -> 4, Black Tail 08 -> 7, Govern
 DLY: Slapback 10 -> 9; RVB: Spring 05 -> 4). The FX2 codes below jump (0-15, 48-54, 80-93, 112-134), so the
 screen-minus-1 rule is not a straight count for every slot: read the code from the record, do not compute it.
 
+Which knob is which for each model is in `docs/knobs.md`.
+
 ## Proven live (set on the pedal, read back from the record)
 
 | Slot | Screen | Name | Code |
