@@ -272,62 +272,64 @@ Rule: code = ID - 107. Both checked.
 
 ### AMP models
 
-Only one amp was checked: Marshell 50 (ID 70) reads as code 55. If the other codes are ID - 15, Tweed Lux (ID 55) is code 40 and Acoustic Preamp 2 (ID 106) is 91. That is a guess from one point; read two more amps back before trusting it.
+The editor's AMP list has 54 models, in this screen order (checked against screenshots, read straight through). Only one code is known: Marshell 50 (screen 18) reads as code 55. The codes for the other amps are not known, and they do not follow the manufacturer's ID order, because the editor has two amps the ID list lacks (Tweed Prince and Black Prince) and calls one Boger XT Blue M where the ID list says Red M. If the codes run in screen order from some start, screen 1 would be code 38; that is a guess from a single point and needs reads at screen 1 and screen 54 before it is used.
 
-| ID | Code | Name | Source |
-| --- | --- | --- | --- |
-| 55 | 40 | Tweed Lux | list order, not checked |
-| 56 | 41 | Baseman Norm | list order, not checked |
-| 57 | 42 | Black Twin | list order, not checked |
-| 58 | 43 | Voxy 30HW Norm | list order, not checked |
-| 59 | 44 | Jazz Clean | list order, not checked |
-| 60 | 45 | Emperor Clean | list order, not checked |
-| 61 | 46 | Superstar Clean | list order, not checked |
-| 62 | 47 | Glacian Clean | list order, not checked |
-| 63 | 48 | Baseman Bright | list order, not checked |
-| 64 | 49 | Voxy 30HW TB | list order, not checked |
-| 65 | 50 | Emperor Drive | list order, not checked |
-| 66 | 51 | Superstar Drive | list order, not checked |
-| 67 | 52 | Marshell 45 | list order, not checked |
-| 68 | 53 | Marshell 45+ | list order, not checked |
-| 69 | 54 | Marshell 45 Jump | list order, not checked |
-| 70 | 55 | Marshell 50 | pedal-proven |
-| 71 | 56 | Marshell 50+ | list order, not checked |
-| 72 | 57 | Marshell 50 Jump | list order, not checked |
-| 73 | 58 | Hot Kitty Drive | list order, not checked |
-| 74 | 59 | Messe IIC+ 1 | list order, not checked |
-| 75 | 60 | Messe IIC+ 2 | list order, not checked |
-| 76 | 61 | Messe IIC+ 3 | list order, not checked |
-| 77 | 62 | Soloist 100 Crunch | list order, not checked |
-| 78 | 63 | Marshell 800 | list order, not checked |
-| 79 | 64 | Fryman B1 | list order, not checked |
-| 80 | 65 | Fryman B2 | list order, not checked |
-| 81 | 66 | Glacian Drive | list order, not checked |
-| 82 | 67 | Marshell 900 | list order, not checked |
-| 83 | 68 | Dizzle VH B | list order, not checked |
-| 84 | 69 | Dizzle VH S | list order, not checked |
-| 85 | 70 | Engle Saga 1 | list order, not checked |
-| 86 | 71 | Engle Saga 2 | list order, not checked |
-| 87 | 72 | Fryman HB | list order, not checked |
-| 88 | 73 | Fryman HB+ | list order, not checked |
-| 89 | 74 | Eddie 51 | list order, not checked |
-| 90 | 75 | Soloist 100 Lead | list order, not checked |
-| 91 | 76 | Messe IV Lead 1 | list order, not checked |
-| 92 | 77 | Messe IV Lead 2 | list order, not checked |
-| 93 | 78 | Messe IV Lead 3 | list order, not checked |
-| 94 | 79 | Tangerine R100 | list order, not checked |
-| 95 | 80 | Rector Dual V | list order, not checked |
-| 96 | 81 | Rector Dual M | list order, not checked |
-| 97 | 82 | Dizzle VH+B | list order, not checked |
-| 98 | 83 | Dizzle VH+S | list order, not checked |
-| 99 | 84 | Boger XT Red M | list order, not checked |
-| 100 | 85 | Alchemy Pre | list order, not checked |
-| 101 | 86 | Ampage Classic | list order, not checked |
-| 102 | 87 | Ampage Flip | list order, not checked |
-| 103 | 88 | Voxy Bass | list order, not checked |
-| 104 | 89 | Messe Bass 400 | list order, not checked |
-| 105 | 90 | Acoustic Preamp 1 | list order, not checked |
-| 106 | 91 | Acoustic Preamp 2 | list order, not checked |
+| Screen | Name | Code |
+| --- | --- | --- |
+| 1 | Tweed Lux | not read |
+| 2 | Baseman Norm | not read |
+| 3 | Black Twin | not read |
+| 4 | Voxy 30HW Norm | not read |
+| 5 | Jazz Clean | not read |
+| 6 | Emperor Clean | not read |
+| 7 | Superstar Clean | not read |
+| 8 | Glacian Clean | not read |
+| 9 | Tweed Prince | not read |
+| 10 | Black Prince | not read |
+| 11 | Baseman Bright | not read |
+| 12 | Voxy 30HW TB | not read |
+| 13 | Emperor Drive | not read |
+| 14 | Superstar Drive | not read |
+| 15 | Marshell 45 | not read |
+| 16 | Marshell 45+ | not read |
+| 17 | Marshell 45 Jump | not read |
+| 18 | Marshell 50 | 55 (pedal-proven) |
+| 19 | Marshell 50+ | not read |
+| 20 | Marshell 50 Jump | not read |
+| 21 | Hot Kitty Drive | not read |
+| 22 | Messe IIC+ 1 | not read |
+| 23 | Messe IIC+ 2 | not read |
+| 24 | Messe IIC+ 3 | not read |
+| 25 | Soloist 100 Crunch | not read |
+| 26 | Marshell 800 | not read |
+| 27 | Fryman B1 | not read |
+| 28 | Fryman B2 | not read |
+| 29 | Glacian Drive | not read |
+| 30 | Marshell 900 | not read |
+| 31 | Dizzle VH B | not read |
+| 32 | Dizzle VH S | not read |
+| 33 | Engle Saga 1 | not read |
+| 34 | Engle Saga 2 | not read |
+| 35 | Fryman HB | not read |
+| 36 | Fryman HB+ | not read |
+| 37 | Eddie 51 | not read |
+| 38 | Soloist 100 Lead | not read |
+| 39 | Messe IV Lead 1 | not read |
+| 40 | Messe IV Lead 2 | not read |
+| 41 | Messe IV Lead 3 | not read |
+| 42 | Tangerine R100 | not read |
+| 43 | Rector Dual V | not read |
+| 44 | Rector Dual M | not read |
+| 45 | Dizzle VH+ B | not read |
+| 46 | Dizzle VH+ S | not read |
+| 47 | Boger XT Blue M | not read |
+| 48 | Alchemy Pre | not read |
+| 49 | Ampage Classic | not read |
+| 50 | Ampage Flip | not read |
+| 51 | Voxy Bass | not read |
+| 52 | Messe Bass 400 | not read |
+| 53 | Acoustic Preamp 1 | not read |
+| 54 | Acoustic Preamp 2 | not read |
 
 ### FX1, FX2 and FX3 models
 
