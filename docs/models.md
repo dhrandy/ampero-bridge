@@ -11,13 +11,13 @@ Which knob is which for each model is in `docs/knobs.md`.
 
 | Slot | Screen | Name | Code |
 | --- | --- | --- | --- |
+| FX1 | 47 | 90 Phaser | 137 (params: Rate, Sync) |
 | FX2 | 05 | Big Pi | 4 |
 | FX2 | 08 | Black Tail | 7 |
 | FX2 | 10 | Governor | 9 |
 | FX2 | 01 | Green Drive (TS-808) | 0 (set from the bridge; not checked on the screen) |
-| FX1 | 47 | 90 Phaser | 137 (params: Rate, Sync) |
-| CAB | 35 | UK Black 4x12 | 34 |
 | AMP | - | Marshell 50 (normal channel) | 55 |
+| CAB | 35 | UK Black 4x12 | 34 |
 | DLY | 10 | Slapback | 9 |
 | RVB | 05 | Spring | 4 |
 

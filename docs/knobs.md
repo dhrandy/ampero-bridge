@@ -19,13 +19,11 @@ How sure each entry is:
 * **Manual**: the order and names come from the manual and the parameter count matches the record, but it was not set and read back here.
 * **Unknown**: only the parameter count and the default values are known (`docs/models.md`). Do not guess the knob names. Pick the model on the pedal, turn one knob, read the record, and see which position changed.
 
-## AMP
+## FX1
 
-| Model | Code | Knobs in order | Status |
+| Code | Model | Knobs in order | Status |
 | --- | --- | --- | --- |
-| Marshell 50 (normal channel) | 55 | 0 Volume, 1 Presence, 2 Master, 3 Bass, 4 Middle, 5 Treble | Checked (positions 3 and 5 are Bass and Treble) |
-
-Other amps in the manual use the same names in one of two layouts: Volume, Presence, Master, Bass, Middle, Treble for the older style amps, or Gain, Presence, Master, Bass, Middle, Treble for the high gain ones. Treat any amp other than the one above as Manual at best until it has been read back.
+| 137 | 90 Phaser | 0 Rate, 1 Sync | Checked |
 
 ## FX2 (drive, distortion, chorus)
 
@@ -51,11 +49,13 @@ The first table is Checked or Manual. The remaining FX2 models, with their param
 | 114 | Liquid C | 0 Mode | Manual |
 | 115 | Choruium B | 0 Depth, 1 Rate, 2 E.Level, 3 Sync | Manual (less sure) |
 
-## FX1
+## AMP
 
-| Code | Model | Knobs in order | Status |
+| Model | Code | Knobs in order | Status |
 | --- | --- | --- | --- |
-| 137 | 90 Phaser | 0 Rate, 1 Sync | Checked |
+| Marshell 50 (normal channel) | 55 | 0 Volume, 1 Presence, 2 Master, 3 Bass, 4 Middle, 5 Treble | Checked (positions 3 and 5 are Bass and Treble) |
+
+Other amps in the manual use the same names in one of two layouts: Volume, Presence, Master, Bass, Middle, Treble for the older style amps, or Gain, Presence, Master, Bass, Middle, Treble for the high gain ones. Treat any amp other than the one above as Manual at best until it has been read back.
 
 ## DLY
 
