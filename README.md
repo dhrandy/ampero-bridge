@@ -391,7 +391,7 @@ More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.
     pip install -r requirements.txt pytest
     python -m pytest
 
-Tests use a fake pedal. Frames are checked byte for byte against the ones
+The tests are in `tests/` and use a fake pedal. Frames are checked byte for byte against the ones
 captured from the editor and the pedal.
 
 ## Docs
