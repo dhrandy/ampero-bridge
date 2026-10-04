@@ -24,11 +24,7 @@ services:
     volumes:
       # USB bus nodes, bind-mounted so replugging the pedal is seen live.
       - /dev/bus/usb:/dev/bus/usb
-      # Backups of the pedal's patches land here, on the host, so they survive
-      # rebuilds. Set BACKUP_DIR in .env to put them somewhere else.
-      - ${BACKUP_DIR:-./backups}:/backups
-    # The only thing the bridge writes is the backup folder mounted above, so lock
-    # the rest of the container down.
+    # The bridge keeps no state and writes no files, so lock the container down.
     cap_drop:
       - ALL
     security_opt:

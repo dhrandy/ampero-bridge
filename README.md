@@ -22,7 +22,7 @@ manager you can script.
 You tell an agent "make me a clean Fender-ish patch with a bit of spring reverb",
 and it does the work on the real pedal: it reads what is there, changes the
 blocks, picks models, sets the knobs, checks its work by reading the patch back,
-and saves. It can also back up a patch before touching it, or the whole pedal in one go.
+and saves. It can also back up a patch before touching it.
 
 It has only been tested on the Ampero Mini, and that is the only pedal it
 supports. The Mini's USB-MIDI protocol differs from the Ampero II Stage, so
@@ -174,41 +174,12 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot. Only codes listed in `docs/models.md` as proven are accepted (see Settings) |
 | `POST /api/param` | `{"slot": "rvb", "model_code": 4, "param": 0, "value": 15}` | set one parameter (0-127) |
 | `POST /api/patch/save` | `{"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}` | save to a slot; needs the exact confirm text |
-| `POST /api/backups` | | start a backup of every patch into one JSON file in the backup folder. Reads only |
-| `GET /api/backups` | | `running`, `done`, the `last` result and the backup files on disk |
-| `GET /api/backups/<file>` | | download one backup file |
 
 Errors come back as `{"error", "kind"}`: 400 bad input, 401 key, 503 pedal not
 connected or busy, 504 pedal silent, 502 other USB error.
 
 The record is 460 bytes: the name, then nine blocks (fx1, fx2, amp, nr, cab, eq,
 fx3, dly, rvb) with their model and parameters. The layout is in `docs/protocol.md`.
-
-## Backups
-
-`POST /api/backups` reads every patch on the pedal and writes one file,
-`ampero-backup-YYYYMMDD-HHMMSS.json`, to the backup folder. The call returns at
-once and the work runs in the background. Poll `GET /api/backups` until `running`
-is false. It reads only: no patch is changed or saved.
-
-The file has an `index` (slot, label and name for every patch), the full
-`record_hex` of each patch, and `selected_before`, which is the patch that was on
-the pedal when the backup started, taken live. An agent can read the index to find
-a preset by name instead of selecting slots one by one. Patches that could not be
-read are listed under `errors`.
-
-While it runs the pedal steps through the patches, so do not play, and the bridge
-refuses other pedal calls with a 409. It puts the original patch back at the end.
-An edit you made on the pedal but did not save may be dropped when it switches
-patch. The live version is kept in the file (`selected_before`), but save first
-if you care.
-moves on, so save first if you care.
-
-The backup folder is `./backups` next to `docker-compose.yml` on the host, mounted
-into the container at `/backups`. To use another folder, set `BACKUP_DIR` in `.env`
-(in Dockhand: the stack's Environment tab) to an absolute host path. After pulling
-this version, rebuild the stack once so the mount is picked up. The folder must be
-writable by root, because the container drops its other privileges.
 
 ## Safety
 
@@ -226,8 +197,6 @@ Set these in `.env` (or Dockhand's Environment tab).
 | --- | --- | --- |
 | `API_KEY` | required | the key clients send in `X-Api-Key` |
 | `PORT` | 8080 | port inside the container |
-| `BACKUP_DIR` | `./backups` | host folder for backups (compose setting, mounted at `/backups`) |
-| `AMPERO_BACKUP_SLOTS` | 100 | how many patches a backup reads, starting at index 0 |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.

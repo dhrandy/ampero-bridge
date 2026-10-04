@@ -16,24 +16,18 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   POST /api/model                  {"slot": "eq", "code": 4}
   POST /api/param                  {"slot": "eq", "model_code": 4, "param": 3, "value": 30}
   POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
-  POST /api/backups                start a backup of every patch into one JSON file (reads only)
-  GET  /api/backups                backup status and the files on disk
-  GET  /api/backups/<file>         download one backup file
 
 Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 503 pedal
 missing or busy, 504 pedal silent, 502 other USB trouble.
 
 Nothing here can leave the process stuck: see usbmidi.Link and docs/usb-lockups.md.
 """
-import datetime
 import hmac
 import json
 import logging
 import os
-import re
 import signal
 import threading
-import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
@@ -65,11 +59,6 @@ PROVEN_MODELS = {
 }
 CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
 GAP = 0.15           # pause between frames, the pacing the pedal was tested with
-
-BACKUP_DIR = os.environ.get("AMPERO_BACKUP_DIR", "/backups")
-BACKUP_SLOTS = int(os.environ.get("AMPERO_BACKUP_SLOTS", "100"))
-SETTLE = 0.4         # seconds the pedal gets to switch patch before it is read
-BACKUP_NAME = re.compile(r"^ampero-backup-\d{8}-\d{6}\.json$")
 
 link = usb.Link(hard_deadline=HARD_DEADLINE)
 
@@ -113,111 +102,6 @@ def read_patch(index: int) -> dict:
     return got
 
 
-class Backup:
-    """Reads every patch and writes one JSON file. Never writes to the pedal.
-
-    It steps the pedal through the patches with Program Change (the same as
-    turning the knob), reads each one, and puts the one that was selected before
-    back at the end. Runs in a thread so the HTTP call returns at once.
-    """
-
-    def __init__(self):
-        self.lock = threading.Lock()
-        self.running = False
-        self.done = 0
-        self.last: dict | None = None
-
-    def start(self) -> dict:
-        with self.lock:
-            if self.running:
-                raise Conflict("a backup is already running")
-            try:
-                os.makedirs(BACKUP_DIR, exist_ok=True)
-            except OSError:
-                raise BackupDirError(f"the backup folder {BACKUP_DIR} cannot be created; check the volume mount")
-            if not os.access(BACKUP_DIR, os.W_OK):
-                raise BackupDirError(f"the backup folder {BACKUP_DIR} is not writable; check the volume mount")
-            self.running, self.done = True, 0
-        threading.Thread(target=self._run, daemon=True).start()
-        return {"ok": True, "started": True, "slots": BACKUP_SLOTS}
-
-    def status(self) -> dict:
-        return {"running": self.running, "done": self.done, "slots": BACKUP_SLOTS,
-                "last": self.last, "files": list_backups()}
-
-    def _read_slot(self, i: int) -> dict:
-        err = None
-        for attempt in range(2):
-            try:
-                send_midi(am.program_change(i), f"backup select {i}")
-                time.sleep(SETTLE * (attempt + 1))
-                got = read_current_patch()
-                if got["index"] == i:
-                    return got
-                err = f"pedal answered with patch {got['index']}"
-            except (usb.UsbMidiError, usb.PedalNotConnected) as e:
-                err = str(e)
-        raise RuntimeError(err)
-
-    def _run(self):
-        started = datetime.datetime.now(datetime.timezone.utc)
-        patches, errors, start_patch = [], [], None
-        try:
-            start_patch = read_current_patch()
-            for i in range(BACKUP_SLOTS):
-                try:
-                    p = self._read_slot(i)
-                    patches.append({"index": p["index"], "label": p["label"], "name": p["name"],
-                                    "record_hex": p["record_hex"]})
-                except Exception as e:
-                    log.warning("backup slot %d failed: %s", i, e)
-                    errors.append({"index": i, "error": str(e)})
-                self.done = i + 1
-            if not patches:
-                raise RuntimeError("no patch could be read")
-            name = "ampero-backup-" + started.strftime("%Y%m%d-%H%M%S") + ".json"
-            doc = {"created": started.isoformat(timespec="seconds"), "slots_tried": BACKUP_SLOTS,
-                   "selected_before": {"index": start_patch["index"], "label": start_patch["label"],
-                                       "name": start_patch["name"], "record_hex": start_patch["record_hex"]},
-                   "index": [{"index": p["index"], "label": p["label"], "name": p["name"]} for p in patches],
-                   "patches": patches, "errors": errors}
-            tmp = os.path.join(BACKUP_DIR, "." + name + ".tmp")
-            with open(tmp, "w") as f:
-                json.dump(doc, f)
-            os.replace(tmp, os.path.join(BACKUP_DIR, name))
-            self.last = {"ok": True, "file": name, "patches": len(patches), "errors": len(errors),
-                         "at": doc["created"]}
-            log.info("backup written: %s (%d patches, %d errors)", name, len(patches), len(errors))
-        except Exception as e:
-            log.warning("backup failed: %s", e)
-            self.last = {"ok": False, "error": str(e), "at": started.isoformat(timespec="seconds")}
-        finally:
-            if start_patch is not None:
-                try:
-                    send_midi(am.program_change(start_patch["index"]), "backup restore selection")
-                except Exception as e:
-                    log.warning("could not put the selected patch back: %s", e)
-            self.running = False
-
-
-class Conflict(Exception):
-    pass
-
-
-class BackupDirError(Exception):
-    pass
-
-
-def list_backups() -> list[str]:
-    try:
-        return sorted((n for n in os.listdir(BACKUP_DIR) if BACKUP_NAME.match(n)), reverse=True)
-    except OSError:
-        return []
-
-
-backup = Backup()
-
-
 def send_midi(msg: bytes, name: str):
     link.session(name, lambda p: p.send_midi(msg))
 
@@ -243,10 +127,6 @@ def _int(data: dict, key: str) -> int:
 
 
 def handle_post(path: str, data: dict) -> dict:
-    if path == "/api/backups":
-        return backup.start()
-    if backup.running:
-        raise Conflict("a backup is running and is using the pedal; try again when it is done")
     if path == "/api/patch/select":
         idx = _int(data, "index")
         send_midi(am.program_change(idx), f"select {idx}")
@@ -285,7 +165,7 @@ def handle_post(path: str, data: dict) -> dict:
 STATUS = {
     usb.PedalNotConnected: 503, usb.PedalBusy: 503, usb.PedalGone: 503,
     usb.PedalTimeout: 504, usb.UsbMidiError: 502,
-    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409, Conflict: 409, BackupDirError: 503,
+    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409,
 }
 # Bad input that slipped past the checks above. Reported as 400 with a fixed message.
 BAD_INPUT = (TypeError, ValueError, OverflowError, UnicodeError)
@@ -299,7 +179,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.1.0"
+    server_version = "ampero-bridge/2.0.2"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
@@ -353,22 +233,6 @@ class Handler(BaseHTTPRequestHandler):
                 log.warning("%s %s -> %d %s: %s", self.command, self.path, code, type(e).__name__, e)
             self._send(code, {"error": str(e), "kind": type(e).__name__, **getattr(e, "extra", {})})
 
-    def _send_backup(self, name: str):
-        if not BACKUP_NAME.match(name):
-            self._send(404, {"error": "not found"})
-            return
-        try:
-            with open(os.path.join(BACKUP_DIR, name), "rb") as f:
-                body = f.read()
-        except OSError:
-            self._send(404, {"error": "not found"})
-            return
-        self.send_response(200)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/health":
@@ -384,10 +248,6 @@ class Handler(BaseHTTPRequestHandler):
             self._run(usb.describe)
         elif path == "/api/patch/current":
             self._run(read_current_patch)
-        elif path == "/api/backups":
-            self._send(200, backup.status())
-        elif path.startswith("/api/backups/"):
-            self._send_backup(path.rsplit("/", 1)[1])
         elif path.startswith("/api/patch/") and path.count("/") == 3:
             self._run(lambda: read_patch(_idx(path.rsplit("/", 1)[1])))
         else:
