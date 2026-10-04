@@ -67,6 +67,33 @@ list, so they cannot walk models. CC 72 is untested here.
 CC 77 (lock) and 78 (all effects off) follow Hotone's Ampero II Stage list and
 are not isolated on the Mini.
 
+### CC sweep results (Mini, firmware V2.2)
+
+Found by sending one CC at a time (value 127, or the value noted) through `POST /api/midi/cc`
+and reading `/api/history` about 11 seconds later. Edit buffer only, nothing saved. Changes
+revert when the patch is reloaded (patch down then up).
+
+| CC | What it does |
+| --- | --- |
+| 7 | patch level, record byte 3, 0-99 (127 clamps to 99) |
+| 8 | record byte 430, 0xff -> 0x7f. Meaning unknown |
+| 11 | FX1 param 0 (record byte 99, 0-100) |
+| 16 | AMP param 0 (record byte 165, 0-100) |
+| 18 | DLY param 0 (record byte 330, 0-100) |
+| 22 / 23 | bank down / bank up (3 patches) |
+| 24 / 25 | patch down / patch up (1 patch) |
+| 48-56 | block power, see above |
+| 57 / 58 | back |
+| 72 and 85 | FX1 on/off (127 on, 0 off) |
+| 73 | bit 7 of record byte 395 (127 sets, 0 clears). Meaning unknown |
+| 74 | low 7 bits of record byte 395 (0-127, 0x78 by default). Meaning unknown |
+| 75 | sets record byte 408 to 1. Value 0 and a second 127 do not clear it. Meaning unknown |
+
+No change in the record: CC 1-5, 9, 10, 12-15, 17, 19-21, 26-47, 59-71, 76-84, 86-119.
+Not tried: 0, 6, 98-101, 120-127, and 77/78 (lock and all-effects-off, see above).
+No CC steps a model list, and none found for the tuner or tap tempo. Model changes need the
+sysex model select.
+
 ## Reading a patch
 
 **The read returns the patch the pedal has selected.** On the real pedal, reads for
