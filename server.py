@@ -1,92 +1,136 @@
 #!/usr/bin/env python3
-"""ampero-bridge: expose the Hotone Ampero Mini over HTTP, key-gated.
+"""ampero-bridge: HTTP front for the Hotone Ampero Mini, key-gated.
 
-The pedal plugs into the NAS over USB when Randy wants changes. This bridge
-speaks the pedal's SysEx protocol over raw USB and serves a tiny HTTP API so
-an assistant can read patches and push effect settings without the editor.
+The pedal plugs into the NAS over USB. This service talks to it with libusb
+(no ALSA) and exposes a small JSON API so Todd can build presets from a script.
 
-Endpoints (all key-gated except /health):
-  GET  /health              -> {"ok": true, "pedal_connected": bool, "port": str|null}
-  GET  /api/patches         -> {"patches": [{"index": int, "label": "A1-1", "name": str}]}
-  GET  /api/patch/<index>   -> {"index": int, "label": str, "name": str, "raw": "<hex of dump>"}
-  POST /api/patch/load      -> {"index": int} load patch into edit buffer
-  POST /api/patch/param     -> {"index": int, "slot": int, "param": int, "value": float}
-  POST /api/patch/block     -> {"scene": int, "powers": [0/1 x9]} block on/off bitmap
-  POST /api/patch/model     -> {"slot": int, "category": int, "code": int} set effect model
-  POST /api/patch/clear     -> {"slot": int} clear a slot
-  POST /api/patch/volume    -> {"volume": 0-100}
-  POST /api/patch/save      -> {"index": int, "name": str} save edit buffer
-  GET  /api/firmware        -> {"firmware": str}
+Auth: X-Api-Key header, except GET /health.
 
-Auth: send API_KEY as the X-Api-Key header.
+  GET  /health                     liveness, pedal presence, request counters
+  GET  /api/usb                    interfaces and endpoints the pedal reports
+  GET  /api/patch/<index>          read a stored patch (name + raw record)
+  POST /api/patch/select           {"index": 75}            Program Change
+  POST /api/block                  {"block": "rvb", "on": true}
+  POST /api/model                  {"slot": "eq", "code": 4}
+  POST /api/param                  {"slot": "eq", "model_code": 4, "param": 3, "value": 30}
+  POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
 
-USB: talks to the pedal through libusb (no ALSA, no sequencer). The container
-needs /dev/bus/usb. The pedal only needs to be plugged in when changes are
-wanted; /health reports whether it is currently visible. The SysEx protocol is
-unverified on the Mini (see README).
+Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 503 pedal
+missing or busy, 504 pedal silent, 502 other USB trouble.
+
+Nothing here can leave the process stuck: see usbmidi.Link and docs/usb-lockups.md.
 """
+import hmac
 import json
 import logging
 import os
 import signal
 import threading
-import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
 import ampero_mini as am
-import usbmidi
+import usbmidi as usb
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("ampero-bridge")
 
-API_KEY = os.environ["API_KEY"]
+API_KEY = os.environ.get("API_KEY", "")
 PORT = int(os.environ.get("PORT", "8080"))
-_lock = threading.Lock()
+HARD_DEADLINE = float(os.environ.get("AMPERO_HARD_DEADLINE_S", "20"))
+MAX_BODY = 4096
+CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
+GAP = 0.15           # pause between frames, the pacing the pedal was tested with
+
+link = usb.Link(hard_deadline=HARD_DEADLINE)
 
 
-def _present() -> bool:
-    return usbmidi.is_present()
-
-
-def _request(frame: bytes, timeout: float = 2.0):
-    """One short USB session: open, send a frame, return the reply frame.
-
-    The device is opened and released for every request, and every transfer has
-    a hard timeout, so nothing can hold the pedal across a replug or hang.
-    """
-    with _lock, usbmidi.Pedal() as p:
+def read_patch(index: int) -> dict:
+    """Pull a stored patch the way the editor does and decode it."""
+    def run(p):
         p.drain()
-        p.send_sysex(frame)
-        raw = p.recv_sysex(timeout)
-        if raw is None:
-            raise TimeoutError("no reply from pedal (it may need a power cycle)")
-        return am.parse_frame(raw)
+        frames = []
+        for req in am.read_patch_requests(index):
+            p.send_sysex(req)
+            frames += p.collect(GAP)
+        frames += p.collect(0.5)
+        try:
+            return am.decode_patch(frames)
+        except am.ProtocolError as e:
+            raise usb.PedalTimeout(str(e))
+    return link.session(f"read patch {index}", run)
 
 
-def _request_dump(frame: bytes, timeout: float = 3.0) -> bytes:
-    """Send a query whose answer is a chunked dump; return reassembled payload."""
-    with _lock, usbmidi.Pedal() as p:
-        p.drain()
-        p.send_sysex(frame)
-        raw = p.recv_sysex(timeout)
-        first = am.parse_frame(raw) if raw else None
-        if first is None or first.cmd != am.CMD_DATA:
-            raise TimeoutError("no dump from pedal")
-        chunks = [first]
-        while sum(len(c.payload) for c in chunks) < first.length:
-            raw = p.recv_sysex(timeout)
-            if raw is None:
-                raise TimeoutError("dump stalled")
-            chunks.append(am.parse_frame(raw))
-        chunks.sort(key=lambda c: c.offset)
-        return b"".join(c.payload for c in chunks)
+def send_midi(msg: bytes, name: str):
+    link.session(name, lambda p: p.send_midi(msg))
+
+
+def send_sysex(frames: list[bytes], name: str):
+    def run(p):
+        if len(frames) == 1:
+            p.send_sysex(frames[0])
+        else:
+            p.send_sysex_batch(frames)
+    link.session(name, run)
+
+
+def _int(data: dict, key: str) -> int:
+    if key not in data:
+        raise am.ProtocolError(f"missing {key!r}")
+    try:
+        return int(data[key])
+    except (TypeError, ValueError):
+        raise am.ProtocolError(f"{key!r} must be a number")
+
+
+def handle_post(path: str, data: dict) -> dict:
+    if path == "/api/patch/select":
+        idx = _int(data, "index")
+        send_midi(am.program_change(idx), f"select {idx}")
+        return {"ok": True, "label": am.patch_label(idx)}
+    if path == "/api/block":
+        block, on = str(data.get("block", "")), bool(data.get("on"))
+        send_midi(am.block_power(block, on), f"block {block}")
+        return {"ok": True}
+    if path == "/api/model":
+        send_sysex([am.model_select(data.get("slot"), _int(data, "code"))], "model")
+        return {"ok": True}
+    if path == "/api/param":
+        frame = am.param_set(data.get("slot"), _int(data, "model_code"),
+                             _int(data, "param"), _int(data, "value"))
+        send_sysex([frame], "param")
+        return {"ok": True}
+    if path == "/api/patch/save":
+        idx = _int(data, "index")
+        want = f"SAVE {am.patch_label(idx)}"
+        if data.get("confirm") != want:
+            raise am.ProtocolError(f'saving overwrites a stored patch: send "confirm": "{want}"')
+        send_sysex(am.save_patch(idx, str(data.get("name", ""))), f"save {idx}")
+        # The pedal sends nothing back for a save. Only its screen shows the result.
+        return {"ok": True, "label": am.patch_label(idx), "verified": False,
+                "note": "no reply exists for save; read the patch back to check"}
+    raise LookupError(path)
+
+
+STATUS = {
+    usb.PedalNotConnected: 503, usb.PedalBusy: 503, usb.PedalGone: 503,
+    usb.PedalTimeout: 504, usb.UsbMidiError: 502,
+    am.ProtocolError: 400, LookupError: 404,
+}
+
+
+def status_for(exc: Exception) -> int:
+    for cls, code in STATUS.items():
+        if isinstance(exc, cls):
+            return code
+    return 500
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/1.0"
+    server_version = "ampero-bridge/2.0"
+    timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
-    def _send_json(self, code: int, obj):
+    def _send(self, code: int, obj: dict):
         body = json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
@@ -94,122 +138,86 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _auth(self) -> bool:
-        return self.headers.get("X-Api-Key") == API_KEY
+    def _authed(self) -> bool:
+        key = self.headers.get("X-Api-Key", "")
+        return bool(API_KEY) and hmac.compare_digest(key.encode(), API_KEY.encode())
 
-    def _read_body(self):
-        length = int(self.headers.get("Content-Length", 0))
-        if not length:
+    def _body(self) -> dict:
+        n = int(self.headers.get("Content-Length") or 0)
+        if n > MAX_BODY:
+            raise am.ProtocolError("body too large")
+        if not n:
             return {}
-        return json.loads(self.rfile.read(length) or b"{}")
+        try:
+            data = json.loads(self.rfile.read(n))
+        except ValueError:
+            raise am.ProtocolError("body is not valid JSON")
+        if not isinstance(data, dict):
+            raise am.ProtocolError("body must be a JSON object")
+        return data
+
+    def _run(self, fn):
+        try:
+            self._send(200, fn())
+        except Exception as e:
+            code = status_for(e)
+            if code >= 500:
+                log.warning("%s %s -> %d %s: %s", self.command, self.path, code, type(e).__name__, e)
+            self._send(code, {"error": str(e), "kind": type(e).__name__})
 
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/health":
-            self._send_json(200, {"ok": True, "pedal_connected": _present(),
-                                 "transport": "libusb"})
+            self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status()})
             return
-        if not self._auth():
-            self._send_json(401, {"error": "unauthorized"})
+        if not self._authed():
+            self._send(401, {"error": "unauthorized"})
             return
-        try:
-            if path == "/api/patches":
-                payload = _request_dump(am.msg_query_patch_names())
-                patches = []
-                # 300 x u16 order table then names; Mini: PATCHES entries
-                for i in range(am.PATCHES):
-                    name = payload[600 + i * 17:600 + i * 17 + 17].split(b"\0")[0].decode("ascii", "replace")
-                    patches.append({"index": i, "label": am.patch_label(i), "name": name})
-                self._send_json(200, {"patches": patches})
-            elif path.startswith("/api/patch/") and path.count("/") == 3:
-                index = int(path.rsplit("/", 1)[1])
-                payload = _request_dump(am.msg_get_patch(index))
-                name = payload[34:51].split(b"\0")[0].decode("ascii", "replace")
-                self._send_json(200, {"index": index, "label": am.patch_label(index),
-                                     "name": name, "dump_hex": payload.hex()})
-            elif path == "/api/firmware":
-                frame = _request(am.msg_query_firmware())
-                fw = am.reply_body(frame).split(b"\0")[0].decode("ascii", "replace")
-                self._send_json(200, {"firmware": fw})
-            elif path in ("/api/usb", "/api/ports"):
-                # Interfaces and endpoints as the pedal reports them. Read-only,
-                # opens nothing: use this to see which interface carries SysEx.
-                self._send_json(200, usbmidi.describe())
-            elif path == "/api/identity":
-                # Standard MIDI Identity Request. A compliant MIDI device answers.
-                # If this works but Hotone commands don't, the Mini uses a
-                # different SysEx dialect than the II Stage.
-                with _lock, usbmidi.Pedal() as p:
-                    p.drain()
-                    p.send_sysex(bytes([0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7]))
-                    raw = p.recv_sysex(2.0)
-                self._send_json(200, {"identity_hex": raw.hex() if raw else None})
-            else:
-                self._send_json(404, {"error": "not found"})
-        except Exception as e:
-            log.exception("GET %s failed", path)
-            self._send_json(500, {"error": str(e)})
+        if path == "/api/usb":
+            self._run(usb.describe)
+        elif path.startswith("/api/patch/") and path.count("/") == 3:
+            self._run(lambda: read_patch(_idx(path.rsplit("/", 1)[1])))
+        else:
+            self._send(404, {"error": "not found"})
 
     def do_POST(self):
         path = urlparse(self.path).path
-        if not self._auth():
-            self._send_json(401, {"error": "unauthorized"})
+        if not self._authed():
+            self._send(401, {"error": "unauthorized"})
             return
-        try:
-            data = self._read_body()
-            if path == "/api/patch/load":
-                _request(am.msg_load_patch(int(data["index"])))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/patch/param":
-                _request(am.msg_set_param(int(data["slot"]), int(data["param"]), float(data["value"])))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/patch/block":
-                powers = [int(x) for x in data["powers"]]
-                _request(am.msg_scene_powers(int(data.get("scene", 0)), powers))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/patch/model":
-                # Guard: never send a model change without explicit category+code.
-                _request(am.msg_set_model(int(data["slot"]), int(data["category"]), int(data["code"])))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/patch/clear":
-                _request(am.msg_clear_slot(int(data["slot"])))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/patch/volume":
-                _request(am.msg_set_patch_volume(int(data["volume"])))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/patch/save":
-                _request(am.msg_save_patch(int(data["index"]), str(data["name"])))
-                self._send_json(200, {"ok": True})
-            elif path == "/api/shutdown":
-                # Nothing holds the pedal between requests, so a plain stop is safe.
-                self._send_json(200, {"ok": True, "shutting_down": True})
-                threading.Thread(target=Handler._server.shutdown, daemon=True).start()
-            else:
-                self._send_json(404, {"error": "not found"})
-        except Exception as e:
-            log.exception("POST %s failed", path)
-            self._send_json(500, {"error": str(e)})
+        self._run(lambda: handle_post(path, self._body()))
 
-    def log_message(self, *args):
-        log.info("%s", args[0] % args[1:])
+    def log_message(self, fmt, *args):
+        log.info("%s", fmt % args)
 
 
-def _handle_term(signum, frame):
-    # Docker stop: exit immediately. No kernel MIDI client is held between
-    # requests, so there is nothing to clean up.
-    log.info("received signal %d, exiting", signum)
-    os._exit(0)
+def _idx(text: str) -> int:
+    try:
+        i = int(text)
+    except ValueError:
+        raise am.ProtocolError("patch index must be a number")
+    if not 0 <= i <= am.MAX_PATCH:
+        raise am.ProtocolError(f"patch index must be 0-{am.MAX_PATCH}")
+    return i
 
 
-signal.signal(signal.SIGTERM, _handle_term)
-signal.signal(signal.SIGINT, _handle_term)
+class Server(ThreadingHTTPServer):
+    daemon_threads = True      # worker threads never keep the process alive
+    request_queue_size = 16
+
+
+def _term(signum, frame):
+    log.info("signal %d, exiting", signum)
+    os._exit(0)  # nothing is held between requests, nothing to clean up
 
 
 def main():
-    log.info("ampero-bridge starting on :%d", PORT)
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
-    Handler._server = server
-    server.serve_forever()
+    if not API_KEY:
+        raise SystemExit("API_KEY is not set")
+    signal.signal(signal.SIGTERM, _term)
+    signal.signal(signal.SIGINT, _term)
+    log.info("ampero-bridge on :%d (hard deadline %.0fs)", PORT, HARD_DEADLINE)
+    Server(("0.0.0.0", PORT), Handler).serve_forever()
 
 
 if __name__ == "__main__":
