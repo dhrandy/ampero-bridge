@@ -98,7 +98,7 @@ The order was confirmed end to end against screenshots of the editor's FX2 list 
 
 ## FX3 list (screen number, code, name)
 
-FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). The Hotone manual gives the names in groups, in the order the pedal shows them: the modulation group first, then the special effects. Screen 03, 07, 17, 26, 27 and 29 were checked on a real pedal. Codes are screen minus 1 for screens 1 to 17 and screen plus 46 for 18 onwards, which fits all the codes read so far (2, 6, 16, 72, 73, 75). Only the rows marked "pedal-read" had their code read back; the other rows come from the pattern and are not proven. The list may continue past 29; that part is not mapped. `/api/model` still only accepts the codes in the proven table above.
+FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). The Hotone manual gives the names in groups, in the order the pedal shows them: the modulation group first, then the special effects. Screen 03, 07, 17, 26, 27 and 29 were checked on a real pedal. Codes are screen minus 1 for screens 1 to 17 and screen plus 46 for 18 onwards, which fits all the codes read so far (2, 6, 16, 72, 73, 75). Only the rows marked "pedal-read" had their code read back; the other rows come from the pattern and are not proven. The list has 30 models; the order was checked against screenshots of the editor's FX3 list, which ends at Classic PS. Screen 30 is the only row whose code was not read. `/api/model` still only accepts the codes in the proven table above.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
@@ -131,6 +131,7 @@ FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in 
 | 27 | 73 | Bit Krusher | pedal-read (screen and code) |
 | 28 | 74 | Ring Mod | manual order, code from the pattern |
 | 29 | 75 | Sweller | pedal-read (screen and code) |
+| 30 | 76 | Classic PS | name from the editor list, code from the pattern (not read) |
 
 Knobs for the FX3 models checked so far are in `docs/knobs.md`.
 
@@ -332,7 +333,7 @@ Only one amp was checked: Marshell 50 (ID 70) reads as code 55. If the other cod
 
 These models share one list, but each block stores its own codes, and each shows only part of the list in its own order.
 
-FX3 is in the table above (screens 1 to 29). Its screens 1 to 17 are IDs 38 to 54 in order (code = ID - 38), then IDs 9, 10, 11, 12, 17, 18, 20, 21, 16, 22, 23 and 24 as screens 18 to 29 (codes 64 to 75).
+FX3 is in the table above (screens 1 to 30). Its screens 1 to 17 are IDs 38 to 54 in order (code = ID - 38), then IDs 9, 10, 11, 12, 17, 18, 20, 21, 16, 22, 23 and 24 as screens 18 to 29 (codes 64 to 75).
 
 FX2 and FX1 are in their own tables (FX2 above, FX1 below). Both have 60 models.
 
