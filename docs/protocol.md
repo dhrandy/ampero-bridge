@@ -90,7 +90,7 @@ in the rest of the record and are returned raw (`record_hex`).
 ### Record layout (460 bytes), tested live on P26-1
 
 Name at offset 4 (18 bytes). Then nine block records, 33 bytes apart, in slot order. Each is
-`<state> <model hi> <model lo> <param 0 hi> <param 0 lo> <param 1 hi> <param 1 lo> ...` with
+`<state> <model hi> <model lo> <unused> <param 0 lo> <param 0 hi> <param 1 lo> <param 1 hi> ...` with
 state 01 = on, 00 = off, model = hi * 128 + lo, and param i value at `state offset + 4 + 2 * i`.
 
 | Slot | State offset | Block |

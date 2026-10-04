@@ -76,7 +76,7 @@ this file (or `docs/models.md`). Then ask in plain words. It can do any of these
 * Tweak a preset that already exists: read it, change a few parameters, save.
 * Swap a model in one block (a different drive, amp or reverb) and keep the rest.
 * Turn blocks on or off, or clean up a preset so it only uses what it needs.
-* Check a patch: read it back and say what is in it.
+* Check a patch: read it back and say what is in it, block by block (see "Reading what is in a patch" below).
 * Back up a patch before changing it, and put it back if you do not like the result.
 
 A prompt that works for any of those:
@@ -87,7 +87,9 @@ A prompt that works for any of those:
 > reverb in P26-1", or "on the patch that is selected now, lower the drive and
 > swap the delay for a slapback"]. Read the patch before you change anything and
 > keep it as a backup. Make every change first, read it back to check, and save
-> last.
+> last. To see what is in a patch, decode `record_hex` from `GET /api/patch/current`
+> using "Reading what is in a patch" in README.md and docs/protocol.md; the server
+> only decodes the name. Use docs/models.md for model numbers and never guess one.
 
 The agent should follow this order. It is the order that keeps the pedal safe:
 
@@ -102,6 +104,36 @@ The agent should follow this order. It is the order that keeps the pedal safe:
 6. `GET /api/patch/current` again and compare. This is the only proof a write
    worked, because the pedal never answers a write.
 7. `POST /api/patch/save`, last, with the confirm text.
+
+### Reading what is in a patch
+
+`GET /api/patch/current` returns `index`, `label`, `name` and `record_hex`. The
+name and slot come ready to use. The effect chain (which blocks are on, which
+model each one runs, every knob value) is in `record_hex`, and the server does not
+unpack it for you: the agent does that from the record layout in
+`docs/protocol.md` ("Record layout"). The only decoding code in the repo is
+`decode_patch()` in `ampero_mini.py`, which joins the pedal's reply into the
+460-byte record and reads the index and name. Reading the blocks is a few lines:
+
+    import json, urllib.request
+    req = urllib.request.Request("http://SERVER:28551/api/patch/current",
+                                 headers={"X-Api-Key": "your-key"})
+    rec = bytes.fromhex(json.load(urllib.request.urlopen(req))["record_hex"])
+    BLOCKS = {"fx1": 95, "fx2": 128, "amp": 161, "nr": 194, "cab": 227,
+              "eq": 260, "fx3": 293, "dly": 326, "rvb": 359}
+    for name, at in BLOCKS.items():
+        on = rec[at] == 1
+        model = rec[at + 1] * 128 + rec[at + 2]
+        params = [int.from_bytes(rec[at + 4 + 2 * i : at + 6 + 2 * i], "little")
+                  for i in range(5)]
+        print(name, "on" if on else "off", "model", model, params)
+
+Each block is 33 bytes. The state byte is 1 for on and 0 for off. The model is a
+code, so look it up in `docs/models.md`. Knob values are two bytes each, low byte
+first, and the first five cover most models. Which knob is which for a given model
+is on the pedal and in Hotone's manual, not in this repo. Reading never changes
+the pedal; it also needs no select first if the patch you want is the one on the
+screen.
 
 ### Models
 
