@@ -141,75 +141,84 @@ A full list of the model names, in the manufacturer's order, with an ID per mode
 
 ### CAB models
 
-Rule: code = ID - 109. Checked at UK Black 4x12 (ID 143, code 34). ID 169 is the user IR slots.
+The editor's CAB list, in screen order, read off screenshots. The manufacturer's ID list only has generic names for cabs (Guitar Cab 1x12 and so on), so the names here are the editor's. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. Rule: code = screen - 1. Checked at UK Black 4x12 (screen 35, code 34). The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
 
-| ID | Code | Name | Source |
+| Screen | Code | Name | Source |
 | --- | --- | --- | --- |
-| 109 | 0 | Super Zep 1x6 | list order, not checked |
-| 110 | 1 | Tweed Chap 1x8 | list order, not checked |
-| 111 | 2 | Black Lux 1x12 | list order, not checked |
-| 112 | 3 | Black Vint 1x12 | list order, not checked |
-| 113 | 4 | Glacian 1x12 | list order, not checked |
-| 114 | 5 | Bad Kitty 1x12 | list order, not checked |
-| 115 | 6 | Voxy 1x12 | list order, not checked |
-| 116 | 7 | Tweed Lux 1x12 | list order, not checked |
-| 117 | 8 | Ace 20 1x12 | list order, not checked |
-| 118 | 9 | UK G12M 1x12 | list order, not checked |
-| 119 | 10 | Voxy 2x12 | list order, not checked |
-| 120 | 11 | Emperor 2x12 | list order, not checked |
-| 121 | 12 | Jazz Twin 2x12 | list order, not checked |
-| 122 | 13 | Black Twin 2x12 | list order, not checked |
-| 123 | 14 | Tweed Super 2x10 | list order, not checked |
-| 124 | 15 | Boutique 2x12 | list order, not checked |
-| 125 | 16 | Baseman 2x12 | list order, not checked |
-| 126 | 17 | Superb 2x12 | list order, not checked |
-| 127 | 18 | Superstar 2x12 | list order, not checked |
-| 128 | 19 | Twin Rock 2x12 | list order, not checked |
-| 129 | 20 | Bluesky 2x12 | list order, not checked |
-| 130 | 21 | Baseman 4x10 | list order, not checked |
-| 131 | 22 | UK Lead 4x12 | list order, not checked |
-| 132 | 23 | UK Trad 2x12 | list order, not checked |
-| 133 | 24 | UK Modern 4x12 | list order, not checked |
-| 134 | 25 | UK Green 4x12 | list order, not checked |
-| 135 | 26 | Eddie 4x12 | list order, not checked |
-| 136 | 27 | Rector 4x12 | list order, not checked |
-| 137 | 28 | Boger 4x12 | list order, not checked |
-| 138 | 29 | Engle 4x12 | list order, not checked |
-| 139 | 30 | Urban 4x12 | list order, not checked |
-| 140 | 31 | Soloist 4x12 | list order, not checked |
-| 141 | 32 | Tang 4x12 | list order, not checked |
-| 142 | 33 | Hiway 4x12 | list order, not checked |
-| 143 | 34 | UK Black 4x12 | pedal-proven |
-| 144 | 35 | The Way 4x12 | list order, not checked |
-| 145 | 36 | Dizzle 4x12 | list order, not checked |
-| 146 | 37 | Triple 4x12 | list order, not checked |
-| 147 | 38 | UK T75 4x12 | list order, not checked |
-| 148 | 39 | US King 4x12 | list order, not checked |
-| 149 | 40 | Adam 1x15 | list order, not checked |
-| 150 | 41 | Worker 1x15 | list order, not checked |
-| 151 | 42 | Flip Top 1x15 | list order, not checked |
-| 152 | 43 | US Bass 2x10 | list order, not checked |
-| 153 | 44 | Mark 2x10 | list order, not checked |
-| 154 | 45 | Adam 4x10 | list order, not checked |
-| 155 | 46 | Ampage 4x10 | list order, not checked |
-| 156 | 47 | Worker 4x10 | list order, not checked |
-| 157 | 48 | Hacker 4x12 | list order, not checked |
-| 158 | 49 | Ampage 8x10 | list order, not checked |
-| 159 | 50 | Dreadnought 1 | list order, not checked |
-| 160 | 51 | Dreadnought 2 | list order, not checked |
-| 161 | 52 | Orchestal | list order, not checked |
-| 162 | 53 | Jumbo | list order, not checked |
-| 163 | 54 | Hum Bird | list order, not checked |
-| 164 | 55 | Auditorium | list order, not checked |
-| 165 | 56 | Classical | list order, not checked |
-| 166 | 57 | Mandolin | list order, not checked |
-| 167 | 58 | Fretless Bass | list order, not checked |
-| 168 | 59 | Double Bass | list order, not checked |
-| 169 | 60 | User IR 1-10 | list order, not checked |
+| 1 | 0 | Super Zep 1x6 | list order, not checked |
+| 2 | 1 | Tweed Chap 1x8 | list order, not checked |
+| 3 | 2 | Black Lux 1x12 | list order, not checked |
+| 4 | 3 | Black Vint 1x12 | list order, not checked |
+| 5 | 4 | Glacian 1x12 | list order, not checked |
+| 6 | 5 | Bad Kitty 1x12 | list order, not checked |
+| 7 | 6 | Voxy 1x12 | list order, not checked |
+| 8 | 7 | Tweed Lux 1x12 | list order, not checked |
+| 9 | 8 | Ace 20 1x12 | list order, not checked |
+| 10 | 9 | UK G12M 1x12 | list order, not checked |
+| 11 | 10 | Voxy 2x12 | list order, not checked |
+| 12 | 11 | Emperor 2x12 | list order, not checked |
+| 13 | 12 | Jazz Twin 2x12 | list order, not checked |
+| 14 | 13 | Black Twin 2x12 | list order, not checked |
+| 15 | 14 | Tweed Super 2x10 | list order, not checked |
+| 16 | 15 | Boutique 2x12 | list order, not checked |
+| 17 | 16 | Baseman 2x12 | list order, not checked |
+| 18 | 17 | Superb 2x12 | list order, not checked |
+| 19 | 18 | Superstar 2x12 | list order, not checked |
+| 20 | 19 | Twin Rock 2x12 | list order, not checked |
+| 21 | 20 | Bluesky 2x12 | list order, not checked |
+| 22 | 21 | Baseman 4x10 | list order, not checked |
+| 23 | 22 | UK Lead 4x12 | list order, not checked |
+| 24 | 23 | UK Trad 4x12 | list order, not checked |
+| 25 | 24 | UK Modern 4x12 | list order, not checked |
+| 26 | 25 | UK Green 4x12 | list order, not checked |
+| 27 | 26 | Eddie 4x12 | list order, not checked |
+| 28 | 27 | Rector 4x12 | list order, not checked |
+| 29 | 28 | Boger 4x12 | list order, not checked |
+| 30 | 29 | Engle 4x12 | list order, not checked |
+| 31 | 30 | Urban 4x12 | list order, not checked |
+| 32 | 31 | Soloist 4x12 | list order, not checked |
+| 33 | 32 | Tang 4x12 | list order, not checked |
+| 34 | 33 | Hiway 4x12 | list order, not checked |
+| 35 | 34 | UK Black 4x12 | pedal-proven |
+| 36 | 35 | The Way 4x12 | list order, not checked |
+| 37 | 36 | Dizzle 4x12 | list order, not checked |
+| 38 | 37 | Triple 4x12 | list order, not checked |
+| 39 | 38 | UK T75 4x12 | list order, not checked |
+| 40 | 39 | US King 4x12 | list order, not checked |
+| 41 | 40 | Adam 1x15 | list order, not checked |
+| 42 | 41 | Worker 1x15 | list order, not checked |
+| 43 | 42 | Flip Top 1x15 | list order, not checked |
+| 44 | 43 | US Bass 2x10 | list order, not checked |
+| 45 | 44 | Mark 2x10 | list order, not checked |
+| 46 | 45 | Adam 4x10 | list order, not checked |
+| 47 | 46 | Ampage 4x10 | list order, not checked |
+| 48 | 47 | Worker 4x10 | list order, not checked |
+| 49 | 48 | Hacker 4x12 | list order, not checked |
+| 50 | 49 | Ampage 8x10 | list order, not checked |
+| 51 | 50 | Dreadnought 1 | list order, not checked |
+| 52 | 51 | Dreadnought 2 | list order, not checked |
+| 53 | 52 | Orchestal | list order, not checked |
+| 54 | 53 | Jumbo | list order, not checked |
+| 55 | 54 | Hum Bird | list order, not checked |
+| 56 | 55 | Auditorium | list order, not checked |
+| 57 | 56 | Classical | list order, not checked |
+| 58 | 57 | Mandolin | list order, not checked |
+| 59 | 58 | Fretless Bass | list order, not checked |
+| 60 | 59 | Double Bass | list order, not checked |
+| 61 | 60 | TJ 66 Alnico Sil | list order, not checked |
+| 62 | 61 | TJ 66 Alnico Sil | list order, not checked |
+| 63 | 62 | TJ 66 Alnico Sil | list order, not checked |
+| 64 | 63 | TJ 69 G12M Green | list order, not checked |
+| 65 | 64 | TJ 70 G12H Green | list order, not checked |
+| 66 | 65 | TJ C12N e906 2 | list order, not checked |
+| 67 | 66 | TJ C12N R121-SM5 | list order, not checked |
+| 68 | 67 | TJ M75 e906 3 | list order, not checked |
+| 69 | 68 | TJ M75 FAT-SM57 | list order, not checked |
+| 70 | 69 | TJ M75 R121-SM54 | list order, not checked |
 
 ### EQ models
 
-Rule: code = ID - 170. Checked at Guitar EQ 1 (code 0).
+Rule: code = ID - 170. Checked at Guitar EQ 1 (code 0). The editor's EQ list has the same 7 models in this order.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
@@ -265,7 +274,7 @@ Rule: code = ID - 193. Checked at Spring (ID 197, code 4). The editor shows the 
 
 ### NR models
 
-Rule: code = ID - 107. Both checked.
+Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
