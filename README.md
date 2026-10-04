@@ -7,6 +7,7 @@
 ![Hotone Ampero Mini](https://img.shields.io/badge/Hotone-Ampero%20Mini-555555?style=flat-square)
 ![Status: beta](https://img.shields.io/badge/status-beta-orange?style=flat-square)
 ![Last commit](https://img.shields.io/github/last-commit/dhrandy/ampero-bridge?style=flat-square)
+![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 
 A small REST API in a Docker container that lets an AI agent, an LLM or any script
 build presets on a Hotone Ampero Mini guitar effects pedal. The pedal plugs into a
@@ -369,3 +370,5 @@ Credits: this was built for the Ampero Mini from scratch. The Mini speaks a
 different USB-MIDI protocol from the Ampero II Stage, so no frames or code are
 shared. jpfaria's Stage work (github.com/jpfaria/hotone-ampero-2) was a useful
 reference for what is possible on the Stage.
+
+MIT licensed, see `LICENSE`.
