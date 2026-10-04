@@ -2,11 +2,11 @@
 
 ![ampero-bridge: an AI builds presets on the Hotone Ampero Mini](docs/banner.svg)
 
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
-![REST API](https://img.shields.io/badge/REST-API-FFB020)
-![USB MIDI](https://img.shields.io/badge/USB-MIDI-555555)
-![Status: beta](https://img.shields.io/badge/status-beta-orange)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![Hotone Ampero Mini](https://img.shields.io/badge/Hotone-Ampero%20Mini-555555?style=flat-square)
+![Status: beta](https://img.shields.io/badge/status-beta-orange?style=flat-square)
+![Last commit](https://img.shields.io/github/last-commit/dhrandy/ampero-bridge?style=flat-square)
 
 A small REST API in a Docker container that lets an AI agent, an LLM or any script
 build presets on a Hotone Ampero Mini guitar effects pedal. The pedal plugs into a
@@ -18,8 +18,20 @@ preset back, and save it.
 Hotone's own editor is point and click. This gives an AI the same hands, a preset
 manager you can script.
 
+## Quickstart
+
+    git clone https://github.com/dhrandy/ampero-bridge && cd ampero-bridge
+    cp .env.example .env        # then put a long random string in API_KEY
+    docker compose up -d --build
+    export API_KEY=$(grep ^API_KEY= .env | cut -d= -f2)
+    curl -H "X-Api-Key: $API_KEY" http://localhost:28551/api/health
+
+`pedal_connected: true` means it is talking to your Ampero Mini. The full setup,
+with the compose file, is under [Run it](#run-it).
+
 **Contents**
 
+* [Quickstart](#quickstart)
 * [Beta](#beta)
 * [What it is for](#what-it-is-for)
 * [What you need](#what-you-need)
@@ -69,8 +81,10 @@ nothing here is shared with those.
 The whole setup is two files next to each other: `docker-compose.yml` and `.env`.
 The repo has both (`.env.example` is the template for `.env`).
 
-`docker-compose.yml` (builds the image straight from this repo, so there is
-nothing else to download):
+`docker-compose.yml` (builds the image straight from this repo):
+
+<details>
+<summary>Show docker-compose.yml</summary>
 
     services:
       ampero-bridge:
@@ -131,6 +145,8 @@ nothing else to download):
         # The bridge exits immediately on SIGTERM, there is nothing to flush.
         stop_grace_period: 5s
 
+</details>
+
 `.env` (copy `.env.example` and fill it in):
 
     API_KEY=paste-a-long-random-string-here
@@ -170,6 +186,9 @@ when it deploys. Do not paste the key into the compose file.
 
 The bridge speaks plain HTTP, so put TLS in front of it with a reverse proxy.
 
+<details>
+<summary>Show both layouts and the Synology steps</summary>
+
 **Layout 1: one port, 443, through the proxy.** This is the tested example. Your
 router forwards only port 443 to the NAS. The proxy is the only way in from
 outside, and the bridge's own port (28551) is never forwarded, so it is only
@@ -188,6 +207,8 @@ proxy's address. This is recommended there. Docker's published ports skip the
 usual `ufw` rules, so the rule goes in the `DOCKER-USER` chain. If the proxy runs
 on the same computer as the container, you can instead publish the port on
 loopback only: change the compose line to `"127.0.0.1:28551:8080"`.
+
+</details>
 
 ## Using it with your AI agent
 
@@ -239,6 +260,9 @@ unpack it for you: the agent does that from the record layout in
 `decode_patch()` in `ampero_mini.py`, which joins the pedal's reply into the
 460-byte record and reads the index and name. Reading the blocks is a few lines:
 
+<details>
+<summary>Show a Python example that decodes every block</summary>
+
     import json, urllib.request
     req = urllib.request.Request("http://SERVER:28551/api/patch/current",
                                  headers={"X-Api-Key": "your-key"})
@@ -251,6 +275,8 @@ unpack it for you: the agent does that from the record layout in
         params = [int.from_bytes(rec[at + 4 + 2 * i : at + 6 + 2 * i], "little")
                   for i in range(5)]
         print(name, "on" if on else "off", "model", model, params)
+
+</details>
 
 Each block is 33 bytes. The state byte is 1 for on and 0 for off. The model is a
 code, so look it up in `docs/models.md`. Knob values are two bytes each, low byte
