@@ -1,9 +1,9 @@
 services:
   ampero-bridge:
-    # Build context straight from git, like mc-bot. Dockhand pulls and builds.
+    # Builds straight from git.
     build: https://github.com/dhrandy/ampero-bridge.git#main
-    # Secrets live in Dockhand's Environment tab. ${API_KEY} is interpolated
-    # from there at deploy time. Never put raw secret values in this file.
+    # API_KEY comes from the .env file next to this one (or from the environment
+    # settings of whatever deploys the stack). Never put the raw key in this file.
     environment:
       - PORT=8080
       - API_KEY=${API_KEY}
@@ -11,8 +11,11 @@ services:
       # - AMPERO_USB_INTERFACE=3
       # - AMPERO_USB_MODE=midi   (midi = USB-MIDI 4-byte packets, raw = bytes as-is)
       # - AMPERO_USB_TIMEOUT_MS=1000
+      # - AMPERO_ALLOW_UNPROVEN_MODELS=1   (let /api/model send model codes not yet proven)
     ports:
-      # Synology reverse proxy needs the port on the host interface, not localhost-only.
+      # Published on every host interface so a reverse proxy on another machine
+      # can reach it. This port speaks plain HTTP, so limit it with a firewall
+      # rule to the proxy's address if you can.
       - "28551:8080"
     # libusb talks to the pedal directly. No /dev/snd: nothing in this container
     # may open an ALSA MIDI port, that is what wedged the host kernel.
@@ -21,17 +24,25 @@ services:
     volumes:
       # USB bus nodes, bind-mounted so replugging the pedal is seen live.
       - /dev/bus/usb:/dev/bus/usb
-      # CasaOS-style host path for app data. The bridge is currently stateless
-      # (backups save client-side), but this is here for logs/caches later.
-      # Add the same path in Dockhand if you mount it.
-      - /DATA/AppData/ampero-bridge:/data
+    # The bridge keeps no state and writes no files, so lock the container down.
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    mem_limit: 128m
+    pids_limit: 100
     # The bridge exits itself (code 70) if a USB request outlives its deadline,
     # so this brings it back clean. See docs/usb-lockups.md.
     restart: unless-stopped
     # Tiny init so signals reach the bridge and no zombies pile up.
     init: true
     # Docker only marks a wedged container unhealthy. The restart policy above
-    # needs the process to exit, which the in-process watchdog does.
+    # needs the process to exit, which the in-process watchdog does. /health is
+    # the open liveness check and only returns {"ok": true}; pedal details are
+    # behind the key at /api/health.
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8080/health', timeout=4)"]
       interval: 30s
