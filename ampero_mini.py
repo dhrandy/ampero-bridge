@@ -130,7 +130,10 @@ def param_set(slot: str | int, model_code: int, param: int, value: int) -> bytes
 
 
 def encode_name(name: str) -> bytes:
-    raw = name.encode("ascii", "strict")
+    try:
+        raw = name.encode("ascii", "strict")
+    except UnicodeEncodeError:
+        raise ProtocolError(f"name must be up to {NAME_LEN} printable ASCII characters")
     if len(raw) > NAME_LEN or any(b < 0x20 or b > 0x7E for b in raw):
         raise ProtocolError(f"name must be up to {NAME_LEN} printable ASCII characters")
     return raw.ljust(NAME_LEN, b"\0")

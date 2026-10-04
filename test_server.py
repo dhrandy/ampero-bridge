@@ -77,13 +77,13 @@ def test_health_open_and_api_needs_key(monkeypatch):
     srv.shutdown()
 
 
-def test_health_and_usb_show_what_the_container_sees(monkeypatch):
+def test_health_is_minimal_and_detail_needs_the_key(monkeypatch):
     srv, base = start(monkeypatch)
     monkeypatch.setattr(usb, "seen", lambda: {"libusb_devices": 3, "dev_nodes": 5})
-    code, body = call(base, "/health", key="")
-    assert code == 200 and body["usb_seen"] == {"libusb_devices": 3, "dev_nodes": 5}
-    # the open endpoint shows counts only, never the device list
-    assert "visible_devices" not in json.dumps(body)
+    assert call(base, "/health", key="") == (200, {"ok": True})
+    assert call(base, "/api/health", key="")[0] == 401
+    code, body = call(base, "/api/health")
+    assert code == 200 and body["pedal_connected"] is True and body["usb_seen"] == {"libusb_devices": 3, "dev_nodes": 5}
     monkeypatch.setattr(usb, "describe", lambda: {"present": False, "visible_devices": [{"id": "1d6b:0002", "bus": 1, "address": 1}]})
     assert call(base, "/api/usb")[1]["visible_devices"][0]["id"] == "1d6b:0002"
     srv.shutdown()
@@ -106,6 +106,84 @@ def test_bad_input_is_400_and_sends_nothing(monkeypatch):
     assert call(base, "/api/block", {"block": "nope", "on": True})[0] == 400
     assert call(base, "/api/param", {"slot": "eq"})[0] == 400
     assert Fake.sent == []
+    srv.shutdown()
+
+
+def test_odd_input_is_a_clean_400_not_a_500_with_internals(monkeypatch):
+    srv, base = start(monkeypatch)
+    for path, body in [("/api/param", {"slot": {"a": 1}, "model_code": 4, "param": 1, "value": 1}),
+                       ("/api/patch/select", {"index": 1e400}),
+                       ("/api/patch/select", {"index": True}),
+                       ("/api/patch/save", {"index": 1, "name": "\u00e9", "confirm": "SAVE P1-2"})]:
+        code, out = call(base, path, body)
+        assert code == 400, (path, body, out)
+        assert "Error" not in out["error"] or out["kind"] == "ProtocolError"
+    assert Fake.sent == []
+    srv.shutdown()
+
+
+def test_unexpected_error_is_a_generic_500(monkeypatch):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(usb, "describe", lambda: 1 / 0)
+    code, out = call(base, "/api/usb")
+    assert code == 500 and out == {"error": "internal error", "kind": "InternalError"}
+    srv.shutdown()
+
+
+def test_bad_content_length_is_400(monkeypatch):
+    import http.client
+    srv, base = start(monkeypatch)
+    for cl in ("-1", "abc"):
+        c = http.client.HTTPConnection("127.0.0.1", srv.server_address[1], timeout=5)
+        c.putrequest("POST", "/api/block")
+        c.putheader("X-Api-Key", "k")
+        c.putheader("Content-Length", cl)
+        c.endheaders()
+        r = c.getresponse()
+        assert r.status == 400
+        c.close()
+    srv.shutdown()
+
+
+def test_server_header_hides_versions(monkeypatch):
+    srv, base = start(monkeypatch)
+    with urllib.request.urlopen(base + "/health", timeout=5) as r:
+        assert r.headers["Server"] == "ampero-bridge"
+    srv.shutdown()
+
+
+def test_model_only_proven_codes_unless_overridden(monkeypatch):
+    srv, base = start(monkeypatch)
+    assert call(base, "/api/model", {"slot": "rvb", "code": 4})[0] == 200
+    assert call(base, "/api/model", {"slot": "fx2", "code": 9})[0] == 200
+    sent = len(Fake.sent)
+    assert call(base, "/api/model", {"slot": "rvb", "code": 5})[0] == 400
+    assert call(base, "/api/model", {"slot": "fx2", "code": 15})[0] == 400
+    assert call(base, "/api/model", {"slot": 2, "code": 4})[0] == 400
+    assert len(Fake.sent) == sent
+    monkeypatch.setattr(server, "ALLOW_UNPROVEN", True)
+    assert call(base, "/api/model", {"slot": "rvb", "code": 5})[0] == 200
+    srv.shutdown()
+
+
+def test_weak_or_placeholder_key_will_not_start(monkeypatch):
+    import pytest
+    for bad in ("short", "change-me-to-a-long-random-string"):
+        monkeypatch.setattr(server, "API_KEY", bad)
+        with pytest.raises(SystemExit):
+            server.main()
+
+
+def test_too_many_connections_get_503(monkeypatch):
+    import socket
+    srv, base = start(monkeypatch)
+    srv._slots = threading.BoundedSemaphore(1)
+    held = socket.create_connection(("127.0.0.1", srv.server_address[1]))   # takes the only slot, sends nothing
+    import time
+    time.sleep(0.3)
+    s2 = socket.create_connection(("127.0.0.1", srv.server_address[1]), timeout=5)
+    assert s2.recv(100).startswith(b"HTTP/1.0 503")
+    held.close(); s2.close()
     srv.shutdown()
 
 

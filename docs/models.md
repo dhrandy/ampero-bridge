@@ -19,6 +19,8 @@ screen-minus-1 rule is not a straight count for every slot: read the code from t
 | DLY | 10 | Slapback | 9 |
 | RVB | 05 | Spring | 4 |
 
+`POST /api/model` accepts only the codes in this table (per slot). Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
+
 Writing a model from the bridge (`POST /api/model`) gave the same record as picking it on the pedal (checked for FX2).
 
 FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1's default was code 76, which the FX2 list does not contain. Read FX1 codes from the record after picking the model on the pedal.

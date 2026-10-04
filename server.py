@@ -4,9 +4,10 @@
 The pedal plugs into the server over USB. This service talks to it with libusb
 (no ALSA) and exposes a small JSON API so any AI can build presets from a script.
 
-Auth: X-Api-Key header, except GET /health.
+Auth: X-Api-Key header, except GET /health (liveness only).
 
-  GET  /health                     liveness, pedal presence, request counters, USB device counts
+  GET  /health                     {"ok": true}, open, for the Docker healthcheck
+  GET  /api/health                 pedal presence, request counters, USB device counts
   GET  /api/usb                    interfaces and endpoints the pedal reports, plus every USB device this process sees
   GET  /api/patch/current          read the patch the pedal has selected (name + raw record)
   GET  /api/patch/<index>          same, but 409 unless <index> is the selected patch
@@ -40,6 +41,22 @@ API_KEY = os.environ.get("API_KEY", "")
 PORT = int(os.environ.get("PORT", "8080"))
 HARD_DEADLINE = float(os.environ.get("AMPERO_HARD_DEADLINE_S", "20"))
 MAX_BODY = 4096
+MAX_THREADS = 64     # simultaneous connections; more get a quick 503
+MIN_KEY_LEN = 24
+PLACEHOLDER_KEYS = {"change-me-to-a-long-random-string"}
+ALLOW_UNPROVEN = os.environ.get("AMPERO_ALLOW_UNPROVEN_MODELS") == "1"
+
+# Model codes that were set on the real pedal and read back (docs/models.md).
+# An unproven code can crash the pedal, so /api/model only takes these unless
+# AMPERO_ALLOW_UNPROVEN_MODELS=1.
+PROVEN_MODELS = {
+    "fx1": {137},
+    "fx2": {0, 4, 7, 9},
+    "amp": {55},
+    "cab": {34},
+    "dly": {9},
+    "rvb": {4},
+}
 CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
 GAP = 0.15           # pause between frames, the pacing the pedal was tested with
 
@@ -101,9 +118,11 @@ def send_sysex(frames: list[bytes], name: str):
 def _int(data: dict, key: str) -> int:
     if key not in data:
         raise am.ProtocolError(f"missing {key!r}")
+    if isinstance(data[key], bool):
+        raise am.ProtocolError(f"{key!r} must be a number")
     try:
         return int(data[key])
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         raise am.ProtocolError(f"{key!r} must be a number")
 
 
@@ -117,7 +136,13 @@ def handle_post(path: str, data: dict) -> dict:
         send_midi(am.block_power(block, on), f"block {block}")
         return {"ok": True}
     if path == "/api/model":
-        send_sysex([am.model_select(data.get("slot"), _int(data, "code"))], "model")
+        slot, code = data.get("slot"), _int(data, "code")
+        proven = PROVEN_MODELS.get(slot) if isinstance(slot, str) else None
+        if not ALLOW_UNPROVEN and (proven is None or code not in proven):
+            raise am.ProtocolError(f"model code {code} is not proven for slot {slot!r} "
+                                   f"(proven: {sorted(proven or [])}); see docs/models.md, "
+                                   "or set AMPERO_ALLOW_UNPROVEN_MODELS=1")
+        send_sysex([am.model_select(slot, code)], "model")
         return {"ok": True}
     if path == "/api/param":
         frame = am.param_set(data.get("slot"), _int(data, "model_code"),
@@ -142,6 +167,8 @@ STATUS = {
     usb.PedalTimeout: 504, usb.UsbMidiError: 502,
     am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409,
 }
+# Bad input that slipped past the checks above. Reported as 400 with a fixed message.
+BAD_INPUT = (TypeError, ValueError, OverflowError, UnicodeError)
 
 
 def status_for(exc: Exception) -> int:
@@ -152,8 +179,11 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.0.1"
+    server_version = "ampero-bridge/2.0.2"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
+
+    def version_string(self):
+        return "ampero-bridge"   # no version or Python build in the Server header
 
     def _send(self, code: int, obj: dict):
         body = json.dumps(obj).encode()
@@ -168,7 +198,12 @@ class Handler(BaseHTTPRequestHandler):
         return bool(API_KEY) and hmac.compare_digest(key.encode(), API_KEY.encode())
 
     def _body(self) -> dict:
-        n = int(self.headers.get("Content-Length") or 0)
+        try:
+            n = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            raise am.ProtocolError("bad Content-Length")
+        if n < 0:
+            raise am.ProtocolError("bad Content-Length")
         if n > MAX_BODY:
             raise am.ProtocolError("body too large")
         if not n:
@@ -186,6 +221,14 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, fn())
         except Exception as e:
             code = status_for(e)
+            if code == 500:
+                if isinstance(e, BAD_INPUT):
+                    log.info("%s %s -> 400 %s: %s", self.command, self.path, type(e).__name__, e)
+                    self._send(400, {"error": "invalid request", "kind": "BadRequest"})
+                else:
+                    log.warning("%s %s -> 500 %s: %s", self.command, self.path, type(e).__name__, e)
+                    self._send(500, {"error": "internal error", "kind": "InternalError"})
+                return
             if code >= 500:
                 log.warning("%s %s -> %d %s: %s", self.command, self.path, code, type(e).__name__, e)
             self._send(code, {"error": str(e), "kind": type(e).__name__, **getattr(e, "extra", {})})
@@ -193,13 +236,15 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/health":
-            self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status(),
-                              "usb_seen": usb.seen()})
+            self._send(200, {"ok": True})
             return
         if not self._authed():
             self._send(401, {"error": "unauthorized"})
             return
-        if path == "/api/usb":
+        if path == "/api/health":
+            self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status(),
+                              "usb_seen": usb.seen()})
+        elif path == "/api/usb":
             self._run(usb.describe)
         elif path == "/api/patch/current":
             self._run(read_current_patch)
@@ -233,6 +278,26 @@ class Server(ThreadingHTTPServer):
     daemon_threads = True      # worker threads never keep the process alive
     request_queue_size = 16
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._slots = threading.BoundedSemaphore(MAX_THREADS)
+
+    def process_request(self, request, client_address):
+        if not self._slots.acquire(blocking=False):
+            try:
+                request.sendall(b"HTTP/1.0 503 Service Unavailable\r\nContent-Length: 0\r\n\r\n")
+            except OSError:
+                pass
+            self.shutdown_request(request)
+            return
+        super().process_request(request, client_address)
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._slots.release()
+
 
 def _term(signum, frame):
     log.info("signal %d, exiting", signum)
@@ -242,6 +307,9 @@ def _term(signum, frame):
 def main():
     if not API_KEY:
         raise SystemExit("API_KEY is not set")
+    if len(API_KEY) < MIN_KEY_LEN or API_KEY in PLACEHOLDER_KEYS:
+        raise SystemExit(f"API_KEY is too weak: use at least {MIN_KEY_LEN} random characters "
+                         "(for example: openssl rand -hex 32), and not the placeholder from .env.example")
     signal.signal(signal.SIGTERM, _term)
     signal.signal(signal.SIGINT, _term)
     log.info("ampero-bridge on :%d (hard deadline %.0fs)", PORT, HARD_DEADLINE)

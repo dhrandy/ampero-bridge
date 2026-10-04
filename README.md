@@ -31,15 +31,19 @@ nothing here is shared with those.
 
 ## Run it
 
-1. Copy `.env.example` to `.env` and put a long random string in `API_KEY`.
-   Anyone who has that key can change your pedal.
+1. Copy `.env.example` to `.env` and put a long random string in `API_KEY`, for
+   example the output of `openssl rand -hex 32`. Anyone who has that key can
+   change your pedal, so the service will not start with a key under 24
+   characters or with the placeholder.
 2. Start it:
 
         docker compose up -d --build
 
-3. Check it. `/health` needs no key:
+3. Check it. `/health` needs no key and only says the service is up. The
+   details are behind the key:
 
         curl http://localhost:28551/health
+        curl -H "X-Api-Key: $API_KEY" http://localhost:28551/api/health
 
    `pedal_connected` should be `true`. The compose file maps host port 28551 to
    the container's 8080. Change the left number if you want another port.
@@ -80,7 +84,7 @@ A prompt that works for any of those:
 
 The agent should follow this order. It is the order that keeps the pedal safe:
 
-1. `GET /health`. Make sure the pedal is connected.
+1. `GET /api/health`. Make sure `pedal_connected` is true.
 2. `POST /api/patch/select` the slot you want to edit.
 3. `GET /api/patch/current`. Keep the `record_hex` as a restore point.
 4. `POST /api/block` to turn blocks on or off. Do not assume everything is on:
@@ -117,17 +121,18 @@ pedal's P26-1 (three patches per bank).
 
 ## API
 
-Send `X-Api-Key`. Only `/health` is open.
+Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 
 | Call | Body | What it does |
 | --- | --- | --- |
-| `GET /health` | | liveness, `pedal_connected`, request counters, `usb_seen` (how many USB devices the service can see) |
+| `GET /health` | | `{"ok": true}`, no key needed. Used by the Docker healthcheck |
+| `GET /api/health` | | `pedal_connected`, request counters, `usb_seen` (how many USB devices the service can see) |
 | `GET /api/usb` | | interfaces and endpoints the pedal reports, plus every USB device the service sees. If this lists fewer devices than `lsusb` on the host, restart the container |
 | `GET /api/patch/current` | | read the patch the pedal has selected: `index`, `label`, `name`, `record_hex` |
 | `GET /api/patch/<index>` | | same, but 409 (with `current_index`, `current_name`) unless `<index>` is the selected patch. Select it first |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
-| `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot |
+| `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot. Only codes listed in `docs/models.md` as proven are accepted (see Settings) |
 | `POST /api/param` | `{"slot": "rvb", "model_code": 4, "param": 0, "value": 15}` | set one parameter (0-127) |
 | `POST /api/patch/save` | `{"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}` | save to a slot; needs the exact confirm text |
 
@@ -142,7 +147,7 @@ fx3, dly, rvb) with their model and parameters. The layout is in `docs/protocol.
 * **Save is always the last step.** A save stores whatever is in the pedal's edit
   buffer at that moment. Make every change, read it back, then save.
 * A save needs the exact `confirm` text, so a stray call cannot overwrite a patch.
-* Do not send a model number you have not read off the pedal.
+* `/api/model` only takes model numbers that were checked on a real pedal, because an unknown one can crash it. To try others, set `AMPERO_ALLOW_UNPROVEN_MODELS=1`.
 * Keep `API_KEY` private and do not expose the port to the internet.
 
 ## Settings
@@ -153,12 +158,13 @@ Set these in `.env` (or Dockhand's Environment tab).
 | --- | --- | --- |
 | `API_KEY` | required | the key clients send in `X-Api-Key` |
 | `PORT` | 8080 | port inside the container |
+| `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.
 
 ## Develop
 
-    pip install pyusb pytest
+    pip install -r requirements.txt pytest
     python -m pytest
 
 Tests use a fake pedal. Frames are checked byte for byte against the ones
