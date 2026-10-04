@@ -86,3 +86,30 @@ chunks and `00 02 16 00 01 <idx> 00 05` (trailer). The chunk data is nibble spli
 
 Only the index and the name are decoded. Models, parameters and block states are
 in the rest of the record and are returned raw (`record_hex`).
+
+### Record layout found on the real pedal (P26-1, tested live)
+
+Byte offsets in the 460-byte record, confirmed by changing one thing and diffing:
+
+| What | Offset | Values |
+| --- | --- | --- |
+| FX1 block state | 95 | 01 on, 00 off |
+| FX2 block state | 128 | 01 on |
+| FX2 model code | 130 | on-screen model number minus 1 (05 Big Pi = 04, 08 Black Tail = 07, 10 Governor = 09) |
+| EQ block state | 260 | 01 on, 00 off |
+| RVB block state | 359 | 01 on, 00 off |
+| last byte | 459 | checksum, changes with every edit; the pedal recomputes it |
+
+When the FX2 model changes, eight copies of the model code at offsets 41, 48, 55, 62,
+69, 76, 83 and 90 change with it, and FX2's parameters reset to the new model's
+defaults. A host `POST /api/model` (`10 02 00 01 00 NN`, NN = number minus 1) gave a
+record identical to picking the model on the pedal. The pedal sends no reply to the
+write, so read the record back to check it.
+
+### Order of a preset write
+
+1. Select the patch (Program Change) and wait about 300 ms.
+2. Set every block on or off. Turn off whatever the preset does not use.
+3. Set models and parameters.
+4. Read the record back and check each change.
+5. Save, last. Never save before the checks pass.

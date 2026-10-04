@@ -10,7 +10,7 @@ small JSON API.
 | Piece | State |
 | --- | --- |
 | Patch select, block on/off (CC) | verified on the pedal's screen |
-| Model select, parameter set (SysEx) | verified for the EQ slot; other slots follow the same frame |
+| Model select (SysEx) | **verified live for FX2** through the bridge: `POST /api/model` with code = on-screen number minus 1, checked by reading record byte 130. Parameter set is not verified through the bridge yet |
 | Read the selected patch (name, raw record) | works on the real pedal; only the name and index are decoded. It reads the patch the pedal has selected, not any index (see API) |
 | Save | **verified on the pedal.** The editor's two frames, sent together in one USB transfer, saved the name TEST into P26-1 (seen on the screen after hopping patches). The pedal sends no reply, so only its screen confirms it |
 | Lock (CC 77), all-off (CC 78) | not isolated on the Mini |
@@ -83,6 +83,9 @@ captured from the editor and the pedal.
 ## Safety
 
 * Hardware writes go through one function that sends exactly the captured frames.
+* **Save is always the last step.** Do every select, block change and model change first,
+  read the record back to check each one, and only then save. A save stores whatever is
+  in the edit buffer at that moment.
 * A save needs `confirm`. Block on/off uses CC, never SysEx: a SysEx write of the
   enable marker crashed the pedal once.
 * Credits: the Ampero II Stage work by jpfaria (github.com/jpfaria/hotone-ampero-2)
