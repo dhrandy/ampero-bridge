@@ -23,7 +23,7 @@ Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorde
 | DLY | 10 | Slapback | 9 |
 | RVB | 05 | Spring | 4 |
 
-`POST /api/model` accepts only the codes in this table (per slot). Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
+`POST /api/model` accepts only the codes in this table (per slot), plus every FX1 and AMP code marked as read (not inferred) in the FX1 and AMP tables below. Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
 
 Writing a model from the bridge (`POST /api/model`) gave the same record as picking it on the pedal (checked for FX2).
 

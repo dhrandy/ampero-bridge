@@ -360,3 +360,14 @@ def test_midi_cc_refuses_everything_else(monkeypatch):
     assert call(base, "/api/midi/cc", {"cc": 22}, key="wrong")[0] == 401
     assert Fake.sent == []
     srv.shutdown()
+
+
+def test_every_pedal_read_fx1_and_amp_code_is_accepted_and_inferred_ones_are_not(monkeypatch):
+    data = server.load_models()
+    for b in data["blocks"]:
+        if b["block"] not in ("FX1", "AMP"):
+            continue
+        slot = b["block"].lower()
+        for m in b["models"]:
+            assert (m["code"] in server.PROVEN_MODELS[slot]) == (m["status"] == "pedal-proven"), (slot, m["screen"])
+    assert len(server.PROVEN_MODELS["fx1"]) == 55 and len(server.PROVEN_MODELS["amp"]) == 57

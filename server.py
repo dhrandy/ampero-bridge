@@ -57,13 +57,16 @@ MODELS_FILES = [p for p in (os.environ.get("AMPERO_MODELS_FILE"),
                             os.path.join(_HERE, "site", "models.json")) if p]
 _models_cache = None
 
-# Model codes that were set on the real pedal and read back (docs/models.md).
+# Model codes that were set on the real pedal and read back, or read from the record
+# with the model selected on the pedal (docs/models.md).
 # An unproven code can crash the pedal, so /api/model only takes these unless
 # AMPERO_ALLOW_UNPROVEN_MODELS=1.
 PROVEN_MODELS = {
-    "fx1": {137},
+    # FX1 and AMP: every code read from the record while stepping the pedal's own list (docs/models.md).
+    # Inferred rows are not included.
+    "fx1": {0,1, *range(3, 6), *range(32, 35), *range(36, 41), *range(42, 46), *range(64, 68), *range(69, 80), *range(128, 151)},
     "fx2": {0, 4, 7, 9},
-    "amp": {55},
+    "amp": {*range(0, 10), *range(48, 59), *range(60, 65), 66, *range(96, 102), *range(103, 114), *range(160, 165), *range(192, 200)},
     "cab": {34},
     "dly": {9},
     "rvb": {4},
@@ -413,7 +416,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.5.0"
+    server_version = "ampero-bridge/2.6.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
