@@ -32,3 +32,17 @@ def test_save_pair_is_one_72_byte_transfer():
     data = u.encode_sysex(a) + u.encode_sysex(b)
     assert len(data) == 72
     assert data.hex().startswith("04f02125047f4d50042d3212040002060407014b05f70000")
+
+
+def test_dev_node_count(tmp_path):
+    (tmp_path / "001").mkdir()
+    (tmp_path / "001" / "002").write_text("")
+    (tmp_path / "001" / "003").write_text("")
+    assert u.dev_node_count(str(tmp_path)) == 2
+    assert u.dev_node_count(str(tmp_path / "missing")) is None
+
+
+def test_visible_devices_never_raises(monkeypatch):
+    monkeypatch.setattr(u, "_usb", lambda: (_ for _ in ()).throw(RuntimeError("no libusb")))
+    assert u.visible_devices() == []
+    assert u.seen() == {"libusb_devices": 0, "dev_nodes": u.dev_node_count()}

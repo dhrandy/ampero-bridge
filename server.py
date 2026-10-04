@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """ampero-bridge: HTTP front for the Hotone Ampero Mini, key-gated.
 
-The pedal plugs into the NAS over USB. This service talks to it with libusb
+The pedal plugs into the server over USB. This service talks to it with libusb
 (no ALSA) and exposes a small JSON API so any AI can build presets from a script.
 
 Auth: X-Api-Key header, except GET /health.
 
-  GET  /health                     liveness, pedal presence, request counters
-  GET  /api/usb                    interfaces and endpoints the pedal reports
+  GET  /health                     liveness, pedal presence, request counters, USB device counts
+  GET  /api/usb                    interfaces and endpoints the pedal reports, plus every USB device this process sees
   GET  /api/patch/current          read the patch the pedal has selected (name + raw record)
   GET  /api/patch/<index>          same, but 409 unless <index> is the selected patch
   POST /api/patch/select           {"index": 75}            Program Change
@@ -193,7 +193,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/health":
-            self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status()})
+            self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status(),
+                              "usb_seen": usb.seen()})
             return
         if not self._authed():
             self._send(401, {"error": "unauthorized"})

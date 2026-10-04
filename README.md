@@ -114,8 +114,8 @@ Send `X-Api-Key`. Only `/health` is open.
 
 | Call | Body | What it does |
 | --- | --- | --- |
-| `GET /health` | | liveness, `pedal_connected`, request counters |
-| `GET /api/usb` | | interfaces and endpoints the pedal reports |
+| `GET /health` | | liveness, `pedal_connected`, request counters, `usb_seen` (how many USB devices the service can see) |
+| `GET /api/usb` | | interfaces and endpoints the pedal reports, plus every USB device the service sees. If this lists fewer devices than `lsusb` on the host, restart the container |
 | `GET /api/patch/current` | | read the patch the pedal has selected: `index`, `label`, `name`, `record_hex` |
 | `GET /api/patch/<index>` | | same, but 409 (with `current_index`, `current_name`) unless `<index>` is the selected patch. Select it first |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |

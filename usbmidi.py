@@ -154,12 +154,39 @@ def is_present() -> bool:
         return False
 
 
+def visible_devices() -> list[dict]:
+    """Every USB device libusb can see from inside this process. Enumerate only."""
+    try:
+        core, _ = _usb()
+        return [{"id": f"{d.idVendor:04x}:{d.idProduct:04x}", "bus": d.bus, "address": d.address}
+                for d in core.find(find_all=True)]
+    except Exception:
+        return []
+
+
+def dev_node_count(root: str = "/dev/bus/usb") -> int | None:
+    """How many device nodes this process has under /dev/bus/usb, or None if the
+    directory is not there. Compare with `lsusb` on the host: fewer here means the
+    container's view is stale and it needs a restart."""
+    if not os.path.isdir(root):
+        return None
+    return sum(len(files) for _, _, files in os.walk(root))
+
+
+def seen() -> dict:
+    """Small summary for /health. Counts only, so the open endpoint leaks no device list."""
+    return {"libusb_devices": len(visible_devices()), "dev_nodes": dev_node_count()}
+
+
 def describe() -> dict:
-    """Interfaces and endpoints, for diagnosing which one carries SysEx."""
+    """Interfaces and endpoints, for diagnosing which one carries SysEx.
+    Also lists every device libusb sees, so a blind container is easy to spot."""
+    visible = visible_devices()
     dev = find_device()
     if dev is None:
-        return {"present": False}
-    info = {"present": True, "vid": hex(VID), "pid": hex(PID), "interfaces": []}
+        return {"present": False, "visible_devices": visible, "dev_nodes": dev_node_count()}
+    info = {"present": True, "visible_devices": visible, "dev_nodes": dev_node_count(),
+            "mini_node": os.path.exists(f"/dev/bus/usb/{dev.bus:03d}/{dev.address:03d}"), "vid": hex(VID), "pid": hex(PID), "interfaces": []}
     for cfg in dev:
         for intf in cfg:
             info["interfaces"].append({

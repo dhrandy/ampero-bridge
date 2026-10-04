@@ -77,6 +77,18 @@ def test_health_open_and_api_needs_key(monkeypatch):
     srv.shutdown()
 
 
+def test_health_and_usb_show_what_the_container_sees(monkeypatch):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(usb, "seen", lambda: {"libusb_devices": 3, "dev_nodes": 5})
+    code, body = call(base, "/health", key="")
+    assert code == 200 and body["usb_seen"] == {"libusb_devices": 3, "dev_nodes": 5}
+    # the open endpoint shows counts only, never the device list
+    assert "visible_devices" not in json.dumps(body)
+    monkeypatch.setattr(usb, "describe", lambda: {"present": False, "visible_devices": [{"id": "1d6b:0002", "bus": 1, "address": 1}]})
+    assert call(base, "/api/usb")[1]["visible_devices"][0]["id"] == "1d6b:0002"
+    srv.shutdown()
+
+
 def test_select_block_param(monkeypatch):
     srv, base = start(monkeypatch)
     assert call(base, "/api/patch/select", {"index": 75})[1]["label"] == "P26-1"
