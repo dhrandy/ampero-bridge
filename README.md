@@ -53,7 +53,7 @@ with the compose file, is under [Run it](#run-it).
 ## Beta
 
 This is a beta. It works on the one Ampero Mini it was built and tested on,
-running firmware V2.2, but the USB protocol is partly reverse-engineered, so some
+running firmware V2.2 (read off the pedal's About page), but the USB protocol is partly reverse-engineered, so some
 things are not proven yet (`docs/models.md` and `docs/knobs.md` say which). It has
 only been tried on a single pedal and firmware, so your unit may behave
 differently. Back up a patch
