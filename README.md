@@ -38,10 +38,81 @@ nothing here is shared with those.
 
 ## Run it
 
-1. Copy `.env.example` to `.env` and put a long random string in `API_KEY`, for
-   example the output of `openssl rand -hex 32`. Anyone who has that key can
-   change your pedal, so the service will not start with a key under 24
-   characters or with the placeholder.
+The whole setup is two files next to each other: `docker-compose.yml` and `.env`.
+The repo has both (`.env.example` is the template for `.env`).
+
+`docker-compose.yml` (builds the image straight from this repo, so there is
+nothing else to download):
+
+    services:
+      ampero-bridge:
+        # Builds straight from git.
+        build: https://github.com/dhrandy/ampero-bridge.git#main
+        # API_KEY comes from the .env file next to this one (or from the environment
+        # settings of whatever deploys the stack). Never put the raw key in this file.
+        environment:
+          - PORT=8080
+          - API_KEY=${API_KEY}
+          # Optional overrides, only after checking GET /api/usb on the real pedal:
+          # - AMPERO_USB_INTERFACE=3
+          # - AMPERO_USB_MODE=midi   (midi = USB-MIDI 4-byte packets, raw = bytes as-is)
+          # - AMPERO_USB_TIMEOUT_MS=1000
+          # - AMPERO_ALLOW_UNPROVEN_MODELS=1   (let /api/model send model codes not yet proven)
+        ports:
+          # Published on every host interface so a reverse proxy on another machine
+          # can reach it. This port speaks plain HTTP, so limit it with a firewall
+          # rule to the proxy's address if you can.
+          - "28551:8080"
+        # libusb talks to the pedal directly. No /dev/snd: nothing in this container
+        # may open an ALSA MIDI port, that is what wedged the host kernel.
+        device_cgroup_rules:
+          - "c 189:* rmw"
+        volumes:
+          # USB bus nodes, bind-mounted so replugging the pedal is seen live.
+          - /dev/bus/usb:/dev/bus/usb
+        # The bridge keeps no state and writes no files, so lock the container down.
+        cap_drop:
+          - ALL
+        security_opt:
+          - no-new-privileges:true
+        read_only: true
+        tmpfs:
+          - /tmp:size=16m
+        mem_limit: 128m
+        pids_limit: 100
+        # The bridge exits itself (code 70) if a USB request outlives its deadline,
+        # so this brings it back clean. See docs/usb-lockups.md.
+        restart: unless-stopped
+        # Tiny init so signals reach the bridge and no zombies pile up.
+        init: true
+        # Docker only marks a wedged container unhealthy. The restart policy above
+        # needs the process to exit, which the in-process watchdog does. /health is
+        # the open liveness check and only returns {"ok": true}; pedal details are
+        # behind the key at /api/health.
+        healthcheck:
+          test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8080/health', timeout=4)"]
+          interval: 30s
+          timeout: 6s
+          retries: 3
+          start_period: 10s
+        logging:
+          driver: json-file
+          options:
+            max-size: "5m"
+            max-file: "3"
+        # The bridge exits immediately on SIGTERM, there is nothing to flush.
+        stop_grace_period: 5s
+
+`.env` (copy `.env.example` and fill it in):
+
+    API_KEY=paste-a-long-random-string-here
+
+Make the key with `openssl rand -hex 32`. Anyone who has it can change your pedal,
+so the service will not start with a key under 24 characters or with the
+placeholder. The compose file reads it as a plain `${API_KEY}`, so the key never
+goes in the compose file.
+
+1. Create the two files above in one folder.
 2. Start it:
 
         docker compose up -d --build
@@ -64,8 +135,17 @@ port, so moving it to another port is fine.
 ### Dockhand
 
 Create a stack from `docker-compose.yml`. Set `API_KEY` in the stack's
-**Environment** tab. The compose file uses a plain `${API_KEY}`, so Dockhand fills
-it in when it deploys. Do not paste the key into the compose file.
+**Environment** tab instead of a `.env` file. Dockhand fills in the `${API_KEY}`
+when it deploys. Do not paste the key into the compose file.
+
+### Behind a reverse proxy (Synology example)
+
+The port speaks plain HTTP, so put TLS in front of it. On a Synology NAS: Control
+Panel, Login Portal, Advanced, Reverse Proxy, Create. Source: HTTPS, your
+hostname, port 443. Destination: HTTP, the IP of the computer running the
+container, port 28551. Add a certificate for the hostname under Security,
+Certificate. Then limit port 28551 on the container host to the NAS's address with
+a firewall rule, so only the proxy can reach it.
 
 ## Using it with your AI agent
 
