@@ -6,6 +6,7 @@
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![REST API](https://img.shields.io/badge/REST-API-FFB020)
 ![USB MIDI](https://img.shields.io/badge/USB-MIDI-555555)
+![Status: beta](https://img.shields.io/badge/status-beta-orange)
 
 A small REST API in a Docker container that lets an AI agent, an LLM or any script
 build presets on a Hotone Ampero Mini guitar effects pedal. The pedal plugs into a
@@ -16,6 +17,15 @@ preset back, and save it.
 
 Hotone's own editor is point and click. This gives an AI the same hands, a preset
 manager you can script.
+
+## Beta
+
+This is a beta. It works on the one Ampero Mini it was built and tested on, but
+the USB protocol is partly reverse-engineered, so some things are not proven yet
+(`docs/models.md` and `docs/knobs.md` say which). It has only been tried on a
+single pedal and firmware, so your unit may behave differently. Back up a patch
+before you let anything change it, and save last. Bug reports, and notes on what
+works or breaks on your Mini, are welcome as GitHub issues.
 
 ## What it is for
 
