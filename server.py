@@ -16,12 +16,14 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   POST /api/model                  {"slot": "eq", "code": 4}
   POST /api/param                  {"slot": "eq", "model_code": 4, "param": 3, "value": 30}
   POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
+  GET  /api/patches/known          slot, label and name of every patch seen so far (no pedal access)
 
 Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 503 pedal
 missing or busy, 504 pedal silent, 502 other USB trouble.
 
 Nothing here can leave the process stuck: see usbmidi.Link and docs/usb-lockups.md.
 """
+import datetime
 import hmac
 import json
 import logging
@@ -60,6 +62,9 @@ PROVEN_MODELS = {
 CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
 GAP = 0.15           # pause between frames, the pacing the pedal was tested with
 
+DATA_DIR = os.environ.get("AMPERO_DATA_DIR", "/data")
+KNOWN_REFRESH = 3600  # seconds between disk writes for a patch whose name did not change
+
 link = usb.Link(hard_deadline=HARD_DEADLINE)
 
 
@@ -78,6 +83,72 @@ class PatchNotCurrent(Exception):
                       "current_label": got["label"], "current_name": got["name"]}
 
 
+class Known:
+    """Names of the patches the bridge has seen, kept in one small JSON file.
+
+    It only remembers what a read already returned: nothing extra is read from the
+    pedal and nothing is written to it. A broken or unwritable file never makes a
+    pedal call fail; the cache just stays in memory.
+    """
+
+    def __init__(self, directory: str):
+        self.path = os.path.join(directory, "known-patches.json")
+        self.lock = threading.Lock()
+        self.items: dict[str, dict] = {}
+        self.persistent = True
+        self._warned = False
+        try:
+            with open(self.path) as f:
+                data = json.load(f)
+            for k, v in data.get("patches", {}).items():
+                if k.isdigit() and isinstance(v, dict) and isinstance(v.get("name"), str):
+                    self.items[k] = {"name": v["name"], "label": str(v.get("label", "")),
+                                     "seen": str(v.get("seen", "")), "source": str(v.get("source", "read"))}
+        except FileNotFoundError:
+            pass
+        except (OSError, ValueError, AttributeError) as e:
+            log.warning("known patches file ignored: %s", e)
+
+    def record(self, index: int, label: str, name: str, source: str = "read"):
+        now = datetime.datetime.now(datetime.timezone.utc)
+        key = str(index)
+        with self.lock:
+            old = self.items.get(key)
+            if old and old["name"] == name and old["source"] == source:
+                try:
+                    age = (now - datetime.datetime.fromisoformat(old["seen"])).total_seconds()
+                except ValueError:
+                    age = KNOWN_REFRESH + 1
+                if age < KNOWN_REFRESH:
+                    return
+            self.items[key] = {"name": name, "label": label, "source": source,
+                               "seen": now.isoformat(timespec="seconds")}
+            self._write()
+
+    def _write(self):
+        try:
+            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+            tmp = self.path + ".tmp"
+            with open(tmp, "w") as f:
+                json.dump({"patches": self.items}, f)
+            os.replace(tmp, self.path)
+            self.persistent = True
+        except OSError as e:
+            self.persistent = False
+            if not self._warned:
+                self._warned = True
+                log.warning("cannot save known patches to %s (%s); keeping them in memory only",
+                            self.path, e)
+
+    def listing(self) -> dict:
+        with self.lock:
+            rows = [{"index": int(k), **v} for k, v in sorted(self.items.items(), key=lambda kv: int(kv[0]))]
+            return {"count": len(rows), "persistent": self.persistent, "patches": rows}
+
+
+known = Known(DATA_DIR)
+
+
 def read_current_patch() -> dict:
     """Read the patch the pedal currently has selected. Reads only."""
     def run(p):
@@ -91,7 +162,9 @@ def read_current_patch() -> dict:
             return am.decode_patch(frames)
         except am.ProtocolError as e:
             raise usb.PedalTimeout(str(e))
-    return link.session("read current patch", run)
+    got = link.session("read current patch", run)
+    known.record(got["index"], got["label"], got["name"])
+    return got
 
 
 def read_patch(index: int) -> dict:
@@ -155,6 +228,7 @@ def handle_post(path: str, data: dict) -> dict:
         if data.get("confirm") != want:
             raise am.ProtocolError(f'saving overwrites a stored patch: send "confirm": "{want}"')
         send_sysex(am.save_patch(idx, str(data.get("name", ""))), f"save {idx}")
+        known.record(idx, am.patch_label(idx), str(data.get("name", "")), "save")
         # The pedal sends nothing back for a save. Only its screen shows the result,
         # so the reply says written, not confirmed.
         return {"ok": True, "label": am.patch_label(idx), "verified": False,
@@ -179,7 +253,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.0.2"
+    server_version = "ampero-bridge/2.1.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
@@ -244,6 +318,8 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/health":
             self._send(200, {"ok": True, "pedal_connected": usb.is_present(), "usb": link.status(),
                               "usb_seen": usb.seen()})
+        elif path == "/api/patches/known":
+            self._send(200, known.listing())
         elif path == "/api/usb":
             self._run(usb.describe)
         elif path == "/api/patch/current":

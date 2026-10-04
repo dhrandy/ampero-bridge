@@ -24,7 +24,10 @@ services:
     volumes:
       # USB bus nodes, bind-mounted so replugging the pedal is seen live.
       - /dev/bus/usb:/dev/bus/usb
-    # The bridge keeps no state and writes no files, so lock the container down.
+      # Names of the patches the bridge has seen are kept here, so they survive
+      # rebuilds. Set DATA_DIR in .env to put the folder somewhere else.
+      - ${DATA_DIR:-./data}:/data
+    # The only thing the bridge writes is that data folder, so lock the rest down.
     cap_drop:
       - ALL
     security_opt:

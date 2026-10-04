@@ -4,7 +4,10 @@ import threading
 import urllib.request
 from urllib.error import HTTPError
 
+import tempfile  # noqa: E402
+
 os.environ["API_KEY"] = "k"
+os.environ["AMPERO_DATA_DIR"] = tempfile.mkdtemp()
 
 import ampero_mini as am  # noqa: E402
 import server  # noqa: E402
@@ -225,4 +228,65 @@ def test_read_by_index_only_when_it_is_the_selected_patch(monkeypatch):
     code, out = call(base, "/api/patch/74")
     assert code == 409 and out["current_index"] == 75 and out["asked_index"] == 74
     assert out["current_name"] == "WADE"
+    srv.shutdown()
+
+
+def test_known_patches_fill_from_reads_and_survive_a_restart(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "known", server.Known(str(tmp_path)))
+    assert call(base, "/api/patches/known")[1] == {"count": 0, "persistent": True, "patches": []}
+    Fake.replies = dump("DEXTER", 0x4C)
+    assert call(base, "/api/patch/current")[0] == 200
+    Fake.replies = dump("CHERUB", 0x4E)
+    call(base, "/api/patch/current")
+    out = call(base, "/api/patches/known")[1]
+    assert out["count"] == 2 and out["persistent"] is True
+    assert [(p["index"], p["name"], p["label"]) for p in out["patches"]] == [
+        (76, "DEXTER", "P26-2"), (78, "CHERUB", "P27-1")]
+    assert out["patches"][0]["seen"]
+    # a fresh process reads the file back
+    assert [p["name"] for p in server.Known(str(tmp_path)).listing()["patches"]] == ["DEXTER", "CHERUB"]
+    srv.shutdown()
+
+
+def test_known_patches_need_the_key_and_ask_the_pedal_nothing(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "known", server.Known(str(tmp_path)))
+    try:
+        urllib.request.urlopen(base + "/api/patches/known")
+        raise AssertionError("expected 401")
+    except HTTPError as e:
+        assert e.code == 401
+    Fake.present = False                      # pedal unplugged: the cache still answers
+    assert call(base, "/api/patches/known")[0] == 200
+    assert Fake.sent == []
+    srv.shutdown()
+
+
+def test_known_patches_rename_is_picked_up_and_save_is_remembered(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "known", server.Known(str(tmp_path)))
+    Fake.replies = dump("OLD", 0x4B)
+    call(base, "/api/patch/current")
+    Fake.replies = dump("NEW", 0x4B)
+    call(base, "/api/patch/current")
+    assert [p["name"] for p in call(base, "/api/patches/known")[1]["patches"]] == ["NEW"]
+    call(base, "/api/patch/save", {"index": 75, "name": "SAVED", "confirm": "SAVE P26-1"})
+    p = call(base, "/api/patches/known")[1]["patches"][0]
+    assert p["name"] == "SAVED" and p["source"] == "save"
+    srv.shutdown()
+
+
+def test_unwritable_or_broken_store_never_breaks_a_pedal_read(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    blocker = tmp_path / "f"
+    blocker.write_text("a file, not a folder")
+    monkeypatch.setattr(server, "known", server.Known(str(blocker / "data")))
+    Fake.replies = dump("WADE", 0x4B)
+    code, out = call(base, "/api/patch/current")
+    assert code == 200 and out["name"] == "WADE"
+    listing = call(base, "/api/patches/known")[1]
+    assert listing["persistent"] is False and listing["patches"][0]["name"] == "WADE"
+    (tmp_path / "known-patches.json").write_text("{not json")
+    assert server.Known(str(tmp_path)).listing()["count"] == 0     # broken file ignored
     srv.shutdown()

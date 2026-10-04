@@ -41,6 +41,7 @@ with the compose file, is under [Run it](#run-it).
   * [Putting it on the internet: reverse proxy (Synology example)](#putting-it-on-the-internet-reverse-proxy-synology-example)
 * [Using it with your AI agent](#using-it-with-your-ai-agent)
   * [Reading what is in a patch](#reading-what-is-in-a-patch)
+  * [Finding a patch by name](#finding-a-patch-by-name)
   * [Models](#models)
   * [Example calls](#example-calls)
 * [API](#api)
@@ -114,7 +115,10 @@ The repo has both (`.env.example` is the template for `.env`).
         volumes:
           # USB bus nodes, bind-mounted so replugging the pedal is seen live.
           - /dev/bus/usb:/dev/bus/usb
-        # The bridge keeps no state and writes no files, so lock the container down.
+          # Names of the patches the bridge has seen are kept here, so they survive
+          # rebuilds. Set DATA_DIR in .env to put the folder somewhere else.
+          - ${DATA_DIR:-./data}:/data
+        # The only thing the bridge writes is that data folder, so lock the rest down.
         cap_drop:
           - ALL
         security_opt:
@@ -234,13 +238,14 @@ A prompt that works for any of those:
 > keep it as a backup. Make every change first, read it back to check, and save
 > last. To see what is in a patch, decode `record_hex` from `GET /api/patch/current`
 > using "Reading what is in a patch" in README.md and docs/protocol.md; the server
-> only decodes the name. Use docs/models.md for model numbers and
-> docs/knobs.md for which knob is which. Never guess either: if a model is not
+> only decodes the name. To find a patch by name, check GET /api/patches/known
+> first: it is free and does not touch the pedal. Use docs/models.md for model
+> numbers and docs/knobs.md for which knob is which. Never guess either: if a model is not
 > listed as checked, say so and read the record to find out.
 
 The agent should follow this order. It is the order that keeps the pedal safe:
 
-1. `GET /api/health`. Make sure `pedal_connected` is true.
+1. `GET /api/health`. Make sure `pedal_connected` is true. Then `GET /api/patches/known` to see which patch names the bridge already knows before reading the pedal.
 2. `POST /api/patch/select` the slot you want to edit.
 3. `GET /api/patch/current`. Keep the `record_hex` as a restore point.
 4. `POST /api/block` to turn blocks on or off. Do not assume everything is on:
@@ -287,6 +292,32 @@ first, and the first five cover most models. Which knob is which for a model is 
 the pedal; it also needs no select first if the patch you want is the one on the
 screen.
 
+### Finding a patch by name
+
+Reading the pedal is slow, so the bridge remembers. Every time it reads a patch
+(`GET /api/patch/current`) or saves one, it notes the slot, label and name in a
+small file in the data folder. `GET /api/patches/known` returns that list at once
+and does not touch the pedal:
+
+    curl -H "X-Api-Key: $API_KEY" http://localhost:28551/api/patches/known
+
+    {"count": 2, "persistent": true, "patches": [
+      {"index": 76, "label": "P26-2", "name": "EXAMPLE ONE", "seen": "2026-10-04T16:00:00+00:00", "source": "read"},
+      {"index": 78, "label": "P27-1", "name": "EXAMPLE TWO", "seen": "2026-10-04T16:05:00+00:00", "source": "read"}]}
+
+It only knows patches that were read or saved through the bridge, and a patch you
+rename on the pedal itself stays stale until it is read again. So treat it as a
+fast first look: if the patch you want is there, select that slot and read it to
+confirm. If it is not there, the bridge has not seen it yet, not that it does not
+exist. `persistent: false` means the data folder cannot be written and the list
+will be lost on restart.
+
+The data folder is `./data` next to `docker-compose.yml`, mounted at `/data` in
+the container (set `DATA_DIR` in `.env`, or in Dockhand's Environment tab, for
+another host folder). It must be writable by root, because the container drops its
+other privileges. After pulling this version, rebuild the stack once so the mount
+is picked up.
+
 ### Models
 
 A model is picked by a number, not a name. `docs/models.md` lists the numbers that
@@ -321,6 +352,7 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `GET /api/usb` | | interfaces and endpoints the pedal reports, plus every USB device the service sees. If this lists fewer devices than `lsusb` on the host, restart the container |
 | `GET /api/patch/current` | | read the patch the pedal has selected: `index`, `label`, `name`, `record_hex` |
 | `GET /api/patch/<index>` | | same, but 409 (with `current_index`, `current_name`) unless `<index>` is the selected patch. Select it first |
+| `GET /api/patches/known` | | slot, label, name and when it was last seen, for every patch the bridge has read so far. Answers from memory, never touches the pedal |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
 | `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot. Only codes listed in `docs/models.md` as proven are accepted (see Settings) |
@@ -349,6 +381,7 @@ Set these in `.env` (or Dockhand's Environment tab).
 | --- | --- | --- |
 | `API_KEY` | required | the key clients send in `X-Api-Key` |
 | `PORT` | 8080 | port inside the container |
+| `DATA_DIR` | `./data` | host folder for the remembered patch names (compose setting, mounted at `/data`) |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.
