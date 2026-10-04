@@ -117,11 +117,22 @@ def test_pedal_unplugged_is_503_not_a_hang(monkeypatch):
     srv.shutdown()
 
 
-def test_read_patch(monkeypatch):
+def test_read_current_patch(monkeypatch):
     srv, base = start(monkeypatch)
     Fake.replies = dump()
-    code, out = call(base, "/api/patch/75")
+    code, out = call(base, "/api/patch/current")
     assert code == 200 and out["name"] == "WADE" and out["label"] == "P26-1"
-    code, out = call(base, "/api/patch/75")      # pedal says nothing
+    code, out = call(base, "/api/patch/current")      # pedal says nothing
     assert code == 504
+    srv.shutdown()
+
+
+def test_read_by_index_only_when_it_is_the_selected_patch(monkeypatch):
+    srv, base = start(monkeypatch)
+    Fake.replies = dump()
+    assert call(base, "/api/patch/75")[1]["name"] == "WADE"
+    Fake.replies = dump()                              # pedal still on 75, asked for 74
+    code, out = call(base, "/api/patch/74")
+    assert code == 409 and out["current_index"] == 75 and out["asked_index"] == 74
+    assert out["current_name"] == "WADE"
     srv.shutdown()

@@ -8,7 +8,8 @@ Auth: X-Api-Key header, except GET /health.
 
   GET  /health                     liveness, pedal presence, request counters
   GET  /api/usb                    interfaces and endpoints the pedal reports
-  GET  /api/patch/<index>          read a stored patch (name + raw record)
+  GET  /api/patch/current          read the patch the pedal has selected (name + raw record)
+  GET  /api/patch/<index>          same, but 409 unless <index> is the selected patch
   POST /api/patch/select           {"index": 75}            Program Change
   POST /api/block                  {"block": "rvb", "on": true}
   POST /api/model                  {"slot": "eq", "code": 4}
@@ -45,12 +46,27 @@ GAP = 0.15           # pause between frames, the pacing the pedal was tested wit
 link = usb.Link(hard_deadline=HARD_DEADLINE)
 
 
-def read_patch(index: int) -> dict:
-    """Pull a stored patch the way the editor does and decode it."""
+class PatchNotCurrent(Exception):
+    """The pedal answered with a different patch than the one asked for.
+
+    The editor's read frames return the pedal's CURRENT patch whatever index
+    they carry (found on the real pedal, Oct 3, 2026: reads for 0, 1, 74 and 76
+    all came back as 75). Never label that data with the requested index.
+    """
+
+    def __init__(self, asked: int, got: dict):
+        super().__init__(f"the pedal answered with its current patch {got['label']} ({got['name']!r}), "
+                         f"not {am.patch_label(asked)}; select the patch first")
+        self.extra = {"asked_index": asked, "current_index": got["index"],
+                      "current_label": got["label"], "current_name": got["name"]}
+
+
+def read_current_patch() -> dict:
+    """Read the patch the pedal currently has selected. Reads only."""
     def run(p):
         p.drain()
         frames = []
-        for req in am.read_patch_requests(index):
+        for req in am.read_patch_requests(0):
             p.send_sysex(req)
             frames += p.collect(GAP)
         frames += p.collect(0.5)
@@ -58,7 +74,15 @@ def read_patch(index: int) -> dict:
             return am.decode_patch(frames)
         except am.ProtocolError as e:
             raise usb.PedalTimeout(str(e))
-    return link.session(f"read patch {index}", run)
+    return link.session("read current patch", run)
+
+
+def read_patch(index: int) -> dict:
+    """Read patch `index`, only if it is the one the pedal has selected."""
+    got = read_current_patch()
+    if got["index"] != index:
+        raise PatchNotCurrent(index, got)
+    return got
 
 
 def send_midi(msg: bytes, name: str):
@@ -116,7 +140,7 @@ def handle_post(path: str, data: dict) -> dict:
 STATUS = {
     usb.PedalNotConnected: 503, usb.PedalBusy: 503, usb.PedalGone: 503,
     usb.PedalTimeout: 504, usb.UsbMidiError: 502,
-    am.ProtocolError: 400, LookupError: 404,
+    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409,
 }
 
 
@@ -164,7 +188,7 @@ class Handler(BaseHTTPRequestHandler):
             code = status_for(e)
             if code >= 500:
                 log.warning("%s %s -> %d %s: %s", self.command, self.path, code, type(e).__name__, e)
-            self._send(code, {"error": str(e), "kind": type(e).__name__})
+            self._send(code, {"error": str(e), "kind": type(e).__name__, **getattr(e, "extra", {})})
 
     def do_GET(self):
         path = urlparse(self.path).path
@@ -176,6 +200,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/usb":
             self._run(usb.describe)
+        elif path == "/api/patch/current":
+            self._run(read_current_patch)
         elif path.startswith("/api/patch/") and path.count("/") == 3:
             self._run(lambda: read_patch(_idx(path.rsplit("/", 1)[1])))
         else:

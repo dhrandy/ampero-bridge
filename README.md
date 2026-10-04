@@ -11,7 +11,7 @@ small JSON API.
 | --- | --- |
 | Patch select, block on/off (CC) | verified on the pedal's screen |
 | Model select, parameter set (SysEx) | verified for the EQ slot; other slots follow the same frame |
-| Read patch (name, raw record) | works; only the name and index are decoded |
+| Read the selected patch (name, raw record) | works on the real pedal; only the name and index are decoded. It reads the patch the pedal has selected, not any index (see API) |
 | Save | **verified on the pedal.** The editor's two frames, sent together in one USB transfer, saved the name TEST into P26-1 (seen on the screen after hopping patches). The pedal sends no reply, so only its screen confirms it |
 | Lock (CC 77), all-off (CC 78) | not isolated on the Mini |
 
@@ -46,7 +46,8 @@ Send `X-Api-Key`. Only `/health` is open.
 | --- | --- | --- |
 | `GET /health` | | liveness, `pedal_connected`, request counters |
 | `GET /api/usb` | | interfaces and endpoints the pedal reports |
-| `GET /api/patch/<index>` | | read a stored patch: `name`, `label`, `record_hex` |
+| `GET /api/patch/current` | | read the patch the pedal has selected: `index`, `label`, `name`, `record_hex` |
+| `GET /api/patch/<index>` | | same, but 409 (with `current_index`, `current_name`) unless `<index>` is the selected patch. Select it first |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
 | `POST /api/model` | `{"slot": "eq", "code": 4}` | pick a model for a slot |
@@ -57,7 +58,7 @@ Errors come back as `{"error", "kind"}`: 400 bad input, 401 key, 503 pedal not
 connected or busy, 504 pedal silent, 502 other USB error.
 
 The pedal never echoes a write. Only its screen shows that a write applied. Before
-overwriting a patch, `GET /api/patch/<index>` first and keep the record as the
+overwriting a patch, select it, `GET /api/patch/<index>`, and keep the record as the
 restore point.
 
 ## Env

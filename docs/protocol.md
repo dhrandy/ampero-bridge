@@ -65,6 +65,12 @@ are not isolated on the Mini.
 
 ## Reading a patch
 
+**The read returns the patch the pedal has selected.** On the real pedal, reads for
+indexes 0, 1, 74 and 76 all answered with patch 75 (the selected one). The index in
+the frames does not choose the patch. To read another patch, select it first
+(Program Change), then read. The bridge refuses to label a read with an index the
+pedal did not answer with.
+
 What the editor does to "load" patch `<idx>` (all kind 12 except where noted):
 
     11  00 02 0a 00 00 00
