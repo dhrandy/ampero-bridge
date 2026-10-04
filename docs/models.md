@@ -223,7 +223,7 @@ Rule: code = ID - 170. Checked at Guitar EQ 1 (code 0).
 
 ### DLY models
 
-Rule: code = ID - 177. Checked at Slapback (ID 186, code 9).
+Rule: code = ID - 177. Checked at Slapback (ID 186, code 9). The editor's list order matches the ID order and has one more model at the end (2290 Mod), so 17 models.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
@@ -243,10 +243,11 @@ Rule: code = ID - 177. Checked at Slapback (ID 186, code 9).
 | 190 | 13 | Lofi Eko | list order, not checked |
 | 191 | 14 | Ring Eko | list order, not checked |
 | 192 | 15 | Ekoverb | list order, not checked |
+| - | 16 | 2290 Mod | in the editor, not in the ID list; code from the pattern, not checked |
 
 ### RVB models
 
-Rule: code = ID - 193. Checked at Spring (ID 197, code 4).
+Rule: code = ID - 193. Checked at Spring (ID 197, code 4). The editor shows the same order with one more model at the end (Cloud), so 11 models. In the editor's list Oceandeep, Sweet Space and Shimmer follow Northstar.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
@@ -260,6 +261,7 @@ Rule: code = ID - 193. Checked at Spring (ID 197, code 4).
 | 200 | 7 | Oceandeep | list order, not checked |
 | 201 | 8 | Sweet Space | list order, not checked |
 | 202 | 9 | Shimmer | list order, not checked |
+| - | 10 | Cloud | in the editor, not in the ID list; code from the pattern, not checked |
 
 ### NR models
 
