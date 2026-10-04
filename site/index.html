@@ -8,15 +8,12 @@
 <meta name="description" content="Unofficial model list for the Hotone Ampero Mini with codes and what each model is based on (beta).">
 <title>Ampero Mini model library (beta)</title>
 <style>
-:root{--bg:#0f1115;--panel:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#9aa3b2;--acc:#f0b429;--ok:#3ecf8e;--warn:#e5a13a;--bad:#8b93a3}
+:root{--bg:#0d0f13;--panel:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#9aa3b2;--acc:#f0b429;--ok:#3ecf8e;--warn:#e5a13a;--bad:#8b93a3}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 .wrap{max-width:960px;margin:0 auto;padding:16px}
-header h1{font-size:22px;margin:8px 0 4px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .beta{font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--acc);color:#111;border-radius:4px;padding:2px 6px;font-weight:700}
-header p{margin:4px 0;color:var(--mute)}
-.links a{color:var(--acc);margin-right:14px}
 #q{width:100%;font:inherit;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);margin:14px 0 10px}
 #q:focus{outline:2px solid var(--acc);border-color:transparent}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
@@ -27,12 +24,13 @@ header p{margin:4px 0;color:var(--mute)}
 .opts{display:flex;flex-wrap:wrap;gap:14px;color:var(--mute);font-size:13px;margin:6px 0 12px}
 .opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
 #count{color:var(--mute);font-size:13px;margin:4px 0 8px}
-.list{display:grid;gap:8px;grid-template-columns:1fr}
+.list{display:grid;gap:8px;grid-template-columns:1fr;align-items:start}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 12px}
 .name{font-weight:600;font-size:16px}
 .blk{font-size:11px;font-weight:700;color:#111;background:var(--mute);border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:1px}
 .codebox{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .code{font-size:20px;font-weight:700}
+.code.dim{color:#4a5262;font-weight:400}
 .sub{color:var(--mute);font-size:12px}
 .based{grid-column:1/-1;color:var(--text);font-size:13px;margin-top:4px}
 .based span{color:var(--mute)}
@@ -47,27 +45,54 @@ details{margin:8px 0;color:var(--mute);font-size:13px}
 details summary{cursor:pointer;color:var(--text)}
 details dl{margin:8px 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
 details dt{font-weight:600;color:var(--text)}details dd{margin:0}
+
+.top{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#141821 0,#0d0f13 100%)}
+.top .wrap{padding-top:22px;padding-bottom:22px}
+.brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--mute);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+.brand i{width:18px;height:2px;background:var(--acc);display:inline-block}
+.top h1{font-size:34px;line-height:1.1;letter-spacing:-.02em;margin:10px 0 8px;font-weight:700}
+.lede{color:#b5bdcb;font-size:16px;max-width:620px;margin:0 0 16px}
+.stats{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 16px;padding:0;list-style:none}
+.stats li{font-size:13px;color:var(--mute)}
+.stats b{display:block;color:var(--text);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;background:var(--panel)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#111}
+.btn:hover{border-color:var(--acc)}
+.note{margin-top:14px;font-size:12px;color:var(--mute)}
+.exp{grid-column:1/-1;margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
+.exp summary{cursor:pointer;color:var(--acc);font-size:13px;font-weight:600;padding:4px 0;list-style:none}
+.exp summary::-webkit-details-marker{display:none}
+.exp summary::after{content:' +'}
+.exp[open] summary::after{content:' \2212'}
+.exp dl{margin:6px 0 2px;display:grid;grid-template-columns:1fr;gap:6px}
+.exp dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.exp dd{margin:0 0 4px;font-size:14px;color:var(--text)}
+@media(max-width:560px){.top h1{font-size:27px}.lede{font-size:15px}}
 @media(min-width:720px){.list{grid-template-columns:1fr 1fr}}
 @media(max-width:380px){.card{grid-template-columns:1fr}.codebox{text-align:left}}
 </style>
 </head>
 <body>
+<div class="top"><div class="wrap">
+<div class="brand"><i></i>Hotone Ampero Mini <span class="beta">beta</span></div>
+<h1>Model library</h1>
+<p class="lede">Every model on firmware V2.2, with the code the pedal stores for it and the real-world gear it is based on.</p>
+<ul class="stats" id="stats"><li><b>317</b>models</li><li><b>9</b>blocks</li><li><b>V2.2</b>firmware</li></ul>
+<div class="btns"><a class="btn pri" href="models.json">models.json</a><a class="btn" href="https://github.com/dhrandy/ampero-bridge">GitHub</a></div>
+<p class="note">Unofficial and not affiliated with Hotone. Codes are labeled by how well they are verified.</p>
+</div></div>
 <div class="wrap">
-<header>
-<h1>Ampero Mini model library <span class="beta">beta</span></h1>
-<p>Every model on the Hotone Ampero Mini (firmware V2.2) with the code the pedal stores for it, and what it is based on. Unofficial, made from the pedal's editor and live reads.</p>
-<p class="links"><a href="models.json">models.json</a><a href="https://github.com/dhrandy/ampero-bridge">Source on GitHub</a></p>
 <details><summary>How to read this</summary>
 <dl>
 <dt>Screen</dt><dd>position in the editor's list for that block, starting at 1.</dd>
 <dt>Code</dt><dd>the number stored in the preset record for the model. FX1, FX2 and FX3 use different codes even for the same name.</dd>
 <dt>pedal-proven</dt><dd>code set on a real pedal and read back from the record.</dd>
-<dt>scroll-derived</dt><dd>FX2 codes seen while scrolling the list; not read back.</dd>
-<dt>list order</dt><dd>code follows from the list order and a rule that held where it was checked. Not checked itself.</dd>
-<dt>code unknown</dt><dd>name known from the editor, code not read yet.</dd>
+<dt>Codes without a tag</dt><dd>follow from the list order and a rule that held everywhere it was checked (FX2 codes come from scrolling the list). Treat them as likely, and read a record back before relying on one. Only the green pedal-proven tag means a read-back on a real pedal.</dd>
+<dt>Dash</dt><dd>the code has not been read yet.</dd>
 <dt>firmware-added</dt><dd>in the editor's list, not in the manufacturer's effect list.</dd>
+<dt>Details</dt><dd>short notes in our own words about the real-world gear. General background, not measurements.</dd>
 </dl></details>
-</header>
 <input id="q" type="search" placeholder="Search, e.g. tube screamer" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search models">
 <div class="chips" id="chips" role="group" aria-label="Filter by block"></div>
 <div class="opts">
@@ -77,7 +102,7 @@ details dt{font-weight:600;color:var(--text)}details dd{margin:0}
 <div id="count" aria-live="polite"></div>
 <div class="list" id="list"></div>
 <footer>
-Beta. Not affiliated with or endorsed by Hotone. Product and brand names belong to their owners and appear only to say which real-world gear a model is based on. Codes marked list order or code unknown can be wrong, so read a record back before relying on one. MIT licensed, copyright dhrandy.
+Beta. Not affiliated with or endorsed by Hotone. Product and brand names belong to their owners and appear only to say which real-world gear a model is based on. Codes without a pedal-proven tag can be wrong, so read a record back before relying on one. MIT licensed, copyright dhrandy.
 </footer>
 </div>
 <script>
@@ -107,7 +132,7 @@ function score(m,q,qt){
 function build(){
  data.blocks.forEach(function(b){b.models.forEach(function(m){
   m.block=b.block;m._n=norm(m.name);m._ba=norm(m.based_on);
-  m._h=norm([m.block,m.name,m.based_on,m.category,m.status,m.firmware_added?'firmware added':'',m.renamed].join(' '));
+  m._h=norm([m.block,m.name,m.based_on,m.category,m.status,m.firmware_added?'firmware added':'',m.renamed,m.notes?[m.notes.tone,m.notes.known_for,m.notes.tip].join(' '):''].join(' '));
   m._t=tri(m._n);m._w=m._h.split(' ');all.push(m)})});
  var chips=$('chips');
  function chip(id,label,n){var b=document.createElement('button');b.className='chip';b.type='button';b.setAttribute('aria-pressed',id===block);b.innerHTML=label+'<small>'+n+'</small>';b.onclick=function(){block=id;render()};b.dataset.id=id;chips.appendChild(b)}
@@ -115,17 +140,19 @@ function build(){
  render()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function card(m){
- var st=STAT[m.status]||[m.status,''];
- var code=m.code===null||m.code===undefined?'?':m.code;
+ var known=!(m.code===null||m.code===undefined);
  var h='<div class="card"><div><span class="blk">'+esc(m.block)+'</span><span class="name">'+esc(m.name)+'</span></div>'+
- '<div class="codebox"><div class="code">'+esc(code)+'</div><div class="sub">code</div></div>';
- var b=m.based_on?'<div class="based"><span>Based on</span> '+esc(m.based_on)+'</div>':
-  '<div class="based"><span>Based on</span> <span>'+(m.based_on_status==='unknown'?'unknown':'none listed')+'</span></div>';
- h+=b+'<div class="meta"><span class="tag '+st[1]+'">'+esc(st[0])+'</span><span class="tag">screen '+m.screen+'</span>';
+ '<div class="codebox">'+(known?'<div class="code">'+esc(m.code)+'</div><div class="sub">code</div>':'<div class="code dim">\u2013</div>')+'</div>';
+ if(m.based_on)h+='<div class="based"><span>Based on</span> '+esc(m.based_on)+'</div>';
+ h+='<div class="meta">';
+ if(m.status==='pedal-proven')h+='<span class="tag ok">pedal-proven</span>';
+ h+='<span class="tag">screen '+m.screen+'</span>';
  if(m.id)h+='<span class="tag">list ID '+m.id+'</span>';
  if(m.firmware_added)h+='<span class="tag new">firmware-added</span>';
  if(m.renamed)h+='<span class="tag">'+esc(m.renamed)+'</span>';
- return h+'</div></div>'}
+ h+='</div>';
+ if(m.notes){h+='<details class="exp"><summary>Details</summary><dl><dt>Tone</dt><dd>'+esc(m.notes.tone)+'</dd><dt>Known for</dt><dd>'+esc(m.notes.known_for)+'</dd><dt>Worth knowing</dt><dd>'+esc(m.notes.tip)+'</dd></dl></details>'}
+ return h+'</div>'}
 function render(){
  [].forEach.call($('chips').children,function(c){c.setAttribute('aria-pressed',c.dataset.id===block)});
  var qraw=$('q').value,q=norm(qraw),qt=q?q.split(' '):[];

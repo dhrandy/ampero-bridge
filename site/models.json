@@ -17,7 +17,8 @@
   "firmware_added": "in the editor's list but not in the manufacturer's effect list",
   "based_on": "real-world equivalent as listed by the manufacturer (null if none listed or unknown)",
   "based_on_status": "listed | none-listed (original model) | unknown (not in the manufacturer's list)",
-  "renamed": "note where the editor's name differs from the manufacturer's list"
+  "renamed": "note where the editor's name differs from the manufacturer's list",
+  "notes": "AMP only. tone, known_for and tip are written by the project in its own words about the real-world amp; null where the amp is not confidently identified. General background, not measurements."
  },
  "notes": [
   "FX1, FX2 and FX3 share many names but store different codes. Always use the code for the slot you are writing.",
@@ -1720,7 +1721,12 @@
      "based_on": "Fender Tweed Deluxe 5E3 bright channel",
      "based_on_status": "listed",
      "id": 55,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Warm, thick and a little compressed. Small amp, so it gets gritty early.",
+      "known_for": "Early rock and roll, blues and roots music.",
+      "tip": "Rolling the guitar volume back cleans it up. Good with a light drive in front."
+     }
     },
     {
      "screen": 2,
@@ -1731,7 +1737,12 @@
      "based_on": "Fender '59 Bassman normal channel",
      "based_on_status": "listed",
      "id": 56,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Round, full and punchy. Stays fairly clean at low gain, then turns gritty and fat when pushed.",
+      "known_for": "Blues and rock and roll. Many later guitar amps grew out of this design.",
+      "tip": "Works best with single coils. Pairs well with an overdrive for more sustain."
+     }
     },
     {
      "screen": 3,
@@ -1742,7 +1753,12 @@
      "based_on": "Fender '65 Twin Reverb",
      "based_on_status": "listed",
      "id": 57,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Very clean, big and sparkly, with lots of headroom and a chimey top end.",
+      "known_for": "Country, surf, jazz and clean pop. A common base for pedals.",
+      "tip": "Takes pedals very well. Do not expect natural breakup at normal volumes."
+     }
     },
     {
      "screen": 4,
@@ -1753,7 +1769,12 @@
      "based_on": "VOX AC30HW normal channel",
      "based_on_status": "listed",
      "id": 58,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Bright, chimey and mid-forward British clean to light crunch. The normal channel is the softer, rounder one.",
+      "known_for": "Jangly British pop and rock. Brian May and the Beatles are the usual names.",
+      "tip": "Breaks up nicely when pushed. Try Top Boost (next entry) if it is too soft."
+     }
     },
     {
      "screen": 5,
@@ -1764,7 +1785,12 @@
      "based_on": "legendary Jazz Chorus solid state combo",
      "based_on_status": "listed",
      "id": 59,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Glassy, very clean solid-state sound with a wide built-in chorus.",
+      "known_for": "80s clean tones, new wave and indie.",
+      "tip": "No tube-style breakup, so lean on pedals for drive. Easy to play with delay and reverb."
+     }
     },
     {
      "screen": 6,
@@ -1775,7 +1801,12 @@
      "based_on": "Matchless Chieftain 212 combo clean",
      "based_on_status": "listed",
      "id": 60,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Chimey clean in the British Class A style, with a fuller low end than a plain AC30.",
+      "known_for": "Boutique clean and jangle.",
+      "tip": "Use it for clean parts that need some body."
+     }
     },
     {
      "screen": 7,
@@ -1786,7 +1817,12 @@
      "based_on": "Mesa/Boogie Lone Star CH1",
      "based_on_status": "listed",
      "id": 61,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Rich boutique clean with a bit of shimmer.",
+      "known_for": "Clean, country and blues tones.",
+      "tip": "A step toward polite and polished, rather than raw."
+     }
     },
     {
      "screen": 8,
@@ -1797,7 +1833,12 @@
      "based_on": "Bogner Shiva 20th Ann. Ch1",
      "based_on_status": "listed",
      "id": 62,
-     "category": "Clean"
+     "category": "Clean",
+     "notes": {
+      "tone": "Clean to light break-up with a sweet, open top end.",
+      "known_for": "Boutique clean tones.",
+      "tip": "A good platform for pedals."
+     }
     },
     {
      "screen": 9,
@@ -1808,7 +1849,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 10,
@@ -1819,7 +1861,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 11,
@@ -1830,7 +1873,12 @@
      "based_on": "Fender '59 Bassman bright channel",
      "based_on_status": "listed",
      "id": 63,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Same amp as Baseman Norm, bright channel: more sparkle and edge, less body.",
+      "known_for": "Blues and rock and roll.",
+      "tip": "Pick this over Norm when your guitar sounds dull or dark."
+     }
     },
     {
      "screen": 12,
@@ -1841,7 +1889,12 @@
      "based_on": "VOX AC30HW Top Boost channel",
      "based_on_status": "listed",
      "id": 64,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Brighter and punchier than the normal channel, with more chime and bite.",
+      "known_for": "Classic British rock and pop.",
+      "tip": "Good for crunch with a bit of treble boost in front."
+     }
     },
     {
      "screen": 13,
@@ -1852,7 +1905,12 @@
      "based_on": "Matchless Chieftain 212 dirty",
      "based_on_status": "listed",
      "id": 65,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "The dirty side of the same amp: a chimey, touch-sensitive crunch.",
+      "known_for": "Classic rock rhythm and bluesy leads.",
+      "tip": "Dynamic. Pick harder for more grit."
+     }
     },
     {
      "screen": 14,
@@ -1863,7 +1921,12 @@
      "based_on": "Mesa/Boogie Lone Star CH2",
      "based_on_status": "listed",
      "id": 66,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Mid-gain, smooth rock overdrive from the second channel.",
+      "known_for": "Rock rhythm and lead.",
+      "tip": "Sits well with a booster in front for solos."
+     }
     },
     {
      "screen": 15,
@@ -1874,7 +1937,12 @@
      "based_on": "Marshall JTM45 normal channel",
      "based_on_status": "listed",
      "id": 67,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Warm, thick, a bit loose, and bluesy. Less gain than later Marshalls.",
+      "known_for": "The roots of British rock and blues.",
+      "tip": "Needs a boost or gain pedal for harder rock."
+     }
     },
     {
      "screen": 16,
@@ -1885,7 +1953,12 @@
      "based_on": "Marshall JTM45 normal channel",
      "based_on_status": "listed",
      "id": 67,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "The pedal's own take on the same Marshall amp as the entry before it.",
+      "known_for": "Classic British rock.",
+      "tip": "Compare by ear with the entry before it."
+     }
     },
     {
      "screen": 17,
@@ -1896,7 +1969,12 @@
      "based_on": "Marshall JTM45 Jump connection",
      "based_on_status": "listed",
      "id": 69,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Like the base entry with both inputs linked, which gives more gain and body.",
+      "known_for": "Classic British rock.",
+      "tip": "Try it when the base entry is too polite."
+     }
     },
     {
      "screen": 18,
@@ -1907,7 +1985,12 @@
      "based_on": "Marshall JMP50 normal channel",
      "based_on_status": "listed",
      "id": 70,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Classic Plexi-style crunch: open, loud, and punchy.",
+      "known_for": "Classic rock and hard rock.",
+      "tip": "Takes a booster very well. Great with humbuckers or single coils."
+     }
     },
     {
      "screen": 19,
@@ -1918,7 +2001,12 @@
      "based_on": "Marshall JMP50 normal channel",
      "based_on_status": "listed",
      "id": 70,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "The pedal's own take on the same Marshall amp as the entry before it.",
+      "known_for": "Classic British rock.",
+      "tip": "Compare by ear with the entry before it."
+     }
     },
     {
      "screen": 20,
@@ -1929,7 +2017,12 @@
      "based_on": "Marshall JMP50 Jump",
      "based_on_status": "listed",
      "id": 72,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Like the base entry with the channels linked: more gain and fatter lows.",
+      "known_for": "Classic and hard rock.",
+      "tip": "Use it when you want a bit more drive without a pedal."
+     }
     },
     {
      "screen": 21,
@@ -1940,7 +2033,12 @@
      "based_on": "Bad Cat Hot Cat 30 drive channel",
      "based_on_status": "listed",
      "id": 73,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Rich, touch-sensitive overdrive with a hint of both Vox and Marshall.",
+      "known_for": "Boutique blues and rock.",
+      "tip": "Responds well to guitar volume."
+     }
     },
     {
      "screen": 22,
@@ -1951,7 +2049,12 @@
      "based_on": "Mesa/Boogie Mark II C+ Lead - switch combo 1",
      "based_on_status": "listed",
      "id": 74,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Smooth, saturated and singing lead tone with a tight low end.",
+      "known_for": "Lead playing in rock and fusion. Carlos Santana is closely linked to early Mesa amps.",
+      "tip": "The three entries are different switch settings. A/B them for taste."
+     }
     },
     {
      "screen": 23,
@@ -1962,7 +2065,12 @@
      "based_on": "Mesa/Boogie Mark II C+ Lead - switch combo 2",
      "based_on_status": "listed",
      "id": 75,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Another switch setting of the same Mark II C+ lead voice.",
+      "known_for": "Lead playing in rock and fusion.",
+      "tip": "A/B with the other two entries (22 to 24)."
+     }
     },
     {
      "screen": 24,
@@ -1973,7 +2081,12 @@
      "based_on": "Mesa/Boogie Mark II C+ Lead - switch combo 3",
      "based_on_status": "listed",
      "id": 76,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Another switch setting of the same Mark II C+ lead voice.",
+      "known_for": "Lead playing in rock and fusion.",
+      "tip": "A/B with the other two entries (22 to 24)."
+     }
     },
     {
      "screen": 25,
@@ -1984,7 +2097,12 @@
      "based_on": "Soldano SLO100 normal channel dirty",
      "based_on_status": "listed",
      "id": 77,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Crunchy high-gain tone, tight and punchy.",
+      "known_for": "80s and 90s hard rock.",
+      "tip": "A good rhythm pick before the lead channel."
+     }
     },
     {
      "screen": 26,
@@ -1995,7 +2113,12 @@
      "based_on": "Marshall JCM800",
      "based_on_status": "listed",
      "id": 78,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Mid-heavy, punchy 80s hard rock crunch.",
+      "known_for": "Hard rock and metal. A staple with a boost in front.",
+      "tip": "Takes an overdrive pedal in front very well."
+     }
     },
     {
      "screen": 27,
@@ -2006,7 +2129,12 @@
      "based_on": "Brown Eye BE channel - combo 1",
      "based_on_status": "listed",
      "id": 79,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Modern high-gain with a Marshall-like voice, tight and aggressive.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Good for rhythm and lead."
+     }
     },
     {
      "screen": 28,
@@ -2017,7 +2145,12 @@
      "based_on": "Brown Eye BE channel - combo 2",
      "based_on_status": "listed",
      "id": 80,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "A second version of the same Brown Eye voice.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Compare it with the entry before it."
+     }
     },
     {
      "screen": 29,
@@ -2028,7 +2161,12 @@
      "based_on": "Bogner Shiva 20th Ann. Ch2",
      "based_on_status": "listed",
      "id": 81,
-     "category": "Drive"
+     "category": "Drive",
+     "notes": {
+      "tone": "Smooth, harmonically rich crunch to lead gain.",
+      "known_for": "Rock and blues lead.",
+      "tip": "Good all-rounder when you want gain that stays clear."
+     }
     },
     {
      "screen": 30,
@@ -2039,7 +2177,12 @@
      "based_on": "Marshall JCM900 Model 4100 Ch B",
      "based_on_status": "listed",
      "id": 82,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Tight, compressed and saturated 90s gain.",
+      "known_for": "Hard rock and metal.",
+      "tip": "More compression than the 800. Watch for a fizzy top end on bright guitars."
+     }
     },
     {
      "screen": 31,
@@ -2050,7 +2193,12 @@
      "based_on": "Diezel VH4 CH3 blue version",
      "based_on_status": "listed",
      "id": 83,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Aggressive modern high gain with a tight, controlled low end and a lot of drive.",
+      "known_for": "Modern metal.",
+      "tip": "Two versions exist (blue and silver) and the + entries are the pedal's own take. Compare by ear."
+     }
     },
     {
      "screen": 32,
@@ -2061,7 +2209,12 @@
      "based_on": "Diezel VH4 CH3 silver version",
      "based_on_status": "listed",
      "id": 84,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Aggressive modern high gain with a tight, controlled low end and a lot of drive.",
+      "known_for": "Modern metal.",
+      "tip": "Two versions exist (blue and silver) and the + entries are the pedal's own take. Compare by ear."
+     }
     },
     {
      "screen": 33,
@@ -2072,7 +2225,12 @@
      "based_on": "ENGL Savage 120 E610 CH4 contour off",
      "based_on_status": "listed",
      "id": 85,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Tight, aggressive modern metal gain with a big low end.",
+      "known_for": "Modern metal and extreme styles.",
+      "tip": "The contour setting changes the mid shape. Listen to both entries to pick."
+     }
     },
     {
      "screen": 34,
@@ -2083,7 +2241,12 @@
      "based_on": "ENGL Savage 120 E610 CH4 contour on",
      "based_on_status": "listed",
      "id": 86,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Tight, aggressive modern metal gain with a big low end.",
+      "known_for": "Modern metal and extreme styles.",
+      "tip": "The contour setting changes the mid shape. Listen to both entries to pick."
+     }
     },
     {
      "screen": 35,
@@ -2094,7 +2257,12 @@
      "based_on": "Brown Eye HBE channel",
      "based_on_status": "listed",
      "id": 87,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Hotter version of the same amp family: more gain and saturation.",
+      "known_for": "Metal and modern hard rock.",
+      "tip": "Use it when you need extra gain without a pedal."
+     }
     },
     {
      "screen": 36,
@@ -2105,7 +2273,12 @@
      "based_on": "Brown Eye HBE channel",
      "based_on_status": "listed",
      "id": 87,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "A second version of the same Brown Eye voice.",
+      "known_for": "Hard rock and metal.",
+      "tip": "Compare it with the entry before it."
+     }
     },
     {
      "screen": 37,
@@ -2116,7 +2289,12 @@
      "based_on": "Peavey 5150 LEAD channel",
      "based_on_status": "listed",
      "id": 89,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Aggressive, tight and saturated lead channel.",
+      "known_for": "Metal and hard rock, with ties to Van Halen era rock.",
+      "tip": "Very high gain, so keep the guitar volume up and use the noise gate."
+     }
     },
     {
      "screen": 38,
@@ -2127,7 +2305,12 @@
      "based_on": "Soldano SLO100 overdrive channel",
      "based_on_status": "listed",
      "id": 90,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Thick, saturated lead tone with long sustain.",
+      "known_for": "Hard rock and metal leads.",
+      "tip": "Tight low end, so it handles fast riffs."
+     }
     },
     {
      "screen": 39,
@@ -2138,7 +2321,12 @@
      "based_on": "Mesa/Boogie Mark IV Lead - combo 1",
      "based_on_status": "listed",
      "id": 91,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Polished, saturated lead with a tight low end.",
+      "known_for": "Rock, metal and fusion leads.",
+      "tip": "Three entries are different switch settings. A/B them."
+     }
     },
     {
      "screen": 40,
@@ -2149,7 +2337,12 @@
      "based_on": "Mesa/Boogie Mark IV Lead - combo 2",
      "based_on_status": "listed",
      "id": 92,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Polished, saturated lead with a tight low end.",
+      "known_for": "Rock, metal and fusion leads.",
+      "tip": "Three entries are different switch settings. A/B them."
+     }
     },
     {
      "screen": 41,
@@ -2160,7 +2353,12 @@
      "based_on": "Mesa/Boogie Mark IV Lead - combo 3",
      "based_on_status": "listed",
      "id": 93,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Polished, saturated lead with a tight low end.",
+      "known_for": "Rock, metal and fusion leads.",
+      "tip": "Three entries are different switch settings. A/B them."
+     }
     },
     {
      "screen": 42,
@@ -2171,7 +2369,12 @@
      "based_on": "Orange Rockerverb 100 Dirty channel",
      "based_on_status": "listed",
      "id": 94,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Thick, mid-forward high gain with a heavy low end.",
+      "known_for": "Hard rock, doom and stoner.",
+      "tip": "Good for slow, heavy riffs."
+     }
     },
     {
      "screen": 43,
@@ -2182,7 +2385,12 @@
      "based_on": "Mesa/Boogie Dual Rectifier CH3 vintage mode",
      "based_on_status": "listed",
      "id": 95,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Massive, tight and heavy. Vintage mode is looser and spongier.",
+      "known_for": "Heavy rock and metal.",
+      "tip": "Pair with a tight cab. Both modes are worth trying."
+     }
     },
     {
      "screen": 44,
@@ -2193,7 +2401,12 @@
      "based_on": "Mesa/Boogie Dual Rectifier CH3 modern mode",
      "based_on_status": "listed",
      "id": 96,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Massive, tight and heavy. Modern mode is tighter and louder.",
+      "known_for": "Heavy rock and metal.",
+      "tip": "Pair with a tight cab. Both modes are worth trying."
+     }
     },
     {
      "screen": 45,
@@ -2204,7 +2417,12 @@
      "based_on": "Diezel VH4 CH3 blue version",
      "based_on_status": "listed",
      "id": 83,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Aggressive modern high gain with a tight, controlled low end and a lot of drive.",
+      "known_for": "Modern metal.",
+      "tip": "Two versions exist (blue and silver) and the + entries are the pedal's own take. Compare by ear."
+     }
     },
     {
      "screen": 46,
@@ -2215,7 +2433,12 @@
      "based_on": "Diezel VH4 CH3 silver version",
      "based_on_status": "listed",
      "id": 84,
-     "category": "HiGain"
+     "category": "HiGain",
+     "notes": {
+      "tone": "Aggressive modern high gain with a tight, controlled low end and a lot of drive.",
+      "known_for": "Modern metal.",
+      "tip": "Two versions exist (blue and silver) and the + entries are the pedal's own take. Compare by ear."
+     }
     },
     {
      "screen": 47,
@@ -2227,7 +2450,12 @@
      "based_on_status": "listed",
      "id": 99,
      "category": "HiGain",
-     "renamed": "ID list calls this Boger XT Red M"
+     "renamed": "ID list calls this Boger XT Red M",
+     "notes": {
+      "tone": "Dense, modern high gain with a firm low end.",
+      "known_for": "Modern hard rock and metal.",
+      "tip": "The editor calls it Blue M but the manufacturer's list says Red M. Listen before relying on the name."
+     }
     },
     {
      "screen": 48,
@@ -2238,7 +2466,12 @@
      "based_on": "Alembic F-2B preamp",
      "based_on_status": "listed",
      "id": 100,
-     "category": "Bass"
+     "category": "Bass",
+     "notes": {
+      "tone": "Clear, articulate bass preamp with a hi-fi tone.",
+      "known_for": "Studio bass.",
+      "tip": "Good for DI-style bass or when you want a clean, detailed sound."
+     }
     },
     {
      "screen": 49,
@@ -2249,7 +2482,12 @@
      "based_on": "Ampeg SVT bass amp",
      "based_on_status": "listed",
      "id": 101,
-     "category": "Bass"
+     "category": "Bass",
+     "notes": {
+      "tone": "Punchy, warm and big at the low end.",
+      "known_for": "The standard rock bass amp.",
+      "tip": "Reliable for rock bass."
+     }
     },
     {
      "screen": 50,
@@ -2260,7 +2498,12 @@
      "based_on": "Ampeg B-15 Flip Top bass amp",
      "based_on_status": "listed",
      "id": 102,
-     "category": "Bass"
+     "category": "Bass",
+     "notes": {
+      "tone": "Round, warm and thumpy vintage bass tone.",
+      "known_for": "Classic soul and studio bass. James Jamerson is the well-known user.",
+      "tip": "Great with flatwound strings."
+     }
     },
     {
      "screen": 51,
@@ -2271,7 +2514,12 @@
      "based_on": "vintage VOX AC-100 bass amp",
      "based_on_status": "listed",
      "id": 103,
-     "category": "Bass"
+     "category": "Bass",
+     "notes": {
+      "tone": "Vintage 60s-style bass tone, clean and round.",
+      "known_for": "Classic 60s recordings.",
+      "tip": "Use it for a vintage, rounded sound."
+     }
     },
     {
      "screen": 52,
@@ -2282,7 +2530,12 @@
      "based_on": "Mesa/Boogie Bass 400 amp",
      "based_on_status": "listed",
      "id": 104,
-     "category": "Bass"
+     "category": "Bass",
+     "notes": {
+      "tone": "Punchy, tight and articulate with plenty of low-mid push.",
+      "known_for": "Rock and hard bass tones.",
+      "tip": "Cuts through a mix well."
+     }
     },
     {
      "screen": 53,
@@ -2293,7 +2546,8 @@
      "based_on": null,
      "based_on_status": "none-listed",
      "id": 105,
-     "category": "Acoustic"
+     "category": "Acoustic",
+     "notes": null
     },
     {
      "screen": 54,
@@ -2304,7 +2558,12 @@
      "based_on": "AER Colourizer 2 acoustic preamp with EQ",
      "based_on_status": "listed",
      "id": 106,
-     "category": "Acoustic"
+     "category": "Acoustic",
+     "notes": {
+      "tone": "Clear, natural acoustic guitar preamp with tone shaping.",
+      "known_for": "Acoustic guitar and pickup-equipped acoustic instruments.",
+      "tip": "Good for acoustic guitars with a piezo pickup."
+     }
     },
     {
      "screen": 55,
@@ -2315,7 +2574,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 56,
@@ -2326,7 +2586,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 57,
@@ -2337,7 +2598,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 58,
@@ -2348,7 +2610,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 59,
@@ -2359,7 +2622,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     },
     {
      "screen": 60,
@@ -2370,7 +2634,8 @@
      "based_on": null,
      "based_on_status": "unknown",
      "id": null,
-     "category": null
+     "category": null,
+     "notes": null
     }
    ]
   },
