@@ -1,5 +1,7 @@
 # ampero-bridge
 
+![ampero-bridge: an AI builds presets on the Hotone Ampero Mini](docs/banner.svg)
+
 A small web service that lets an AI agent (or any script) build presets on a
 Hotone Ampero Mini. The pedal plugs into a computer over USB. This service runs
 on that computer and turns plain HTTP calls into what the Hotone editor would
