@@ -96,7 +96,7 @@ Names are from the manual where the parameter count and order match; `?` means n
 
 ## FX3 list (screen number, code, name)
 
-FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). The Hotone manual gives the names in groups, in the order the pedal shows them: the modulation group first, then the special effects. Screen 03, 07, 17, 26, 27 and 29 were checked on a real pedal. Codes are screen minus 1 for screens 1 to 17 and screen plus 46 for 18 onwards, which fits all the codes read so far (2, 6, 16, 72, 73, 75). Only the rows marked "pedal-read" had their code read back; the other rows come from the pattern and are not proven. The list may continue past 29 (Pitch Shift and others); that part is not mapped. `/api/model` still only accepts the codes in the proven table above.
+FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). The Hotone manual gives the names in groups, in the order the pedal shows them: the modulation group first, then the special effects. Screen 03, 07, 17, 26, 27 and 29 were checked on a real pedal. Codes are screen minus 1 for screens 1 to 17 and screen plus 46 for 18 onwards, which fits all the codes read so far (2, 6, 16, 72, 73, 75). Only the rows marked "pedal-read" had their code read back; the other rows come from the pattern and are not proven. The list may continue past 29; that part is not mapped. `/api/model` still only accepts the codes in the proven table above.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
@@ -130,4 +130,4 @@ FX3 has its own list. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in 
 | 28 | 74 | Ring Mod | manual order, code from the pattern |
 | 29 | 75 | Sweller | pedal-read (screen and code) |
 
-The screen read "Bit Crusher" and the manual spells it "Bit Krusher". Knobs for the FX3 models checked so far are in `docs/knobs.md`.
+Knobs for the FX3 models checked so far are in `docs/knobs.md`.

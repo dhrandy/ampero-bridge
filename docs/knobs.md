@@ -108,12 +108,18 @@ The five bands show -50 to +50 on the pedal and are stored as the shown value pl
 
 ## FX3
 
-FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in FX2) and they do not follow the screen number (screen 03 and 07 read as codes 2 and 6, screen 27 reads as code 73). Read each model's code from the record.
+FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in FX2) and they do not follow the screen number past screen 17 (see the list in `docs/models.md`). Read each model's code from the record.
 
 | Code | Model (screen number) | Knobs in order | Status |
 | --- | --- | --- | --- |
 | 2 | Liquid C (03) | 0 Mode (stored as the shown mode minus 1; mode 3 read as 2) | Checked for one value |
 | 6 | Jetter B (07) | 0 Depth, 1 Rate, 2 Pre Delay, 3 Feedback, 4 Sync (Off/On) | Checked |
+| 16 | Custom Trem (17) | 6 slots read [70, 20, 80, 50, 0, 50]; knob labels not mapped | Code checked, knobs not mapped |
 | 73 | Bit Crusher (27) | 0 Mix, 1 Krush, 2 Bit, 3 Hi Cut, 4 Lo Cut | Checked |
+| 75 | Sweller (29) | Attack (14 bits, see below), 1 Curve (0 Line, 1 Exp, 2 Log) | Checked |
 
 Jetter B: all ranges 0-100 raw. Rate read 20 before Sync was turned on and 40 after, with no knob turn recorded. That change is observed but unexplained. Other FX3 models were not checked.
+
+Sweller: Attack runs 80 to 4000 ms and does not fit in one byte. The high 7 bits sit in the block's header byte 3 and the low 7 bits in the low byte of knob 0, so Attack ms = 80 + (byte3 * 128 + low byte). Read back at 80, 1000, 2353 and 4000. Curve was read as 0, 1 and 2 for Line, Exp and Log.
+
+The pedal screen splits the knobs over pages, the record is one flat list. Selecting a model can reload its defaults (Sweller went back to Attack 1000, Curve Line after leaving the screen and coming back). It did not always do this.
