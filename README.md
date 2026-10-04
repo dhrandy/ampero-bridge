@@ -9,7 +9,7 @@
 ![Last commit](https://img.shields.io/github/last-commit/dhrandy/ampero-bridge?style=flat-square)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 
-A small REST API in a Docker container that lets an AI agent, an LLM or any script
+A REST API of about a dozen endpoints, in a Docker container, that lets an AI agent, an LLM or any script
 build presets on a Hotone Ampero Mini guitar effects pedal. The pedal plugs into a
 computer over USB. This service runs on that computer and turns plain HTTP calls
 into the USB MIDI messages the Hotone editor would send: pick a patch, switch
