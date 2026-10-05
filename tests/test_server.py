@@ -440,3 +440,42 @@ def test_a_long_queue_gets_429_with_retry_after(monkeypatch):
     assert all(ra and int(ra) >= 1 for c, ra in results if c == 429)
     assert len(Fake.sent) == codes.count(200)        # a refused write never reaches the pedal
     srv.shutdown()
+
+
+def test_a_read_waits_out_the_quiet_time_after_a_save_but_not_when_idle(monkeypatch):
+    import time
+    srv, base = start(monkeypatch, gap=0.0, save_gap=0.6)
+    Fake.replies = []
+    # idle: settle returns at once
+    t0 = time.monotonic()
+    server.gate.settle()
+    assert time.monotonic() - t0 < 0.1
+    body = {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
+    assert call(base, "/api/patch/save", body)[0] == 200
+    t1 = time.monotonic()
+    server.gate.settle()                              # what a read does before it touches the pedal
+    assert time.monotonic() - t1 >= 0.5
+    srv.shutdown()
+
+
+def test_settle_waits_for_a_write_on_the_wire_and_never_takes_a_slot(monkeypatch):
+    import time
+    srv, base = start(monkeypatch, gap=0.0, save_gap=0.0, queue=1)
+    gate = server.gate
+    gate.active = 1
+    threading.Timer(0.3, lambda: setattr(gate, "active", 0)).start()
+    t0 = time.monotonic()
+    gate.settle()
+    assert time.monotonic() - t0 >= 0.25
+    assert gate.waiting == 0                          # a read holds no slot, so no 429 for writes
+    assert call(base, "/api/midi/cc", {"cc": 24})[0] == 200
+    srv.shutdown()
+
+
+def test_read_current_patch_settles_before_it_touches_the_pedal(monkeypatch):
+    order = []
+    monkeypatch.setattr(server.gate, "settle", lambda: order.append("settle"))
+    got = {"index": 75, "label": "P26-1", "name": "WADE"}
+    monkeypatch.setattr(server.link, "session", lambda name, fn: order.append("pedal") or got)
+    assert server.read_current_patch() == got
+    assert order == ["settle", "pedal"]

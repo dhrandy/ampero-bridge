@@ -102,7 +102,8 @@ class WriteGate:
 
     A Mini once stopped on a firmware assert during heavy use. The cause
     is not proven; giving the pedal room between writes is the cautious fix. Writes wait their
-    turn here; reads never do.
+    turn here. A read that touches the pedal does not wait in line but holds off until the
+    write before it is done and the quiet time has passed (settle).
     A save also waits for quiet before it goes out, and holds the next write back after it.
     """
 
@@ -112,6 +113,7 @@ class WriteGate:
         self.waiting = 0
         self.last_end = 0.0   # monotonic time the previous write finished
         self.next_ok = 0.0    # earliest start for the next ordinary write
+        self.active = 0       # writes on the wire right now (0 or 1)
 
     def run(self, save: bool, fn):
         with self.count:
@@ -126,14 +128,31 @@ class WriteGate:
                 pause = start_ok - time.monotonic()
                 if pause > 0:
                     time.sleep(pause)
+                with self.count:
+                    self.active += 1
                 try:
                     return fn()
                 finally:
                     self.last_end = time.monotonic()
                     self.next_ok = self.last_end + (WRITE_SAVE_GAP if save else WRITE_GAP)
+                    with self.count:
+                        self.active -= 1
         finally:
             with self.count:
                 self.waiting -= 1
+
+
+    def settle(self):
+        """For reads that touch the pedal: wait until no write is on the wire and the quiet
+        time after the last write (3 s after a save) is over. A read never joins the line
+        of writes, takes a write slot or counts toward the 429 limit."""
+        while True:
+            with self.count:
+                busy = self.active > 0
+            pause = self.next_ok - time.monotonic()
+            if not busy and pause <= 0:
+                return
+            time.sleep(0.05 if busy or pause > 0.05 else max(pause, 0.001))
 
 
 gate = WriteGate()
@@ -374,6 +393,7 @@ def read_current_patch() -> dict:
             return am.decode_patch(frames)
         except am.ProtocolError as e:
             raise usb.PedalTimeout(str(e))
+    gate.settle()
     got = link.session("read current patch", run)
     known.record(got["index"], got["label"], got["name"])
     return got
@@ -471,7 +491,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.7.3"
+    server_version = "ampero-bridge/2.7.4"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):

@@ -62,7 +62,13 @@ the safer bet. All writes (`/api/midi/cc`, `/api/patch/select`, `/api/block`,
 (0.5 s) between them. A save waits `AMPERO_WRITE_SAVE_GAP_S` (3 s) after the last write, and
 the next write waits that long after the save. If more than `AMPERO_WRITE_QUEUE_MAX` (30)
 writes are in line, the extra ones get HTTP 429 with `Retry-After` and nothing is sent.
-Reads, health and refused requests are not delayed.
+Health, history and refused requests are not delayed. A read that touches the
+pedal (`/api/patch/current`, the history poller) does not join the line and does not count
+toward the 429 limit, but since v2.7.4 it waits until no write is on the wire and the quiet
+time after the last write is over (3 s after a save), so nothing reaches the pedal inside
+that window. The USB lock alone did not do this: it keeps two requests from overlapping but
+lets the next one start the moment the last one ends. A read right behind a save or write is
+one possible contributor to the Oct 4 assert; that is a guess, not a finding.
 
 ## What cannot be fixed in application code
 

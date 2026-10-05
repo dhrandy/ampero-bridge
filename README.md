@@ -446,7 +446,7 @@ Set these in `.env` (or Dockhand's Environment tab).
 | `AMPERO_HISTORY_WINDOW_S` | 600 | how many seconds of history to keep (also capped at 400 entries) |
 | `AMPERO_WRITE_GAP_S` | 0.5 | least seconds between two writes to the pedal. Writes go out one at a time, in the order they came in |
 | `AMPERO_WRITE_SAVE_GAP_S` | 3 | quiet time before a save and after it. A save waits this long after the last write, and the next write waits this long after the save |
-| `AMPERO_WRITE_QUEUE_MAX` | 30 | writes allowed in line at once. More get `429` with a `Retry-After` header and nothing is sent. Reads, health and refused requests are never held up |
+| `AMPERO_WRITE_QUEUE_MAX` | 30 | writes allowed in line at once. More get `429` with a `Retry-After` header and nothing is sent. Health, history and refused requests are never held up. Reads that touch the pedal (`/api/patch/current`, the history poller) do not wait in line, but they hold off until the write before them has finished and the quiet time has passed |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.
