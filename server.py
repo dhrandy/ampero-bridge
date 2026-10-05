@@ -62,14 +62,14 @@ _models_cache = None
 # An unproven code can crash the pedal, so /api/model only takes these unless
 # AMPERO_ALLOW_UNPROVEN_MODELS=1.
 PROVEN_MODELS = {
-    # FX1 and AMP: every code read from the record while stepping the pedal's own list (docs/models.md).
-    # Inferred rows are not included.
-    "fx1": {0,1, *range(3, 6), *range(32, 35), *range(36, 41), *range(42, 46), *range(64, 68), *range(69, 80), *range(128, 151)},
-    "fx2": {0, 4, 7, 9},
-    "amp": {*range(0, 10), *range(48, 59), *range(60, 65), 66, *range(96, 102), *range(103, 114), *range(160, 165), *range(192, 200)},
-    "cab": {34},
-    "dly": {9},
-    "rvb": {4},
+    # Every code read from the record while stepping the pedal's own list (docs/models.md).
+    "fx1": {*range(0, 7), *range(32, 46), *range(64, 80), *range(128, 151)},
+    "fx2": {*range(0, 16), *range(48, 55), *range(80, 94), *range(112, 135)},
+    "amp": {*range(0, 10), *range(48, 67), *range(96, 114), *range(160, 165), *range(192, 200)},
+    "cab": {*range(0, 50), *range(112, 122), *range(144, 154)},
+    "eq": {*range(0, 7)},
+    "dly": {*range(0, 17)},
+    "rvb": {*range(0, 11)},
 }
 CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
 GAP = 0.15           # pause between frames, the pacing the pedal was tested with
@@ -416,7 +416,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.7.0"
+    server_version = "ampero-bridge/2.7.1"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):

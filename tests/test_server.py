@@ -160,12 +160,12 @@ def test_model_only_proven_codes_unless_overridden(monkeypatch):
     assert call(base, "/api/model", {"slot": "rvb", "code": 4})[0] == 200
     assert call(base, "/api/model", {"slot": "fx2", "code": 9})[0] == 200
     sent = len(Fake.sent)
-    assert call(base, "/api/model", {"slot": "rvb", "code": 5})[0] == 400
-    assert call(base, "/api/model", {"slot": "fx2", "code": 15})[0] == 400
+    assert call(base, "/api/model", {"slot": "rvb", "code": 11})[0] == 400
+    assert call(base, "/api/model", {"slot": "fx2", "code": 16})[0] == 400
     assert call(base, "/api/model", {"slot": 2, "code": 4})[0] == 400
     assert len(Fake.sent) == sent
     monkeypatch.setattr(server, "ALLOW_UNPROVEN", True)
-    assert call(base, "/api/model", {"slot": "rvb", "code": 5})[0] == 200
+    assert call(base, "/api/model", {"slot": "rvb", "code": 11})[0] == 200
     srv.shutdown()
 
 
@@ -365,12 +365,13 @@ def test_midi_cc_refuses_bad_input(monkeypatch):
     srv.shutdown()
 
 
-def test_every_pedal_read_fx1_and_amp_code_is_accepted_and_inferred_ones_are_not(monkeypatch):
+def test_every_pedal_read_code_is_accepted_and_only_those(monkeypatch):
     data = server.load_models()
     for b in data["blocks"]:
-        if b["block"] not in ("FX1", "AMP"):
-            continue
         slot = b["block"].lower()
+        if slot not in server.PROVEN_MODELS:
+            continue
         for m in b["models"]:
             assert (m["code"] in server.PROVEN_MODELS[slot]) == (m["status"] == "pedal-proven"), (slot, m["screen"])
-    assert len(server.PROVEN_MODELS["fx1"]) == 55 and len(server.PROVEN_MODELS["amp"]) == 57
+    counts = {s: len(c) for s, c in server.PROVEN_MODELS.items()}
+    assert counts == {"fx1": 60, "fx2": 60, "amp": 60, "cab": 70, "eq": 7, "dly": 17, "rvb": 11}

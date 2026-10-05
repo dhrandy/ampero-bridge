@@ -23,7 +23,7 @@ Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorde
 | DLY | 10 | Slapback | 9 |
 | RVB | 05 | Spring | 4 |
 
-`POST /api/model` accepts only the codes in this table (per slot), plus every FX1 and AMP code marked as read (not inferred) in the FX1 and AMP tables below. Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
+`POST /api/model` accepts only the codes in this table (per slot), plus every code in the FX1, FX2, AMP, CAB, EQ, DLY and RVB tables below (all read on a real pedal by stepping through each list). FX3 and NR are read the same way but have no write slot in the bridge. Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
 
 Writing a model from the bridge (`POST /api/model`) gave the same record as picking it on the pedal (checked for FX2).
 
@@ -31,7 +31,7 @@ FX1 has its own list. Its numbering is not FX2's: screen 47 is code 137, and FX1
 
 ## FX2 models (60)
 
-The FX2 list has 60 models, in the editor's order. The codes jump in groups (0-15, 48-54, 80-93, 112-134). Only the rows in the proven table above were read back on a real pedal; treat the other codes as likely, not proven. The names match the FX1 list below: FX2 screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60.
+The FX2 list has 60 models, in the editor's order. The codes jump in groups (0-15, 48-54, 80-93, 112-134). All 60 codes were read from the record while stepping through the pedal's FX2 list by hand (the poller at 4 s, every stop caught). The rows in the proven table above were also set from the bridge. The names match the FX1 list below: FX2 screens 1 to 16 are FX1 screens 22 to 37, 17 to 23 are FX1 1 to 7, 24 to 37 are FX1 8 to 21, and 38 to 60 are FX1 38 to 60.
 
 | Screen | Code | Params (defaults) | Name |
 | --- | --- | --- | --- |
@@ -98,179 +98,179 @@ The FX2 list has 60 models, in the editor's order. The codes jump in groups (0-1
 
 ## FX3 list (screen number, code, name)
 
-FX3 has its own list of 30 models, in the editor's order. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). Codes are screen minus 1 for screens 1 to 17 and screen plus 46 from 18 onwards. That fits every code read from a real pedal (2, 6, 16, 72, 73, 75), but only the rows marked pedal-proven were read back; the rest follow the pattern. `/api/model` accepts only the codes in the proven table above.
+FX3 has its own list of 30 models, in the editor's order. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). Codes are screen minus 1 for screens 1 to 17 and screen plus 46 from 18 onwards. All 30 codes were read from the record while stepping through the pedal's FX3 list by hand, and the pattern held at every stop (0-16, then 64-76). `/api/model` accepts only the codes in the proven table above.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
-| 01 | 0 | Aozora Chorus | list order, not checked |
-| 02 | 1 | Grand Choruium | list order, not checked |
+| 01 | 0 | Aozora Chorus | pedal-proven |
+| 02 | 1 | Grand Choruium | pedal-proven |
 | 03 | 2 | Liquid C | pedal-proven |
-| 04 | 3 | Choruium B | list order, not checked |
-| 05 | 4 | Detune | list order, not checked |
-| 06 | 5 | Jetter | list order, not checked |
+| 04 | 3 | Choruium B | pedal-proven |
+| 05 | 4 | Detune | pedal-proven |
+| 06 | 5 | Jetter | pedal-proven |
 | 07 | 6 | Jetter B | pedal-proven |
-| 08 | 7 | Jetter N | list order, not checked |
-| 09 | 8 | Trem Jet | list order, not checked |
-| 10 | 9 | Pulser | list order, not checked |
-| 11 | 10 | Grand Vibrato | list order, not checked |
-| 12 | 11 | Shiver T | list order, not checked |
-| 13 | 12 | 90 Phaser | list order, not checked |
-| 14 | 13 | Green Phaser | list order, not checked |
-| 15 | 14 | Revolver | list order, not checked |
-| 16 | 15 | Helicopter | list order, not checked |
+| 08 | 7 | Jetter N | pedal-proven |
+| 09 | 8 | Trem Jet | pedal-proven |
+| 10 | 9 | Pulser | pedal-proven |
+| 11 | 10 | Grand Vibrato | pedal-proven |
+| 12 | 11 | Shiver T | pedal-proven |
+| 13 | 12 | 90 Phaser | pedal-proven |
+| 14 | 13 | Green Phaser | pedal-proven |
+| 15 | 14 | Revolver | pedal-proven |
+| 16 | 15 | Helicopter | pedal-proven |
 | 17 | 16 | Custom Trem | pedal-proven |
-| 18 | 64 | Acoustic Refiner | list order, not checked |
-| 19 | 65 | AC Sim | list order, not checked |
-| 20 | 66 | Toucher | list order, not checked |
-| 21 | 67 | Crier | list order, not checked |
-| 22 | 68 | Clean Octa | list order, not checked |
-| 23 | 69 | Harmony | list order, not checked |
-| 24 | 70 | Telephone Line | list order, not checked |
-| 25 | 71 | Satisfaction | list order, not checked |
+| 18 | 64 | Acoustic Refiner | pedal-proven |
+| 19 | 65 | AC Sim | pedal-proven |
+| 20 | 66 | Toucher | pedal-proven |
+| 21 | 67 | Crier | pedal-proven |
+| 22 | 68 | Clean Octa | pedal-proven |
+| 23 | 69 | Harmony | pedal-proven |
+| 24 | 70 | Telephone Line | pedal-proven |
+| 25 | 71 | Satisfaction | pedal-proven |
 | 26 | 72 | Path Filter | pedal-proven |
 | 27 | 73 | Bit Krusher | pedal-proven |
-| 28 | 74 | Ring Mod | list order, not checked |
+| 28 | 74 | Ring Mod | pedal-proven |
 | 29 | 75 | Sweller | pedal-proven |
-| 30 | 76 | Classic PS | list order, not checked |
+| 30 | 76 | Classic PS | pedal-proven |
 
 Knobs for the FX3 models checked so far are in `docs/knobs.md`.
 
 ## Full effect list (from the manufacturer's model list)
 
-A full list of the model names, in the manufacturer's order, with an ID per model (1 to 202). The ID is not the code the pedal stores, but for most blocks the code is the ID minus where that block's section starts. Rows say how each code was found: `pedal-proven` means it was set on a real pedal and read back from the record; `list order, not checked` means it follows from the rule and the list order only. Do not rely on an unchecked code before you have read it back. This list names the models; it says nothing about the knobs, which are in `docs/knobs.md`.
+A full list of the model names, in the manufacturer's order, with an ID per model (1 to 202). The ID is not the code the pedal stores, but for most blocks the code is the ID minus where that block's section starts. Rows say how each code was found: `pedal-proven` means it was set on a real pedal and read back from the record; In the CAB, EQ, DLY, RVB and FX3 tables every row has now been read from the record while stepping through the pedal's list, so all rows say `pedal-proven`. Do not rely on a code after a firmware change before you have read it back. This list names the models; it says nothing about the knobs, which are in `docs/knobs.md`.
 
 ### CAB models
 
-The editor's CAB list, in screen order. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. Rule: code = screen - 1. Checked at UK Black 4x12 (screen 35, code 34). The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
+The editor's CAB list, in screen order. The first 60 rows are the 60 cabs of the ID list (IDs 109 to 168) under their real names, in the same order. After them comes a block of cabs that start with "TJ", which the ID list does not have. All 70 codes were read from the record while stepping through the pedal's CAB list. Screens 1-50 are codes 0-49 (code = screen - 1), screens 51-60 are codes 112-121 and screens 61-70 are codes 144-153; the codes jump, so read them from the table, do not compute them. Earlier versions listed screens 51-70 as 50-69 by list order, which was wrong. The editor's list has 70 rows, which matches the count the pedal shows. The three "TJ 66 Alnico Sil" rows look identical on screen, probably because the names are cut short. Names are as shown, including the spelling "Orchestal". The ID list also has user IR slots (ID 169); where they sit in the editor's list is not known.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
-| 1 | 0 | Super Zep 1x6 | list order, not checked |
-| 2 | 1 | Tweed Chap 1x8 | list order, not checked |
-| 3 | 2 | Black Lux 1x12 | list order, not checked |
-| 4 | 3 | Black Vint 1x12 | list order, not checked |
-| 5 | 4 | Glacian 1x12 | list order, not checked |
-| 6 | 5 | Bad Kitty 1x12 | list order, not checked |
-| 7 | 6 | Voxy 1x12 | list order, not checked |
-| 8 | 7 | Tweed Lux 1x12 | list order, not checked |
-| 9 | 8 | Ace 20 1x12 | list order, not checked |
-| 10 | 9 | UK G12M 1x12 | list order, not checked |
-| 11 | 10 | Voxy 2x12 | list order, not checked |
-| 12 | 11 | Emperor 2x12 | list order, not checked |
-| 13 | 12 | Jazz Twin 2x12 | list order, not checked |
-| 14 | 13 | Black Twin 2x12 | list order, not checked |
-| 15 | 14 | Tweed Super 2x10 | list order, not checked |
-| 16 | 15 | Boutique 2x12 | list order, not checked |
-| 17 | 16 | Baseman 2x12 | list order, not checked |
-| 18 | 17 | Superb 2x12 | list order, not checked |
-| 19 | 18 | Superstar 2x12 | list order, not checked |
-| 20 | 19 | Twin Rock 2x12 | list order, not checked |
-| 21 | 20 | Bluesky 2x12 | list order, not checked |
-| 22 | 21 | Baseman 4x10 | list order, not checked |
-| 23 | 22 | UK Lead 4x12 | list order, not checked |
-| 24 | 23 | UK Trad 4x12 | list order, not checked |
-| 25 | 24 | UK Modern 4x12 | list order, not checked |
-| 26 | 25 | UK Green 4x12 | list order, not checked |
-| 27 | 26 | Eddie 4x12 | list order, not checked |
-| 28 | 27 | Rector 4x12 | list order, not checked |
-| 29 | 28 | Boger 4x12 | list order, not checked |
-| 30 | 29 | Engle 4x12 | list order, not checked |
-| 31 | 30 | Urban 4x12 | list order, not checked |
-| 32 | 31 | Soloist 4x12 | list order, not checked |
-| 33 | 32 | Tang 4x12 | list order, not checked |
-| 34 | 33 | Hiway 4x12 | list order, not checked |
+| 1 | 0 | Super Zep 1x6 | pedal-proven |
+| 2 | 1 | Tweed Chap 1x8 | pedal-proven |
+| 3 | 2 | Black Lux 1x12 | pedal-proven |
+| 4 | 3 | Black Vint 1x12 | pedal-proven |
+| 5 | 4 | Glacian 1x12 | pedal-proven |
+| 6 | 5 | Bad Kitty 1x12 | pedal-proven |
+| 7 | 6 | Voxy 1x12 | pedal-proven |
+| 8 | 7 | Tweed Lux 1x12 | pedal-proven |
+| 9 | 8 | Ace 20 1x12 | pedal-proven |
+| 10 | 9 | UK G12M 1x12 | pedal-proven |
+| 11 | 10 | Voxy 2x12 | pedal-proven |
+| 12 | 11 | Emperor 2x12 | pedal-proven |
+| 13 | 12 | Jazz Twin 2x12 | pedal-proven |
+| 14 | 13 | Black Twin 2x12 | pedal-proven |
+| 15 | 14 | Tweed Super 2x10 | pedal-proven |
+| 16 | 15 | Boutique 2x12 | pedal-proven |
+| 17 | 16 | Baseman 2x12 | pedal-proven |
+| 18 | 17 | Superb 2x12 | pedal-proven |
+| 19 | 18 | Superstar 2x12 | pedal-proven |
+| 20 | 19 | Twin Rock 2x12 | pedal-proven |
+| 21 | 20 | Bluesky 2x12 | pedal-proven |
+| 22 | 21 | Baseman 4x10 | pedal-proven |
+| 23 | 22 | UK Lead 4x12 | pedal-proven |
+| 24 | 23 | UK Trad 4x12 | pedal-proven |
+| 25 | 24 | UK Modern 4x12 | pedal-proven |
+| 26 | 25 | UK Green 4x12 | pedal-proven |
+| 27 | 26 | Eddie 4x12 | pedal-proven |
+| 28 | 27 | Rector 4x12 | pedal-proven |
+| 29 | 28 | Boger 4x12 | pedal-proven |
+| 30 | 29 | Engle 4x12 | pedal-proven |
+| 31 | 30 | Urban 4x12 | pedal-proven |
+| 32 | 31 | Soloist 4x12 | pedal-proven |
+| 33 | 32 | Tang 4x12 | pedal-proven |
+| 34 | 33 | Hiway 4x12 | pedal-proven |
 | 35 | 34 | UK Black 4x12 | pedal-proven |
-| 36 | 35 | The Way 4x12 | list order, not checked |
-| 37 | 36 | Dizzle 4x12 | list order, not checked |
-| 38 | 37 | Triple 4x12 | list order, not checked |
-| 39 | 38 | UK T75 4x12 | list order, not checked |
-| 40 | 39 | US King 4x12 | list order, not checked |
-| 41 | 40 | Adam 1x15 | list order, not checked |
-| 42 | 41 | Worker 1x15 | list order, not checked |
-| 43 | 42 | Flip Top 1x15 | list order, not checked |
-| 44 | 43 | US Bass 2x10 | list order, not checked |
-| 45 | 44 | Mark 2x10 | list order, not checked |
-| 46 | 45 | Adam 4x10 | list order, not checked |
-| 47 | 46 | Ampage 4x10 | list order, not checked |
-| 48 | 47 | Worker 4x10 | list order, not checked |
-| 49 | 48 | Hacker 4x12 | list order, not checked |
-| 50 | 49 | Ampage 8x10 | list order, not checked |
-| 51 | 50 | Dreadnought 1 | list order, not checked |
-| 52 | 51 | Dreadnought 2 | list order, not checked |
-| 53 | 52 | Orchestal | list order, not checked |
-| 54 | 53 | Jumbo | list order, not checked |
-| 55 | 54 | Hum Bird | list order, not checked |
-| 56 | 55 | Auditorium | list order, not checked |
-| 57 | 56 | Classical | list order, not checked |
-| 58 | 57 | Mandolin | list order, not checked |
-| 59 | 58 | Fretless Bass | list order, not checked |
-| 60 | 59 | Double Bass | list order, not checked |
-| 61 | 60 | TJ 66 Alnico Sil | list order, not checked |
-| 62 | 61 | TJ 66 Alnico Sil | list order, not checked |
-| 63 | 62 | TJ 66 Alnico Sil | list order, not checked |
-| 64 | 63 | TJ 69 G12M Green | list order, not checked |
-| 65 | 64 | TJ 70 G12H Green | list order, not checked |
-| 66 | 65 | TJ C12N e906 2 | list order, not checked |
-| 67 | 66 | TJ C12N R121-SM5 | list order, not checked |
-| 68 | 67 | TJ M75 e906 3 | list order, not checked |
-| 69 | 68 | TJ M75 FAT-SM57 | list order, not checked |
-| 70 | 69 | TJ M75 R121-SM54 | list order, not checked |
+| 36 | 35 | The Way 4x12 | pedal-proven |
+| 37 | 36 | Dizzle 4x12 | pedal-proven |
+| 38 | 37 | Triple 4x12 | pedal-proven |
+| 39 | 38 | UK T75 4x12 | pedal-proven |
+| 40 | 39 | US King 4x12 | pedal-proven |
+| 41 | 40 | Adam 1x15 | pedal-proven |
+| 42 | 41 | Worker 1x15 | pedal-proven |
+| 43 | 42 | Flip Top 1x15 | pedal-proven |
+| 44 | 43 | US Bass 2x10 | pedal-proven |
+| 45 | 44 | Mark 2x10 | pedal-proven |
+| 46 | 45 | Adam 4x10 | pedal-proven |
+| 47 | 46 | Ampage 4x10 | pedal-proven |
+| 48 | 47 | Worker 4x10 | pedal-proven |
+| 49 | 48 | Hacker 4x12 | pedal-proven |
+| 50 | 49 | Ampage 8x10 | pedal-proven |
+| 51 | 112 | Dreadnought 1 | pedal-proven |
+| 52 | 113 | Dreadnought 2 | pedal-proven |
+| 53 | 114 | Orchestal | pedal-proven |
+| 54 | 115 | Jumbo | pedal-proven |
+| 55 | 116 | Hum Bird | pedal-proven |
+| 56 | 117 | Auditorium | pedal-proven |
+| 57 | 118 | Classical | pedal-proven |
+| 58 | 119 | Mandolin | pedal-proven |
+| 59 | 120 | Fretless Bass | pedal-proven |
+| 60 | 121 | Double Bass | pedal-proven |
+| 61 | 144 | TJ 66 Alnico Sil | pedal-proven |
+| 62 | 145 | TJ 66 Alnico Sil | pedal-proven |
+| 63 | 146 | TJ 66 Alnico Sil | pedal-proven |
+| 64 | 147 | TJ 69 G12M Green | pedal-proven |
+| 65 | 148 | TJ 70 G12H Green | pedal-proven |
+| 66 | 149 | TJ C12N e906 2 | pedal-proven |
+| 67 | 150 | TJ C12N R121-SM5 | pedal-proven |
+| 68 | 151 | TJ M75 e906 3 | pedal-proven |
+| 69 | 152 | TJ M75 FAT-SM57 | pedal-proven |
+| 70 | 153 | TJ M75 R121-SM54 | pedal-proven |
 
 ### EQ models
 
-Rule: code = ID - 170. Checked at Guitar EQ 1 (code 0). The editor's EQ list has the same 7 models in this order.
+Rule: code = ID - 170. All 7 read from the record while stepping through the pedal's list. The editor's EQ list has the same 7 models in this order.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
 | 170 | 0 | Guitar EQ 1 | pedal-proven |
-| 171 | 1 | Guitar EQ 2 | list order, not checked |
-| 172 | 2 | Bass EQ 1 | list order, not checked |
-| 173 | 3 | Bass EQ 2 | list order, not checked |
-| 174 | 4 | Para EQ | list order, not checked |
-| 175 | 5 | Graphic EQ | list order, not checked |
-| 176 | 6 | V-EQ | list order, not checked |
+| 171 | 1 | Guitar EQ 2 | pedal-proven |
+| 172 | 2 | Bass EQ 1 | pedal-proven |
+| 173 | 3 | Bass EQ 2 | pedal-proven |
+| 174 | 4 | Para EQ | pedal-proven |
+| 175 | 5 | Graphic EQ | pedal-proven |
+| 176 | 6 | V-EQ | pedal-proven |
 
 ### DLY models
 
-Rule: code = ID - 177. Checked at Slapback (ID 186, code 9). The editor's list order matches the ID order and has one more model at the end (2290 Mod), so 17 models.
+Rule: code = ID - 177. All 17 read from the record while stepping through the pedal's list. The editor's list order matches the ID order and has one more model at the end (2290 Mod), so 17 models.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
-| 177 | 0 | Sweetie | list order, not checked |
-| 178 | 1 | Recaller | list order, not checked |
-| 179 | 2 | Pure Eko | list order, not checked |
-| 180 | 3 | Analog Eko | list order, not checked |
-| 181 | 4 | Mag Eko | list order, not checked |
-| 182 | 5 | Tube Eko | list order, not checked |
-| 183 | 6 | Backmask | list order, not checked |
-| 184 | 7 | Ping Pong | list order, not checked |
-| 185 | 8 | Multi Head | list order, not checked |
+| 177 | 0 | Sweetie | pedal-proven |
+| 178 | 1 | Recaller | pedal-proven |
+| 179 | 2 | Pure Eko | pedal-proven |
+| 180 | 3 | Analog Eko | pedal-proven |
+| 181 | 4 | Mag Eko | pedal-proven |
+| 182 | 5 | Tube Eko | pedal-proven |
+| 183 | 6 | Backmask | pedal-proven |
+| 184 | 7 | Ping Pong | pedal-proven |
+| 185 | 8 | Multi Head | pedal-proven |
 | 186 | 9 | Slapback | pedal-proven |
-| 187 | 10 | Vintage Rack | list order, not checked |
-| 188 | 11 | Sweep Eko | list order, not checked |
-| 189 | 12 | Trem Eko | list order, not checked |
-| 190 | 13 | Lofi Eko | list order, not checked |
-| 191 | 14 | Ring Eko | list order, not checked |
-| 192 | 15 | Ekoverb | list order, not checked |
-| - | 16 | 2290 Mod | in the editor, not in the ID list; code from the pattern, not checked |
+| 187 | 10 | Vintage Rack | pedal-proven |
+| 188 | 11 | Sweep Eko | pedal-proven |
+| 189 | 12 | Trem Eko | pedal-proven |
+| 190 | 13 | Lofi Eko | pedal-proven |
+| 191 | 14 | Ring Eko | pedal-proven |
+| 192 | 15 | Ekoverb | pedal-proven |
+| - | 16 | 2290 Mod | pedal-proven (in the editor, not in the ID list) |
 
 ### RVB models
 
-Rule: code = ID - 193. Checked at Spring (ID 197, code 4). The editor shows the same order with one more model at the end (Cloud), so 11 models. In the editor's list Oceandeep, Sweet Space and Shimmer follow Northstar.
+Rule: code = ID - 193. All 11 read from the record while stepping through the pedal's list. The editor shows the same order with one more model at the end (Cloud), so 11 models. In the editor's list Oceandeep, Sweet Space and Shimmer follow Northstar.
 
 | ID | Code | Name | Source |
 | --- | --- | --- | --- |
-| 193 | 0 | Room | list order, not checked |
-| 194 | 1 | Hall | list order, not checked |
-| 195 | 2 | Church | list order, not checked |
-| 196 | 3 | Plate | list order, not checked |
+| 193 | 0 | Room | pedal-proven |
+| 194 | 1 | Hall | pedal-proven |
+| 195 | 2 | Church | pedal-proven |
+| 196 | 3 | Plate | pedal-proven |
 | 197 | 4 | Spring | pedal-proven |
-| 198 | 5 | Izumi | list order, not checked |
-| 199 | 6 | Northstar | list order, not checked |
-| 200 | 7 | Oceandeep | list order, not checked |
-| 201 | 8 | Sweet Space | list order, not checked |
-| 202 | 9 | Shimmer | list order, not checked |
-| - | 10 | Cloud | in the editor, not in the ID list; code from the pattern, not checked |
+| 198 | 5 | Izumi | pedal-proven |
+| 199 | 6 | Northstar | pedal-proven |
+| 200 | 7 | Oceandeep | pedal-proven |
+| 201 | 8 | Sweet Space | pedal-proven |
+| 202 | 9 | Shimmer | pedal-proven |
+| - | 10 | Cloud | pedal-proven (in the editor, not in the ID list) |
 
 ### NR models
 
@@ -283,7 +283,7 @@ Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 ### AMP models
 
-The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly and three (screens 22, 28 and 36) are inferred from the codes on either side. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. Sound Clone 6 to 10 (screens 56 to 60) produce no sound on the pedal; this was confirmed on a real pedal.
+The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly in the first pass and the other three (screens 22, 28 and 36) were read in a second pass: codes 59, 65 and 102, exactly what the unbroken run predicted. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. Sound Clone 6 to 10 (screens 56 to 60) produce no sound on the pedal; this was confirmed on a real pedal.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -308,13 +308,13 @@ The editor's AMP list has 60 models, in this screen order. All 60 were stepped t
 | 19 | Marshell 50+ | 56 |
 | 20 | Marshell 50 Jump | 57 |
 | 21 | Hot Kitty Drive | 58 |
-| 22 | Messe IIC+ 1 | 59 (inferred) |
+| 22 | Messe IIC+ 1 | 59 |
 | 23 | Messe IIC+ 2 | 60 |
 | 24 | Messe IIC+ 3 | 61 |
 | 25 | Soloist 100 Crunch | 62 |
 | 26 | Marshell 800 | 63 |
 | 27 | Fryman B1 | 64 |
-| 28 | Fryman B2 | 65 (inferred) |
+| 28 | Fryman B2 | 65 |
 | 29 | Glacian Drive | 66 |
 | 30 | Marshell 900 | 96 |
 | 31 | Dizzle VH B | 97 |
@@ -322,7 +322,7 @@ The editor's AMP list has 60 models, in this screen order. All 60 were stepped t
 | 33 | Engle Saga 1 | 99 |
 | 34 | Engle Saga 2 | 100 |
 | 35 | Fryman HB | 101 |
-| 36 | Fryman HB+ | 102 (inferred) |
+| 36 | Fryman HB+ | 102 |
 | 37 | Eddie 51 | 103 |
 | 38 | Soloist 100 Lead | 104 |
 | 39 | Messe IV Lead 1 | 105 |
@@ -415,27 +415,27 @@ FX2 and FX1 are in their own tables (FX2 above, FX1 below). Both have 60 models.
 
 ## FX1 list (screen order)
 
-The editor's FX1 list has 60 models, which matches the count the pedal shows. All 60 codes below come from stepping through the pedal's FX1 list and reading the record at each stop. 55 were read directly. The five marked inferred (screens 3, 7, 11, 17 and 26) were stepped past too fast to catch; each sits between two read codes in an unbroken run, and screen 47 (90 Phaser, code 137) was proven earlier by setting it. The codes run in four groups: screens 1-7 are 0-6, 8-21 are 32-45, 22-37 are 64-79 and 38-60 are 128-150. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
+The editor's FX1 list has 60 models, which matches the count the pedal shows. All 60 codes below come from stepping through the pedal's FX1 list and reading the record at each stop. 55 were read directly during the first pass. The other five (screens 3, 7, 11, 17 and 26) were stepped past too fast to catch, then read on the pedal in a second pass with the poller at 4 s: codes 2, 6, 35, 41 and 68, exactly what the unbroken run predicted. Screen 47 (90 Phaser, code 137) was proven earlier by setting it. The codes run in four groups: screens 1-7 are 0-6, 8-21 are 32-45, 22-37 are 64-79 and 38-60 are 128-150. FX1 codes are not the FX2 ones. Classic PS, Magic T, Blues Butter, Dr. Blues, Precise Attack and Sound Clone 1 to 5 are not in the manufacturer's ID list above.
 
 | Screen | Name | Code |
 | --- | --- | --- |
 | 1 | Comprosso | 0 |
 | 2 | Squeezer | 1 |
-| 3 | Affinity Boost | 2 (inferred) |
+| 3 | Affinity Boost | 2 |
 | 4 | FET Boost | 3 |
 | 5 | Enhancer | 4 |
 | 6 | Smart Gate | 5 |
-| 7 | Fast Gate | 6 (inferred) |
+| 7 | Fast Gate | 6 |
 | 8 | AC Sim | 32 |
 | 9 | Toucher | 33 |
 | 10 | Crier | 34 |
-| 11 | Voxy Wah | 35 (inferred) |
+| 11 | Voxy Wah | 35 |
 | 12 | Cry Wah | 36 |
 | 13 | Bass Press | 37 |
 | 14 | Clean Octa | 38 |
 | 15 | Harmony | 39 |
 | 16 | Telephone Line | 40 |
-| 17 | Satisfaction | 41 (inferred) |
+| 17 | Satisfaction | 41 |
 | 18 | Path Filter | 42 |
 | 19 | Bit Krusher | 43 |
 | 20 | Ring Mod | 44 |
@@ -444,7 +444,7 @@ The editor's FX1 list has 60 models, which matches the count the pedal shows. Al
 | 23 | Super Drive | 65 |
 | 24 | Screamood | 66 |
 | 25 | Zen Garden | 67 |
-| 26 | Big Pie | 68 (inferred) |
+| 26 | Big Pie | 68 |
 | 27 | Face Fuzz | 69 |
 | 28 | Bend Fuzz | 70 |
 | 29 | Black Tail | 71 |

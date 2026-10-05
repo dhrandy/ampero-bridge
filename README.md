@@ -384,8 +384,8 @@ A searchable list of every Ampero Mini model on firmware V2.2 is at
 https://dhrandy.github.io/ampero-bridge/ (beta). Use it to find a model fast, see the
 code the pedal stores for it, and see what real-world gear it is based on. A tap on an
 amp opens short notes on its tone and what it is known for. Codes that have been read
-back from a real pedal are marked; the rest follow the list order and should be checked
-before you rely on them.
+back from a real pedal are marked; every row in the library is now read from a real pedal
+(firmware V2.2). Re-check a code after a firmware update.
 
 The same data is in `site/models.json`, for tools and agents: block, screen, code, name,
 what it is based on, how well the code is verified, and short notes. The bridge serves
