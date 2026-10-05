@@ -53,6 +53,17 @@ Also: requests are serialized. A caller that cannot get the pedal within 3 s
 gets HTTP 503 `PedalBusy`, so a slow request does not pile up threads. A client
 that stalls is dropped after 10 s. Unplugged pedal is HTTP 503 immediately.
 
+Writes are also paced (v2.7.2). On Oct 4, 2026 a Mini stopped on a firmware assert
+("Record the error and restart", `ParaNum <= GetParaNum(Paratype, Effect)`, audio.c line 2269)
+during an evening of heavy use. The cause was not proven and the bridge's
+own writes were not shown to be the trigger, but a pedal that is given time between writes is
+the safer bet. All writes (`/api/midi/cc`, `/api/patch/select`, `/api/block`,
+`/api/model`, `/api/param`, `/api/patch/save`) go out one at a time with `AMPERO_WRITE_GAP_S`
+(0.5 s) between them. A save waits `AMPERO_WRITE_SAVE_GAP_S` (3 s) after the last write, and
+the next write waits that long after the save. If more than `AMPERO_WRITE_QUEUE_MAX` (6)
+writes are in line, the extra ones get HTTP 429 with `Retry-After` and nothing is sent.
+Reads, health and refused requests are not delayed.
+
 ## What cannot be fixed in application code
 
 If the kernel itself blocks inside a USB URB cancel (a D-state task), no process

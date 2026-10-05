@@ -21,8 +21,8 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   GET  /api/patches/known          slot, label and name of every patch seen so far (no pedal access)
   GET  /api/history                states the bridge saw while polling the pedal (no pedal access)
 
-Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 503 pedal
-missing or busy, 504 pedal silent, 502 other USB trouble.
+Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 429 too many
+writes waiting (see Retry-After), 503 pedal missing or busy, 504 pedal silent, 502 other USB trouble.
 
 Nothing here can leave the process stuck: see usbmidi.Link and docs/usb-lockups.md.
 """
@@ -30,6 +30,7 @@ import datetime
 import hmac
 import json
 import logging
+import math
 import os
 import signal
 import threading
@@ -79,9 +80,63 @@ HISTORY_POLL = float(os.environ.get("AMPERO_HISTORY_POLL_S", "2"))      # pause 
 HISTORY_WINDOW = float(os.environ.get("AMPERO_HISTORY_WINDOW_S", "600"))  # how far back to keep states
 HISTORY_BUSY_MAX = float(os.environ.get("AMPERO_HISTORY_BUSY_MAX_S", "10"))  # longest wait while the patch keeps changing
 HISTORY_MAX = 400     # states kept at most, whatever the window
+WRITE_GAP = float(os.environ.get("AMPERO_WRITE_GAP_S", "0.5"))            # least seconds between two writes to the pedal
+WRITE_SAVE_GAP = float(os.environ.get("AMPERO_WRITE_SAVE_GAP_S", "3"))    # quiet time before and after a save
+WRITE_QUEUE_MAX = int(os.environ.get("AMPERO_WRITE_QUEUE_MAX", "6"))      # writes allowed to wait; more get a 429
 KNOWN_REFRESH = 3600  # seconds between disk writes for a patch whose name did not change
 
 link = usb.Link(hard_deadline=HARD_DEADLINE)
+
+
+class TooFast(Exception):
+    """Too many writes are already waiting for the pedal. Try again after Retry-After seconds."""
+
+    def __init__(self, retry_after: int):
+        super().__init__(f"too many writes waiting for the pedal; retry in {retry_after} s")
+        self.retry_after = retry_after
+        self.extra = {"retry_after": retry_after}
+
+
+class WriteGate:
+    """Lets one write at a time reach the pedal, with a pause after each.
+
+    A Mini once stopped on a firmware assert during heavy use. The cause
+    is not proven; giving the pedal room between writes is the cautious fix. Writes wait their
+    turn here; reads never do.
+    A save also waits for quiet before it goes out, and holds the next write back after it.
+    """
+
+    def __init__(self):
+        self.turn = threading.Lock()
+        self.count = threading.Lock()
+        self.waiting = 0
+        self.last_end = 0.0   # monotonic time the previous write finished
+        self.next_ok = 0.0    # earliest start for the next ordinary write
+
+    def run(self, save: bool, fn):
+        with self.count:
+            if self.waiting >= WRITE_QUEUE_MAX:
+                raise TooFast(max(1, math.ceil(WRITE_QUEUE_MAX * max(WRITE_GAP, 0.5))))
+            self.waiting += 1
+        try:
+            with self.turn:
+                start_ok = self.next_ok
+                if save:
+                    start_ok = max(start_ok, self.last_end + WRITE_SAVE_GAP)
+                pause = start_ok - time.monotonic()
+                if pause > 0:
+                    time.sleep(pause)
+                try:
+                    return fn()
+                finally:
+                    self.last_end = time.monotonic()
+                    self.next_ok = self.last_end + (WRITE_SAVE_GAP if save else WRITE_GAP)
+        finally:
+            with self.count:
+                self.waiting -= 1
+
+
+gate = WriteGate()
 
 
 class PatchNotCurrent(Exception):
@@ -333,7 +388,7 @@ def read_patch(index: int) -> dict:
 
 
 def send_midi(msg: bytes, name: str):
-    link.session(name, lambda p: p.send_midi(msg))
+    gate.run(False, lambda: link.session(name, lambda p: p.send_midi(msg)))
 
 
 def send_sysex(frames: list[bytes], name: str):
@@ -342,7 +397,7 @@ def send_sysex(frames: list[bytes], name: str):
             p.send_sysex(frames[0])
         else:
             p.send_sysex_batch(frames)
-    link.session(name, run)
+    gate.run(name.startswith("save"), lambda: link.session(name, run))
 
 
 def _int(data: dict, key: str) -> int:
@@ -402,7 +457,7 @@ def handle_post(path: str, data: dict) -> dict:
 STATUS = {
     usb.PedalNotConnected: 503, usb.PedalBusy: 503, usb.PedalGone: 503,
     usb.PedalTimeout: 504, usb.UsbMidiError: 502,
-    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409,
+    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409, TooFast: 429,
 }
 # Bad input that slipped past the checks above. Reported as 400 with a fixed message.
 BAD_INPUT = (TypeError, ValueError, OverflowError, UnicodeError)
@@ -416,16 +471,18 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.7.1"
+    server_version = "ampero-bridge/2.7.2"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
         return "ampero-bridge"   # no version or Python build in the Server header
 
-    def _send(self, code: int, obj: dict):
+    def _send(self, code: int, obj: dict, retry_after: int | None = None):
         body = json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
+        if retry_after is not None:
+            self.send_header("Retry-After", str(retry_after))
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -468,7 +525,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
             if code >= 500:
                 log.warning("%s %s -> %d %s: %s", self.command, self.path, code, type(e).__name__, e)
-            self._send(code, {"error": str(e), "kind": type(e).__name__, **getattr(e, "extra", {})})
+            self._send(code, {"error": str(e), "kind": type(e).__name__, **getattr(e, "extra", {})},
+                       getattr(e, "retry_after", None))
 
     def do_GET(self):
         path = urlparse(self.path).path

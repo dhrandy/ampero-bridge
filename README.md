@@ -417,7 +417,7 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `POST /api/param` | `{"slot": "rvb", "model_code": 4, "param": 0, "value": 15}` | set one parameter (0-127) |
 | `POST /api/patch/save` | `{"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}` | save to a slot; needs the exact confirm text |
 
-Errors come back as `{"error", "kind"}`: 400 bad input, 401 key, 503 pedal not
+Errors come back as `{"error", "kind"}`: 400 bad input, 401 key, 429 too many writes in line (see `Retry-After`), 503 pedal not
 connected or busy, 504 pedal silent, 502 other USB error.
 
 The record is 460 bytes: the name, then nine blocks (fx1, fx2, amp, nr, cab, eq,
@@ -444,6 +444,9 @@ Set these in `.env` (or Dockhand's Environment tab).
 | `AMPERO_HISTORY_POLL_S` | 2 | base seconds between the background reads that feed `/api/history`. `0` turns the history off. The wait grows on its own while the patch is changing or reads fail |
 | `AMPERO_HISTORY_BUSY_MAX_S` | 10 | longest wait while the patch keeps changing |
 | `AMPERO_HISTORY_WINDOW_S` | 600 | how many seconds of history to keep (also capped at 400 entries) |
+| `AMPERO_WRITE_GAP_S` | 0.5 | least seconds between two writes to the pedal. Writes go out one at a time, in the order they came in |
+| `AMPERO_WRITE_SAVE_GAP_S` | 3 | quiet time before a save and after it. A save waits this long after the last write, and the next write waits this long after the save |
+| `AMPERO_WRITE_QUEUE_MAX` | 6 | writes allowed in line at once. More get `429` with a `Retry-After` header and nothing is sent. Reads, health and refused requests are never held up |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.

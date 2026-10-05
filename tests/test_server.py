@@ -54,7 +54,11 @@ class Fake:
         return r
 
 
-def start(monkeypatch):
+def start(monkeypatch, gap=0.0, save_gap=0.0, queue=6):
+    monkeypatch.setattr(server, "WRITE_GAP", gap)
+    monkeypatch.setattr(server, "WRITE_SAVE_GAP", save_gap)
+    monkeypatch.setattr(server, "WRITE_QUEUE_MAX", queue)
+    monkeypatch.setattr(server, "gate", server.WriteGate())
     monkeypatch.setattr(usb, "Pedal", Fake)
     monkeypatch.setattr(usb, "is_present", lambda: Fake.present)
     Fake.sent, Fake.present, Fake.replies = [], True, []
@@ -375,3 +379,64 @@ def test_every_pedal_read_code_is_accepted_and_only_those(monkeypatch):
             assert (m["code"] in server.PROVEN_MODELS[slot]) == (m["status"] == "pedal-proven"), (slot, m["screen"])
     counts = {s: len(c) for s, c in server.PROVEN_MODELS.items()}
     assert counts == {"fx1": 60, "fx2": 60, "amp": 60, "cab": 70, "eq": 7, "dly": 17, "rvb": 11}
+
+
+def test_writes_are_spaced_and_reads_are_not_delayed(monkeypatch):
+    import time
+    srv, base = start(monkeypatch, gap=0.4)
+    t0 = time.monotonic()
+    assert call(base, "/api/midi/cc", {"cc": 24})[0] == 200
+    t1 = time.monotonic()
+    done = []
+    th = threading.Thread(target=lambda: done.append(call(base, "/api/midi/cc", {"cc": 25})[0]))
+    th.start()
+    time.sleep(0.05)
+    r0 = time.monotonic()
+    assert call(base, "/api/health")[0] == 200       # a read while a write is waiting
+    assert call(base, "/api/model", {"slot": "cab", "code": 999})[0] == 400   # a refused write is not queued
+    assert time.monotonic() - r0 < 0.3
+    th.join(3)
+    assert done == [200]
+    assert time.monotonic() - t1 >= 0.35             # the second write waited out the gap
+    assert [m for k, m in Fake.sent] == [server.am.raw_cc(24, 127), server.am.raw_cc(25, 127)]
+    srv.shutdown()
+
+
+def test_save_waits_for_quiet_and_holds_the_next_write_back(monkeypatch):
+    import time
+    srv, base = start(monkeypatch, gap=0.0, save_gap=0.5)
+    assert call(base, "/api/midi/cc", {"cc": 24})[0] == 200
+    t0 = time.monotonic()
+    body = {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
+    assert call(base, "/api/patch/save", body)[0] == 200
+    assert time.monotonic() - t0 >= 0.45             # waited for quiet after the CC
+    t1 = time.monotonic()
+    assert call(base, "/api/midi/cc", {"cc": 25})[0] == 200
+    assert time.monotonic() - t1 >= 0.45             # and the next write waited after the save
+    srv.shutdown()
+
+
+def test_a_long_queue_gets_429_with_retry_after(monkeypatch):
+    import time
+    srv, base = start(monkeypatch, gap=0.6, queue=2)
+    results = []
+
+    def one(cc):
+        req = urllib.request.Request(base + "/api/midi/cc", data=json.dumps({"cc": cc}).encode(),
+                                     headers={"X-Api-Key": "k"})
+        try:
+            with urllib.request.urlopen(req, timeout=5) as r:
+                results.append((r.status, None))
+        except HTTPError as e:
+            results.append((e.code, e.headers.get("Retry-After")))
+    ths = [threading.Thread(target=one, args=(cc,)) for cc in (24, 25, 22, 23)]
+    for th in ths:
+        th.start()
+        time.sleep(0.05)
+    for th in ths:
+        th.join(5)
+    codes = sorted(c for c, _ in results)
+    assert codes.count(429) >= 1 and codes.count(200) >= 2
+    assert all(ra and int(ra) >= 1 for c, ra in results if c == 429)
+    assert len(Fake.sent) == codes.count(200)        # a refused write never reaches the pedal
+    srv.shutdown()
