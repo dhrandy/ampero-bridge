@@ -82,7 +82,7 @@ HISTORY_BUSY_MAX = float(os.environ.get("AMPERO_HISTORY_BUSY_MAX_S", "10"))  # l
 HISTORY_MAX = 400     # states kept at most, whatever the window
 WRITE_GAP = float(os.environ.get("AMPERO_WRITE_GAP_S", "0.5"))            # least seconds between two writes to the pedal
 WRITE_SAVE_GAP = float(os.environ.get("AMPERO_WRITE_SAVE_GAP_S", "3"))    # quiet time before and after a save
-WRITE_QUEUE_MAX = int(os.environ.get("AMPERO_WRITE_QUEUE_MAX", "6"))      # writes allowed to wait; more get a 429
+WRITE_QUEUE_MAX = int(os.environ.get("AMPERO_WRITE_QUEUE_MAX", "30"))      # writes allowed to wait; more get a 429
 KNOWN_REFRESH = 3600  # seconds between disk writes for a patch whose name did not change
 
 link = usb.Link(hard_deadline=HARD_DEADLINE)
@@ -471,7 +471,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.7.2"
+    server_version = "ampero-bridge/2.7.3"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):

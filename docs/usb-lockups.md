@@ -60,7 +60,7 @@ own writes were not shown to be the trigger, but a pedal that is given time betw
 the safer bet. All writes (`/api/midi/cc`, `/api/patch/select`, `/api/block`,
 `/api/model`, `/api/param`, `/api/patch/save`) go out one at a time with `AMPERO_WRITE_GAP_S`
 (0.5 s) between them. A save waits `AMPERO_WRITE_SAVE_GAP_S` (3 s) after the last write, and
-the next write waits that long after the save. If more than `AMPERO_WRITE_QUEUE_MAX` (6)
+the next write waits that long after the save. If more than `AMPERO_WRITE_QUEUE_MAX` (30)
 writes are in line, the extra ones get HTTP 429 with `Retry-After` and nothing is sent.
 Reads, health and refused requests are not delayed.
 
