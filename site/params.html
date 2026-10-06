@@ -40,7 +40,7 @@ function render(){
  Object.keys(b.models).sort(function(a,c){return a-c}).forEach(function(code){
   var m=b.models[code];if(f&&String(m.name).toLowerCase().indexOf(f)<0)return;
   var ps=Object.keys(m.params||{});
-  h+='<div class="box"><span class="model">'+esc(m.name)+'</span> <span class="mute">code '+esc(code)+(m.verification?' - '+esc(m.verification):'')+'</span>';
+  h+='<div class="box"><span class="model">'+esc(m.name)+'</span> <span class="mute">code '+esc(code)+'</span>';
   if(ps.length){h+='<table><tr><th>#</th><th>Param</th><th>Status</th><th>Range</th><th>Notes</th></tr>';
    ps.forEach(function(p){var x=m.params[p];h+='<tr><td>'+esc(p)+'</td><td>'+esc(x.name||'')+'</td><td class="'+esc(x.status)+'">'+esc(x.status)+'</td><td>'+(x.valid_range?esc(x.valid_range.join(' to ')):'')+'</td><td>'+esc(x.note||'')+'</td></tr>'});
    h+='</table>'}else h+='<div class="mute">No params mapped yet.</div>';

@@ -9,7 +9,7 @@
   "address_confirmed_only": "index responds and lands at the byte, but value range/semantics not exercised (usually only 0/1 written)",
   "unswept": "not written in the sweep",
   "trailer": "record byte 459 changes on every edit (checksum-like), not a param",
-  "safety": "write only published ranges; out-of-range index values can wedge the pedal (Classic PS p0 = 6 did). NO SAVES in any sweep.",
+  "safety": "write only published ranges; out-of-range index values can wedge the pedal (Classic PS p0 = 6 did).",
   "synced_rate": "With Sync on, a rate is an 11-step division enum, stored = index x 10: 1/1=0, 1/2=10, 1/2D=20, 1/2T=30, 1/4=40, 1/4D=50, 1/4T=60, 1/8=70, 1/8D=80, 1/8T=90, 1/16=100. Screen-confirmed on Trem Jet and Shiver T; likely the same on other syncable FX3 models. With Sync off the rate is free 0-100."
  },
  "blocks": {
@@ -9192,7 +9192,7 @@
         0,
         100
        ],
-       "note": "synced: division enum, see synced_rate"
+       "note": "with Sync on: a note division, stored as index x 10 (1/1 = 0 up to 1/16 = 100)"
       },
       "2": {
        "record_offset": 301,
@@ -9220,7 +9220,7 @@
         0,
         100
        ],
-       "note": "synced: division enum, see synced_rate"
+       "note": "with Sync on: a note division, stored as index x 10 (1/1 = 0 up to 1/16 = 100)"
       },
       "5": {
        "record_offset": 307,
@@ -9345,7 +9345,7 @@
         0,
         100
        ],
-       "note": "synced: division enum, see synced_rate"
+       "note": "with Sync on: a note division, stored as index x 10 (1/1 = 0 up to 1/16 = 100)"
       },
       "2": {
        "record_offset": 301,
