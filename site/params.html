@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<title>Ampero Mini parameter map (beta)</title>
+<style>
+:root{--bg:#0d0f13;--panel:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#9aa3b2;--acc:#f0b429;--ok:#3ecf8e;--warn:#e5a13a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+a{color:var(--acc)}
+h1{margin:6px 0}
+.mute{color:var(--mute);font-size:13px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+select,input{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+table{width:100%;border-collapse:collapse;margin:6px 0 0;font-size:14px}
+td,th{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.write-verified{color:var(--ok)}.address-confirmed-only,.inferred{color:var(--warn)}.unswept{color:var(--mute)}
+.model{font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+<p><a href="index.html">&larr; Model library</a></p>
+<h1>Parameter map</h1>
+<p class="mute">Which knob is which for each model, where it sits in the preset record, and how sure we are. Unofficial; firmware V2.2 on an Ampero Mini. Also as <a href="param-map.json">param-map.json</a>.</p>
+<div class="box mute" id="conv"></div>
+<div class="bar"><select id="blk" aria-label="Block"></select><input id="q" placeholder="Filter by model name" aria-label="Filter by model name"></div>
+<div id="out"></div>
+</div>
+<script>
+(function(){
+var D,blk=document.getElementById('blk'),q=document.getElementById('q'),out=document.getElementById('out');
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function render(){
+ var b=D.blocks[blk.value],f=q.value.toLowerCase(),h='';
+ Object.keys(b.models).sort(function(a,c){return a-c}).forEach(function(code){
+  var m=b.models[code];if(f&&String(m.name).toLowerCase().indexOf(f)<0)return;
+  var ps=Object.keys(m.params||{});
+  h+='<div class="box"><span class="model">'+esc(m.name)+'</span> <span class="mute">code '+esc(code)+(m.verification?' - '+esc(m.verification):'')+'</span>';
+  if(ps.length){h+='<table><tr><th>#</th><th>Param</th><th>Status</th><th>Range</th><th>Notes</th></tr>';
+   ps.forEach(function(p){var x=m.params[p];h+='<tr><td>'+esc(p)+'</td><td>'+esc(x.name||'')+'</td><td class="'+esc(x.status)+'">'+esc(x.status)+'</td><td>'+(x.valid_range?esc(x.valid_range.join(' to ')):'')+'</td><td>'+esc(x.note||'')+'</td></tr>'});
+   h+='</table>'}else h+='<div class="mute">No params mapped yet.</div>';
+  h+='</div>'});
+ out.innerHTML=h||'<p class="mute">No match.</p>';
+}
+fetch('param-map.json').then(function(r){return r.json()}).then(function(d){
+ D=d;var c=d.conventions;
+ document.getElementById('conv').innerHTML=Object.keys(c).map(function(k){return '<div><b>'+esc(k.replace(/_/g,' '))+':</b> '+esc(c[k])+'</div>'}).join('');
+ blk.innerHTML=Object.keys(d.blocks).map(function(k){return '<option value="'+k+'">'+k.toUpperCase()+'</option>'}).join('');
+ blk.onchange=render;q.oninput=render;render();
+}).catch(function(){out.textContent='Could not load param-map.json'});
+})();
+</script>
+</body>
+</html>

@@ -558,6 +558,7 @@ captured from the editor and the pedal.
 * `docs/protocol.md`: the USB and SysEx protocol, record layout, order of a preset write
 * `docs/models.md`: model numbers checked on a real pedal
 * `docs/knobs.md`: which parameter is which, per model, and how sure each entry is
+* `site/params.html`: the same map as a searchable page (dhrandy.github.io/ampero-bridge/params.html)
 * `docs/param-map.json`: the machine-readable parameter map for agents. Every param is tagged write-verified, confirmed at its address only, inferred or not swept. Getting this map right took many hours of live probing against a real pedal.
 * `docs/prst.md`: the `.prst` import
 * `site/`: the model library page and `site/models.json` (see Model library above)

@@ -99,8 +99,8 @@ The first byte of the block is the on/off switch (1 on, 0 off).
 
 | Code | Model | Knobs in order | Status |
 | --- | --- | --- | --- |
-| 0 | Smart Gate (screen 01) | 0 Threshold (0-100) | Checked |
-| 1 | Fast Gate (screen 02) | 0 Threshold (0-100), 1 Mode (0 = I, 1 = II) | Checked (Mode II = 1 read; Mode I = 0 inferred) |
+| 0 | Smart Gate (screen 01) | 0 Threshold (0-100) | Write-verified, both ends |
+| 1 | Fast Gate (screen 02) | 0 Threshold (0-100), 1 Mode (0 = I, 1 = II) | Write-verified (Mode 0 = I, 1 = II) |
 
 ## EQ
 
@@ -120,6 +120,9 @@ FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in 
 | --- | --- | --- | --- |
 | 2 | Liquid C (03) | 0 Mode (stored as the shown mode minus 1; mode 3 read as 2) | Checked for one value |
 | 6 | Jetter B (07) | 0 Depth, 1 Rate, 2 Pre Delay, 3 Feedback, 4 Sync (Off/On) | Checked |
+| 7 | Jetter N (08) | 0 Depth, 1 Rate, 2 Pre Delay, 3 Feedback, 4 Sync (0/1) | All write-verified (0-100). Sync on resets Rate to 40 |
+| 8 | Trem Jet (09) | 0 Flg Depth, 1 Flg Rate, 2 Feedback, 3 Trm Depth, 4 Trm Rate, 5 Flg Sync, 6 Trm Sync | All write-verified (knobs 0-100). Sync on resets its linked rate to 40 |
+| 11 | Shiver T (12) | 0 Sens, 1 Rate, 2 Output (0-100), 3 Sync (0/1) | All write-verified. Sync on resets Rate to 40 |
 | 16 | Custom Trem (17) | 0 Depth, 1 Rate, 2 Volume, 3 Color, 4 Shape (0 sine, 1 triangle, 2 square, 3 sawtooth), 5 Bias, 6 Sync (0/1) | Rate, Shape and Sync write-verified; Depth, Volume, Color and Bias confirmed at their address only. Turning Sync on resets Rate to 40 |
 | 64 | Acoustic Refiner (18) | 0 Shape (0-100) | p0 write-verified; other positions not mapped |
 | 69 | Harmony (23) | 0 Hi pitch, 1 Low pitch, 2 Dry, 3 Hi volume, 4 Low volume | Hi and Low pitch write-verified; Dry, Hi volume and Low volume confirmed at their address only (0-100 range from the manual) |
@@ -128,9 +131,11 @@ FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in 
 
 Jetter B: all ranges 0-100 raw. Rate read 20 before Sync was turned on and 40 after, with no knob turn recorded. That change is observed but unexplained. Other FX3 models were not checked.
 
+Synced rates: with Sync off a rate is free, 0-100. With Sync on it is an 11-step note division stored as index x 10: 1/1 = 0, 1/2 = 10, 1/2D = 20, 1/2T = 30, 1/4 = 40, 1/4D = 50, 1/4T = 60, 1/8 = 70, 1/8D = 80, 1/8T = 90, 1/16 = 100. The reset to 40 on turning Sync on is the quarter note. Checked on Trem Jet and Shiver T; other syncable FX3 models probably work the same. On Trem Jet, maxing a free rate switches its sync on by itself.
+
 Harmony: Hi pitch runs 0 to +24 on the screen and is stored as shown. Low pitch runs 0 to -24 on the screen and is stored as the shown value plus 24 (screen 0 is stored 24, screen -24 is stored 0). Hotone draws the Low pitch slider backwards, with 0 at the far left. Dry, Hi volume and Low volume are 0-100.
 
-Parameter writes to FX3 and NR go through slots 07 and 04. NR has only Smart Gate p0 (Threshold) write-verified; Fast Gate and the rest of NR are not swept.
+Parameter writes to FX3 and NR go through slots 07 and 04. Both NR models are write-verified.
 
 Custom Trem: the Shape enum is 0-3 only. Sync is 0 or 1, and turning it on sets Rate to 40.
 

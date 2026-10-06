@@ -24,6 +24,8 @@ frames from those projects do not apply.
 
 ## Writes
 
+A param write whose model code does not match the model the slot currently holds is ignored by the pedal (the call returns 200 and no byte changes). Set the model first and read it back.
+
 | What | Body |
 | --- | --- |
 | model select | `10 AA 00 01 HH LL` (HH LL = model code, 14-bit as two 7-bit bytes) |

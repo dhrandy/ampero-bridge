@@ -8,6 +8,7 @@
 <meta name="description" content="Unofficial model list for the Hotone Ampero Mini with codes and what each model is based on (beta).">
 <title>Ampero Mini model library (beta)</title>
 <style>
+.pt{width:100%;border-collapse:collapse;font-size:13px}.pt td,.pt th{text-align:left;padding:3px 5px;border-bottom:1px solid var(--line);vertical-align:top}.pn{color:var(--mute);font-size:12px}
 :root{--bg:#0d0f13;--panel:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#9aa3b2;--acc:#f0b429;--ok:#3ecf8e;--warn:#e5a13a;--bad:#8b93a3}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -81,7 +82,7 @@ details dt{font-weight:600;color:var(--text)}details dd{margin:0}
 <h1>Model library</h1>
 <p class="lede">Every model on firmware V2.2, with the code the pedal stores for it and the real-world gear it is based on.</p>
 <ul class="stats" id="stats"><li><b>317</b>models</li><li><b>9</b>blocks</li><li><b>V2.2</b>firmware</li></ul>
-<div class="btns"><a class="btn pri" href="models.json">models.json</a><a class="btn" href="https://github.com/dhrandy/ampero-bridge">GitHub</a></div>
+<div class="btns"><a class="btn pri" href="models.json">models.json</a><a class="btn" href="params.html">Parameter map</a><a class="btn" href="https://github.com/dhrandy/ampero-bridge">GitHub</a></div>
 <p class="note">Every code was read from a real pedal on firmware V2.2. Unofficial and not affiliated with Hotone.</p>
 </div></div>
 <div class="wrap">
@@ -166,6 +167,13 @@ function build(){
  chip('ALL','All',all.length);data.blocks.forEach(function(b){chip(b.block,b.block,b.count)});
  render()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var pmap={};
+function paramRows(m){
+ var b=pmap[String(m.block).toLowerCase()],e=b&&b.models&&b.models[m.code];
+ if(!e||!e.params)return '';var ks=Object.keys(e.params);if(!ks.length)return '';
+ var t='<table class="pt"><tr><th>#</th><th>Knob</th><th>Range</th><th>Checked</th></tr>';
+ ks.forEach(function(k){var p=e.params[k];t+='<tr><td>'+esc(k)+'</td><td>'+esc(p.name||'')+(p.note?'<div class="pn">'+esc(p.note)+'</div>':'')+'</td><td>'+(p.valid_range?esc(p.valid_range.join(' to ')):'')+'</td><td>'+(p.status==='write-verified'?'written and read back':p.status==='address-confirmed-only'?'address only':esc(p.status))+'</td></tr>'});
+ return '<dt>Parameters</dt><dd>'+t+'</table></dd>'}
 function card(m){
  var known=!(m.code===null||m.code===undefined);
  var star=window.AmperoBridge?AmperoBridge.modelStarHtml(m):'';
@@ -183,6 +191,7 @@ function card(m){
  var i=m._i,rows='';
  if(m.notes)rows+='<dt>Tone</dt><dd>'+esc(m.notes.tone)+'</dd><dt>Known for</dt><dd>'+esc(m.notes.known_for)+'</dd><dt>Worth knowing</dt><dd>'+esc(m.notes.tip)+'</dd>';
  if(i)[['what','What it is'],['behavior','How it behaves'],['character','Character'],['era','Era'],['power','Tubes and power'],['cab','Cab'],['controls','Controls'],['players','Used by']].forEach(function(f){if(i[f[0]])rows+='<dt>'+f[1]+'</dt><dd>'+esc(i[f[0]])+'</dd>'});
+ rows+=paramRows(m);
  if(rows)h+='<details class="exp"><summary>Details</summary><dl>'+rows+'</dl></details>';
  else if(m.block==='AMP')h+='<div class="based"><span>More specs coming</span></div>';
  return h+'</div>'}
@@ -202,7 +211,7 @@ function init(){
  var t;$('q').addEventListener('input',function(){clearTimeout(t);t=setTimeout(render,80)});
  $('added').onchange=render;
  if(window.AmperoBridge)AmperoBridge.start({rerender:function(){if(data)render()}});
- fetch('models.json').then(function(r){return r.json()}).then(function(d){data=d;if(window.AmperoBridge)AmperoBridge.setModels(d);return fetch('info.json').then(function(r){return r.ok?r.json():{}}).catch(function(){return {}})}).then(function(i){info=i||{};build()}).catch(function(){$('list').innerHTML='<div class="empty">Could not load models.json.</div>'})}
+ fetch('models.json').then(function(r){return r.json()}).then(function(d){data=d;if(window.AmperoBridge)AmperoBridge.setModels(d);return fetch('param-map.json').then(function(r){return r.ok?r.json():{}}).catch(function(){return {}}).then(function(p){pmap=p.blocks||{};return fetch('info.json').then(function(r){return r.ok?r.json():{}}).catch(function(){return {}})})}).then(function(i){info=i||{};build()}).catch(function(){$('list').innerHTML='<div class="empty">Could not load models.json.</div>'})}
 init();
 })();
 </script>

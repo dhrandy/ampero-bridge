@@ -5,7 +5,7 @@ code = on-screen number minus 1 (FX2: Big Pie 05 -> 4, Black Tail 08 -> 7, Gover
 DLY: Slapback 10 -> 9; RVB: Spring 05 -> 4). The FX2 codes below jump (0-15, 48-54, 80-93, 112-134), so the
 screen-minus-1 rule is not a straight count for every slot: read the code from the record, do not compute it.
 
-Which knob is which for each model is in `docs/knobs.md`.
+Which knob is which for each model is in `docs/knobs.md`, and in each model's Details on the model library page (from `docs/param-map.json`).
 
 Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorder models in an update, and the codes may move with them. Check a code with a read-back before relying on it after a firmware change.
 

@@ -18,3 +18,9 @@ def test_param_map_is_valid_and_matches_the_bridge_slots():
             for param in model["params"].values():
                 assert param["status"] in STATUSES
                 assert records.BLOCK_OFFSETS[slot] < param["record_offset"] < 459
+
+
+def test_site_copy_matches_docs_copy():
+    a = open(os.path.join(HERE, "..", "docs", "param-map.json"), "rb").read()
+    b = open(os.path.join(HERE, "..", "site", "param-map.json"), "rb").read()
+    assert a == b
