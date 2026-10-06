@@ -122,35 +122,43 @@
    "controls": "Two channels, tone controls, master, effects loop"
   },
   "AMP:192": {
-   "era": "Hotone original, no named source"
+   "what": "Acoustic guitar preamp",
+   "behavior": "Shapes an acoustic pickup signal",
+   "character": "Clear, natural"
   },
   "AMP:193": {
    "era": "Acoustic guitar preamp with EQ",
    "controls": "EQ shaping for acoustic pickups"
   },
   "AMP:194": {
-   "era": "Name points to a Matchless DC-30 (Hotone lists no source)",
-   "power": "If so: four EL84, 30 W, class A"
+   "what": "Clean amp model",
+   "behavior": "In the editor but not in Hotone's model list, so no real-world amp is named for it",
+   "character": "Clean"
   },
   "AMP:195": {
-   "era": "Hotone capture slot, no named amp",
-   "controls": "Makes no sound on the pedal"
+   "what": "Placeholder amp slot",
+   "behavior": "Makes no sound on the pedal (confirmed on a real pedal)",
+   "character": "Silent"
   },
   "AMP:196": {
-   "era": "Hotone capture slot, no named amp",
-   "controls": "Makes no sound on the pedal"
+   "what": "Placeholder amp slot",
+   "behavior": "Makes no sound on the pedal (confirmed on a real pedal)",
+   "character": "Silent"
   },
   "AMP:197": {
-   "era": "Hotone capture slot, no named amp",
-   "controls": "Makes no sound on the pedal"
+   "what": "Placeholder amp slot",
+   "behavior": "Makes no sound on the pedal (confirmed on a real pedal)",
+   "character": "Silent"
   },
   "AMP:198": {
-   "era": "Hotone capture slot, no named amp",
-   "controls": "Makes no sound on the pedal"
+   "what": "Placeholder amp slot",
+   "behavior": "Makes no sound on the pedal (confirmed on a real pedal)",
+   "character": "Silent"
   },
   "AMP:199": {
-   "era": "Hotone capture slot, no named amp",
-   "controls": "Makes no sound on the pedal"
+   "what": "Placeholder amp slot",
+   "behavior": "Makes no sound on the pedal (confirmed on a real pedal)",
+   "character": "Silent"
   },
   "AMP:2": {
    "era": "1960s",
@@ -305,16 +313,14 @@
    "controls": "Channel 1: Bass, Treble, Volume, Bright"
   },
   "AMP:8": {
-   "era": "1950s",
-   "power": "A single 6V6 tube, a few watts",
-   "cab": "1x8",
-   "controls": "Volume, Tone"
+   "what": "Clean amp model",
+   "behavior": "In the editor but not in Hotone's model list, so no real-world amp is named for it",
+   "character": "Clean"
   },
   "AMP:9": {
-   "era": "1960s",
-   "power": "Pair of 6V6 tubes, about 12 W",
-   "cab": "1x10",
-   "controls": "Volume, Treble, Bass, reverb and tremolo on the real amp (Fender blackface Princeton, AA964 version)"
+   "what": "Clean amp model",
+   "behavior": "In the editor but not in Hotone's model list, so no real-world amp is named for it",
+   "character": "Clean"
   },
   "AMP:96": {
    "era": "1990s",
@@ -962,6 +968,664 @@
    "what": "Shimmer reverb",
    "behavior": "Pitched-up bloom on the tail",
    "character": "Bright and airy"
+  },
+  "FX1:0": {
+   "what": "Compressor",
+   "behavior": "Evens out your picking and adds sustain",
+   "character": "Squishy, smooth"
+  },
+  "FX1:2": {
+   "what": "Clean boost",
+   "behavior": "Adds volume and a little tone shaping",
+   "character": "Transparent lift"
+  },
+  "FX1:3": {
+   "what": "Preamp-style boost",
+   "behavior": "Pushes the amp harder with a thick, slightly colored gain",
+   "character": "Thick, punchy"
+  },
+  "FX1:4": {
+   "what": "Boost",
+   "behavior": "Adds level and a warm, fuller tone",
+   "character": "Warm, full"
+  },
+  "FX1:5": {
+   "what": "Noise gate",
+   "behavior": "Cuts hiss and hum between notes",
+   "character": "Tight, quiet"
+  },
+  "FX1:35": {
+   "what": "Wah",
+   "behavior": "Rocking filter sweep with the pedal, here controlled from the knobs or an expression pedal",
+   "character": "Vocal, throaty"
+  },
+  "FX1:36": {
+   "what": "Wah",
+   "behavior": "Rocking filter sweep, here controlled from the knobs or an expression pedal",
+   "character": "Classic, biting"
+  },
+  "FX1:64": {
+   "what": "Overdrive",
+   "behavior": "Mid-hump drive that tightens the low end and pushes an amp",
+   "character": "Smooth, creamy"
+  },
+  "FX1:65": {
+   "what": "Overdrive",
+   "behavior": "Soft clipping that sounds like a turned-up amp",
+   "character": "Warm, mid-forward"
+  },
+  "FX1:67": {
+   "what": "Overdrive",
+   "behavior": "Touch-sensitive, open-sounding drive",
+   "character": "Dynamic, transparent"
+  },
+  "FX1:68": {
+   "what": "Fuzz",
+   "behavior": "Thick, sustaining fuzz with a smooth top end",
+   "character": "Fat, wall of sound"
+  },
+  "FX1:69": {
+   "what": "Fuzz",
+   "behavior": "Two-knob fuzz that cleans up when you turn the guitar down",
+   "character": "Woolly, vintage"
+  },
+  "FX1:70": {
+   "what": "Fuzz",
+   "behavior": "Raw, early British-style fuzz",
+   "character": "Raspy, spitty"
+  },
+  "FX1:71": {
+   "what": "Distortion",
+   "behavior": "Hard-clipping distortion with a filter control",
+   "character": "Gritty, aggressive"
+  },
+  "FX1:72": {
+   "what": "Distortion",
+   "behavior": "Hard-clipping distortion with a bright, edgy top",
+   "character": "Bright, edgy"
+  },
+  "FX1:73": {
+   "what": "Distortion",
+   "behavior": "British-style crunch with a full tone stack",
+   "character": "Crunchy, amp-like"
+  },
+  "FX1:74": {
+   "what": "Distortion",
+   "behavior": "High-gain British-style stack in one block",
+   "character": "Tight, aggressive"
+  },
+  "FX1:128": {
+   "what": "Stereo chorus",
+   "behavior": "Wide modulation that doubles the signal",
+   "character": "Glassy, 1980s"
+  },
+  "FX1:129": {
+   "what": "Ensemble chorus",
+   "behavior": "Thick, wide chorus",
+   "character": "Lush, swirling"
+  },
+  "FX1:130": {
+   "what": "Multi-mode chorus",
+   "behavior": "One control picks the chorus mode",
+   "character": "Watery, classic"
+  },
+  "FX1:135": {
+   "what": "Vibrato",
+   "behavior": "Pure pitch wobble with no dry signal",
+   "character": "Wobbly, vintage"
+  },
+  "FX1:136": {
+   "what": "Ensemble vibrato",
+   "behavior": "Deep pitch modulation from the same circuit as the ensemble chorus",
+   "character": "Deep, seasick"
+  },
+  "FX1:137": {
+   "what": "Phaser",
+   "behavior": "Classic phaser sweep, one rate control",
+   "character": "Warm swirl"
+  },
+  "FX1:138": {
+   "what": "Phaser",
+   "behavior": "Smooth, soft phase sweep",
+   "character": "Gentle, vintage"
+  },
+  "FX1:139": {
+   "what": "Uni-Vibe style modulation",
+   "behavior": "Throbbing chorus or vibrato with a mode switch",
+   "character": "Liquid, psychedelic"
+  },
+  "FX1:140": {
+   "what": "Tremolo",
+   "behavior": "Smooth volume pulsing",
+   "character": "Pulsing, vintage"
+  },
+  "FX2:0": {
+   "what": "Overdrive",
+   "behavior": "Mid-hump drive that tightens the low end and pushes an amp",
+   "character": "Smooth, creamy"
+  },
+  "FX2:1": {
+   "what": "Overdrive",
+   "behavior": "Soft clipping that sounds like a turned-up amp",
+   "character": "Warm, mid-forward"
+  },
+  "FX2:3": {
+   "what": "Overdrive",
+   "behavior": "Touch-sensitive, open-sounding drive",
+   "character": "Dynamic, transparent"
+  },
+  "FX2:4": {
+   "what": "Fuzz",
+   "behavior": "Thick, sustaining fuzz with a smooth top end",
+   "character": "Fat, wall of sound"
+  },
+  "FX2:5": {
+   "what": "Fuzz",
+   "behavior": "Two-knob fuzz that cleans up when you turn the guitar down",
+   "character": "Woolly, vintage"
+  },
+  "FX2:6": {
+   "what": "Fuzz",
+   "behavior": "Raw, early British-style fuzz",
+   "character": "Raspy, spitty"
+  },
+  "FX2:7": {
+   "what": "Distortion",
+   "behavior": "Hard-clipping distortion with a filter control",
+   "character": "Gritty, aggressive"
+  },
+  "FX2:8": {
+   "what": "Distortion",
+   "behavior": "Hard-clipping distortion with a bright, edgy top",
+   "character": "Bright, edgy"
+  },
+  "FX2:9": {
+   "what": "Distortion",
+   "behavior": "British-style crunch with a full tone stack",
+   "character": "Crunchy, amp-like"
+  },
+  "FX2:10": {
+   "what": "Distortion",
+   "behavior": "High-gain British-style stack in one block",
+   "character": "Tight, aggressive"
+  },
+  "FX2:48": {
+   "what": "Compressor",
+   "behavior": "Evens out your picking and adds sustain",
+   "character": "Squishy, smooth"
+  },
+  "FX2:50": {
+   "what": "Clean boost",
+   "behavior": "Adds volume and a little tone shaping",
+   "character": "Transparent lift"
+  },
+  "FX2:51": {
+   "what": "Preamp-style boost",
+   "behavior": "Pushes the amp harder with a thick, slightly colored gain",
+   "character": "Thick, punchy"
+  },
+  "FX2:52": {
+   "what": "Boost",
+   "behavior": "Adds level and a warm, fuller tone",
+   "character": "Warm, full"
+  },
+  "FX2:53": {
+   "what": "Noise gate",
+   "behavior": "Cuts hiss and hum between notes",
+   "character": "Tight, quiet"
+  },
+  "FX2:83": {
+   "what": "Wah",
+   "behavior": "Rocking filter sweep with the pedal, here controlled from the knobs or an expression pedal",
+   "character": "Vocal, throaty"
+  },
+  "FX2:84": {
+   "what": "Wah",
+   "behavior": "Rocking filter sweep, here controlled from the knobs or an expression pedal",
+   "character": "Classic, biting"
+  },
+  "FX2:112": {
+   "what": "Stereo chorus",
+   "behavior": "Wide modulation that doubles the signal",
+   "character": "Glassy, 1980s"
+  },
+  "FX2:113": {
+   "what": "Ensemble chorus",
+   "behavior": "Thick, wide chorus",
+   "character": "Lush, swirling"
+  },
+  "FX2:114": {
+   "what": "Multi-mode chorus",
+   "behavior": "One control picks the chorus mode",
+   "character": "Watery, classic"
+  },
+  "FX2:119": {
+   "what": "Vibrato",
+   "behavior": "Pure pitch wobble with no dry signal",
+   "character": "Wobbly, vintage"
+  },
+  "FX2:120": {
+   "what": "Ensemble vibrato",
+   "behavior": "Deep pitch modulation from the same circuit as the ensemble chorus",
+   "character": "Deep, seasick"
+  },
+  "FX2:121": {
+   "what": "Phaser",
+   "behavior": "Classic phaser sweep, one rate control",
+   "character": "Warm swirl"
+  },
+  "FX2:122": {
+   "what": "Phaser",
+   "behavior": "Smooth, soft phase sweep",
+   "character": "Gentle, vintage"
+  },
+  "FX2:123": {
+   "what": "Uni-Vibe style modulation",
+   "behavior": "Throbbing chorus or vibrato with a mode switch",
+   "character": "Liquid, psychedelic"
+  },
+  "FX2:124": {
+   "what": "Tremolo",
+   "behavior": "Smooth volume pulsing",
+   "character": "Pulsing, vintage"
+  },
+  "FX3:0": {
+   "what": "Stereo chorus",
+   "behavior": "Wide modulation that doubles the signal",
+   "character": "Glassy, 1980s"
+  },
+  "FX3:1": {
+   "what": "Ensemble chorus",
+   "behavior": "Thick, wide chorus",
+   "character": "Lush, swirling"
+  },
+  "FX3:2": {
+   "what": "Multi-mode chorus",
+   "behavior": "One control picks the chorus mode",
+   "character": "Watery, classic"
+  },
+  "FX3:9": {
+   "what": "Vibrato",
+   "behavior": "Pure pitch wobble with no dry signal",
+   "character": "Wobbly, vintage"
+  },
+  "FX3:10": {
+   "what": "Ensemble vibrato",
+   "behavior": "Deep pitch modulation from the same circuit as the ensemble chorus",
+   "character": "Deep, seasick"
+  },
+  "FX3:12": {
+   "what": "Phaser",
+   "behavior": "Classic phaser sweep, one rate control",
+   "character": "Warm swirl"
+  },
+  "FX3:13": {
+   "what": "Phaser",
+   "behavior": "Smooth, soft phase sweep",
+   "character": "Gentle, vintage"
+  },
+  "FX3:14": {
+   "what": "Uni-Vibe style modulation",
+   "behavior": "Throbbing chorus or vibrato with a mode switch",
+   "character": "Liquid, psychedelic"
+  },
+  "FX3:15": {
+   "what": "Tremolo",
+   "behavior": "Smooth volume pulsing",
+   "character": "Pulsing, vintage"
+  },
+  "NR:0": {
+   "what": "Noise gate",
+   "behavior": "Cuts hiss and hum between notes",
+   "character": "Tight, quiet"
+  },
+  "CAB:0": {
+   "what": "Single 6-inch cab",
+   "character": "Small, tight, breaks up early",
+   "cab": "1x6"
+  },
+  "CAB:1": {
+   "what": "Single 8-inch cab",
+   "character": "Small and focused",
+   "cab": "1x8"
+  },
+  "CAB:2": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:3": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:4": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:5": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:6": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:7": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:8": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:9": {
+   "what": "Single 12-inch cab",
+   "character": "Focused, easy to break up",
+   "cab": "1x12"
+  },
+  "CAB:10": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:11": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:12": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:13": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:14": {
+   "what": "Two 10-inch cab",
+   "character": "Open and punchy",
+   "cab": "2x10"
+  },
+  "CAB:15": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:17": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:18": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:19": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12"
+  },
+  "CAB:20": {
+   "what": "Two 12-inch cab",
+   "character": "Wider and fuller than a single 12",
+   "cab": "2x12",
+   "behavior": "Alnico Blue-style speaker: chimey and vintage"
+  },
+  "CAB:21": {
+   "what": "Four 10-inch bass cab",
+   "character": "Punchy, clear lows",
+   "cab": "4x10"
+  },
+  "CAB:22": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:23": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:24": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:25": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12",
+   "behavior": "Greenback-style speaker: woody, mid-forward"
+  },
+  "CAB:26": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:27": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:28": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:29": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:30": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:31": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:32": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:33": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:34": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:35": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:36": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:37": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:38": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12",
+   "behavior": "G12T-75-style speaker: bright and tight"
+  },
+  "CAB:39": {
+   "what": "Four 12-inch cab",
+   "character": "Big, tight low end, the classic rock stack",
+   "cab": "4x12"
+  },
+  "CAB:40": {
+   "what": "Single 15-inch bass cab",
+   "character": "Deep and round",
+   "cab": "1x15"
+  },
+  "CAB:41": {
+   "what": "Single 15-inch bass cab",
+   "character": "Deep and round",
+   "cab": "1x15"
+  },
+  "CAB:42": {
+   "what": "Single 15-inch bass cab",
+   "character": "Deep and round",
+   "cab": "1x15"
+  },
+  "CAB:43": {
+   "what": "Two 10-inch bass cab",
+   "character": "Punchy and defined",
+   "cab": "2x10"
+  },
+  "CAB:44": {
+   "what": "Two 10-inch bass cab",
+   "character": "Punchy and defined",
+   "cab": "2x10"
+  },
+  "CAB:45": {
+   "what": "Four 10-inch bass cab",
+   "character": "Punchy, clear lows",
+   "cab": "4x10"
+  },
+  "CAB:46": {
+   "what": "Four 10-inch bass cab",
+   "character": "Punchy, clear lows",
+   "cab": "4x10"
+  },
+  "CAB:47": {
+   "what": "Four 10-inch bass cab",
+   "character": "Punchy, clear lows",
+   "cab": "4x10"
+  },
+  "CAB:48": {
+   "what": "Four 12-inch bass cab",
+   "character": "Tight and full",
+   "cab": "4x12"
+  },
+  "CAB:49": {
+   "what": "Eight 10-inch bass cab",
+   "character": "Huge, powerful low end",
+   "cab": "8x10"
+  },
+  "CAB:112": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a dreadnought acoustic guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:113": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a dreadnought acoustic guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:114": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a om-style acoustic guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:115": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a jumbo acoustic guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:116": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a hummingbird-style acoustic guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:117": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a auditorium-style acoustic guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:118": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a classical guitar body",
+   "character": "Woody, airy"
+  },
+  "CAB:119": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a mandolin body",
+   "character": "Woody, airy"
+  },
+  "CAB:120": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a fretless acoustic bass body",
+   "character": "Woody, airy"
+  },
+  "CAB:121": {
+   "what": "Acoustic body simulation",
+   "behavior": "Gives a pickup or preamp signal the sound of a double bass body",
+   "character": "Woody, airy"
+  },
+  "EQ:6": {
+   "what": "Five-band graphic EQ",
+   "behavior": "Five fixed bands, each plus or minus 12 dB",
+   "character": "Surgical, amp-style"
+  },
+  "DLY:0": {
+   "what": "Analog delay",
+   "behavior": "Dark repeats that fade into soft warble",
+   "character": "Warm, murky"
+  },
+  "DLY:1": {
+   "what": "Analog delay",
+   "behavior": "Warm repeats, with a sync option",
+   "character": "Warm, vintage"
+  },
+  "DLY:7": {
+   "what": "Stereo delay",
+   "behavior": "Repeats bounce left and right",
+   "character": "Wide, spacious"
+  },
+  "DLY:9": {
+   "what": "Short delay",
+   "behavior": "One quick repeat close behind the note",
+   "character": "Tight, rockabilly"
+  },
+  "RVB:0": {
+   "what": "Room reverb",
+   "behavior": "Short, small-space ambience",
+   "character": "Natural, tight"
+  },
+  "RVB:1": {
+   "what": "Hall reverb",
+   "behavior": "Large space with a long, smooth tail",
+   "character": "Open, spacious"
+  },
+  "RVB:2": {
+   "what": "Cathedral-style reverb",
+   "behavior": "Very large space and a long decay",
+   "character": "Huge, airy"
+  },
+  "RVB:3": {
+   "what": "Plate reverb",
+   "behavior": "Dense, bright tail with a high damp control",
+   "character": "Bright, smooth"
+  },
+  "RVB:4": {
+   "what": "Spring reverb",
+   "behavior": "Bouncy tank sound with a drippy tail",
+   "character": "Splashy, surfy"
   }
  }
 }
