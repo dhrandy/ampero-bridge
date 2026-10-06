@@ -20,34 +20,56 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
   GET  /api/patches/known          slot, label and name of every patch seen so far (no pedal access)
   GET  /api/history                states the bridge saw while polling the pedal (no pedal access)
+  POST /api/notes                  {"patch": 75, "note": "...", "source": "todd"}  add a preset note (no pedal access)
+  GET  /api/notes                  every note;  GET /api/notes/<patch>  notes for one patch (index or P26-1)
+  GET  /api/favorites              starred presets and models (no pedal access)
+  POST /api/favorites              {"kind": "patch", "id": 75, "starred": true}  star or unstar (kind: patch or model)
+  POST /api/block/copy             {"from": 75, "to": 78, "block": "dly", "confirm": "COPY DLY P26-1 TO P27-1"}
+  POST /api/backup                 start a dump of every patch to a file on the bridge;  GET /api/backup/status
+  GET  /api/backups                the dump files;  GET /api/backups/<name>  download one
+  POST /api/restore                put patches from a dump back on the pedal (dry run unless "apply": true)
+  POST /api/import/prst            {"filename": "x.prst", "data": "<base64>"}  look inside a .prst file (read only)
 
 Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 429 too many
 writes waiting (see Retry-After), 503 pedal missing or busy, 504 pedal silent, 502 other USB trouble.
 
 Nothing here can leave the process stuck: see usbmidi.Link and docs/usb-lockups.md.
 """
+import base64
+import binascii
 import datetime
 import hmac
 import json
 import logging
 import math
 import os
+import re
 import signal
 import threading
 import time
+import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 import ampero_mini as am
+import prst
+import records
 import usbmidi as usb
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("ampero-bridge")
 
+
+def _env(name: str, default: str) -> str:
+    """An environment value, with an empty one (an unfilled ${VAR} in compose) counted as not set."""
+    return (os.environ.get(name) or "").strip() or default
+
 API_KEY = os.environ.get("API_KEY", "")
-PORT = int(os.environ.get("PORT", "8080"))
-HARD_DEADLINE = float(os.environ.get("AMPERO_HARD_DEADLINE_S", "20"))
+PORT = int(_env("PORT", "8080"))
+HARD_DEADLINE = float(_env("AMPERO_HARD_DEADLINE_S", "20"))
 MAX_BODY = 4096
+MAX_BIG_BODY = 3_000_000   # restore and .prst uploads carry a whole backup or file
+BIG_BODY_PATHS = {"/api/restore", "/api/import/prst"}
 MAX_THREADS = 64     # simultaneous connections; more get a quick 503
 MIN_KEY_LEN = 24
 PLACEHOLDER_KEYS = {"change-me-to-a-long-random-string"}
@@ -71,18 +93,27 @@ PROVEN_MODELS = {
     "eq": {*range(0, 7)},
     "dly": {*range(0, 17)},
     "rvb": {*range(0, 11)},
+    "fx3": {*range(0, 17), *range(64, 77)},
+    "nr": {0, 1},
 }
 CLIENT_TIMEOUT = 10  # seconds a client may stall before we drop the socket
 GAP = 0.15           # pause between frames, the pacing the pedal was tested with
 
-DATA_DIR = os.environ.get("AMPERO_DATA_DIR", "/data")
-HISTORY_POLL = float(os.environ.get("AMPERO_HISTORY_POLL_S", "2"))      # pause between polls; 0 turns history off
-HISTORY_WINDOW = float(os.environ.get("AMPERO_HISTORY_WINDOW_S", "600"))  # how far back to keep states
-HISTORY_BUSY_MAX = float(os.environ.get("AMPERO_HISTORY_BUSY_MAX_S", "10"))  # longest wait while the patch keeps changing
+DATA_DIR = _env("AMPERO_DATA_DIR", "/data")
+HISTORY_POLL = float(_env("AMPERO_HISTORY_POLL_S", "2"))      # pause between polls; 0 turns history off
+HISTORY_WINDOW = float(_env("AMPERO_HISTORY_WINDOW_S", "600"))  # how far back to keep states
+HISTORY_BUSY_MAX = float(_env("AMPERO_HISTORY_BUSY_MAX_S", "10"))  # longest wait while the patch keeps changing
 HISTORY_MAX = 400     # states kept at most, whatever the window
-WRITE_GAP = float(os.environ.get("AMPERO_WRITE_GAP_S", "0.5"))            # least seconds between two writes to the pedal
-WRITE_SAVE_GAP = float(os.environ.get("AMPERO_WRITE_SAVE_GAP_S", "3"))    # quiet time before and after a save
-WRITE_QUEUE_MAX = int(os.environ.get("AMPERO_WRITE_QUEUE_MAX", "30"))      # writes allowed to wait; more get a 429
+WRITE_GAP = float(_env("AMPERO_WRITE_GAP_S", "0.5"))            # least seconds between two writes to the pedal
+WRITE_SAVE_GAP = float(_env("AMPERO_WRITE_SAVE_GAP_S", "3"))    # quiet time before and after a save
+WRITE_QUEUE_MAX = int(_env("AMPERO_WRITE_QUEUE_MAX", "30"))      # writes allowed to wait; more get a 429
+NOTE_MAX_CHARS = 2000      # longest preset note
+NOTES_PER_PATCH = 200      # notes kept per patch; more get a 400 (there is no delete)
+NOTE_SOURCE_MAX = 60       # longest "source" label
+FAVORITES_MAX = 500        # stars kept per kind
+PATCH_COUNT = int(_env("AMPERO_PATCH_COUNT", "100"))        # patches a backup walks through, from index 0
+PEDAL_SETTLE = float(_env("AMPERO_PEDAL_SETTLE_S", "0.4"))  # pause after a Program Change before reading
+CORS_ORIGINS = {o.strip().rstrip("/") for o in os.environ.get("AMPERO_CORS_ORIGINS", "").split(",") if o.strip()}
 KNOWN_REFRESH = 3600  # seconds between disk writes for a patch whose name did not change
 
 link = usb.Link(hard_deadline=HARD_DEADLINE)
@@ -380,6 +411,186 @@ def poll_history(stop: threading.Event | None = None, rounds: int | None = None)
         history.pace(delay, pacer.mode())
 
 
+class Notes:
+    """Free-text notes about presets, kept in one JSON file next to the known patch names.
+
+    Notes are only ever added: there is no edit and no delete call. Nothing here talks
+    to the pedal. A note is stored under the patch slot (0-based index) it is about.
+    """
+
+    def __init__(self, path: str):
+        self.path = path
+        self.lock = threading.Lock()
+        self.items: dict[str, list[dict]] = {}
+        try:
+            with open(self.path) as f:
+                data = json.load(f)
+            for k, v in data.get("patches", {}).items():
+                if k.isdigit() and isinstance(v, list):
+                    self.items[k] = [n for n in v if isinstance(n, dict) and isinstance(n.get("note"), str)]
+        except FileNotFoundError:
+            pass
+        except (OSError, ValueError, AttributeError) as e:
+            log.warning("preset notes file ignored: %s", e)
+
+    def _save(self):
+        tmp = self.path + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump({"version": 1, "patches": self.items}, f)
+        os.replace(tmp, self.path)
+
+    def add(self, index: int, note: str, source: str) -> dict:
+        entry = {"n": 0, "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+                 "source": source, "note": note}
+        with self.lock:
+            lst = self.items.setdefault(str(index), [])
+            if len(lst) >= NOTES_PER_PATCH:
+                raise am.ProtocolError(f"patch {am.patch_label(index)} already has {NOTES_PER_PATCH} notes")
+            entry["n"] = (lst[-1].get("n", len(lst)) + 1) if lst else 1
+            lst.append(entry)
+            try:
+                self._save()
+            except OSError as e:
+                lst.pop()
+                log.warning("preset notes not saved: %s", e)
+                raise OSError("notes file is not writable") from e
+            return {"ok": True, "index": index, "label": am.patch_label(index), "note": dict(entry),
+                    "count": len(lst)}
+
+    def for_patch(self, index: int) -> dict:
+        with self.lock:
+            lst = [dict(n) for n in self.items.get(str(index), [])]
+        return {"index": index, "label": am.patch_label(index), "count": len(lst), "notes": lst}
+
+    def listing(self) -> dict:
+        with self.lock:
+            out = [{"index": int(k), "label": am.patch_label(int(k)), "count": len(v),
+                    "notes": [dict(n) for n in v]} for k, v in sorted(self.items.items(), key=lambda kv: int(kv[0])) if v]
+        return {"count": sum(p["count"] for p in out), "patches": out}
+
+
+NOTES_FILE = os.environ.get("AMPERO_NOTES_FILE") or os.path.join(DATA_DIR, "preset-notes.json")
+notes = Notes(NOTES_FILE)
+
+
+def _patch_ref(value) -> int:
+    """A patch as a 0-based index (75) or a label such as "P26-1"."""
+    if isinstance(value, bool):
+        raise am.ProtocolError("'patch' must be an index or a label like P26-1")
+    if isinstance(value, str):
+        m = re.fullmatch(r"\s*[Pp](\d{1,3})-(\d)\s*", value)
+        if m:
+            bank, n = int(m.group(1)), int(m.group(2))
+            if bank < 1 or not 1 <= n <= am.PATCHES_PER_BANK:
+                raise am.ProtocolError("patch label out of range")
+            value = (bank - 1) * am.PATCHES_PER_BANK + (n - 1)
+    try:
+        i = int(value)
+    except (TypeError, ValueError, OverflowError):
+        raise am.ProtocolError("'patch' must be an index or a label like P26-1")
+    if not 0 <= i <= am.MAX_PATCH:
+        raise am.ProtocolError(f"patch index must be 0-{am.MAX_PATCH}")
+    return i
+
+
+def add_note(data: dict) -> dict:
+    if "patch" not in data:
+        raise am.ProtocolError("missing 'patch'")
+    idx = _patch_ref(data["patch"])
+    note = data.get("note")
+    if not isinstance(note, str) or not note.strip():
+        raise am.ProtocolError("'note' must be non-empty text")
+    if len(note) > NOTE_MAX_CHARS:
+        raise am.ProtocolError(f"'note' is {len(note)} characters; the limit is {NOTE_MAX_CHARS}")
+    source = data.get("source", "")
+    if not isinstance(source, str) or len(source) > NOTE_SOURCE_MAX:
+        raise am.ProtocolError(f"'source' must be text of at most {NOTE_SOURCE_MAX} characters")
+    return notes.add(idx, note.strip(), source.strip())
+
+
+class Favorites:
+    """Starred presets and models, kept on the bridge so every browser sees the same stars.
+
+    Two kinds: "patch" (stored by 0-based index) and "model" (stored as "AMP:55", the block
+    and the model code). Nothing here talks to the pedal.
+    """
+
+    KINDS = ("patch", "model")
+
+    def __init__(self, path: str):
+        self.path = path
+        self.lock = threading.Lock()
+        self.items: dict[str, dict[str, str]] = {k: {} for k in self.KINDS}
+        try:
+            with open(self.path) as f:
+                data = json.load(f)
+            for kind in self.KINDS:
+                for key, ts in (data.get(kind) or {}).items():
+                    if isinstance(key, str) and isinstance(ts, str):
+                        self.items[kind][key] = ts
+        except FileNotFoundError:
+            pass
+        except (OSError, ValueError, AttributeError) as e:
+            log.warning("favorites file ignored: %s", e)
+
+    def _save(self):
+        tmp = self.path + ".tmp"
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        with open(tmp, "w") as f:
+            json.dump({"version": 1, **self.items}, f)
+        os.replace(tmp, self.path)
+
+    def set(self, kind: str, key: str, starred: bool) -> dict:
+        with self.lock:
+            before = dict(self.items[kind])
+            if starred:
+                if key not in self.items[kind] and len(self.items[kind]) >= FAVORITES_MAX:
+                    raise am.ProtocolError(f"already {FAVORITES_MAX} starred {kind}s; unstar one first")
+                self.items[kind].setdefault(key, datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"))
+            else:
+                self.items[kind].pop(key, None)
+            try:
+                self._save()
+            except OSError as e:
+                self.items[kind] = before
+                log.warning("favorites not saved: %s", e)
+                raise OSError("favorites file is not writable") from e
+        return self.listing()
+
+    def listing(self) -> dict:
+        with self.lock:
+            patches = sorted(self.items["patch"], key=int)
+            models = sorted(self.items["model"])
+            return {"patches": [{"index": int(k), "label": am.patch_label(int(k)), "starred_at": self.items["patch"][k]}
+                                for k in patches],
+                    "models": [{"id": k, "starred_at": self.items["model"][k]} for k in models],
+                    "count": len(patches) + len(models)}
+
+
+FAVORITES_FILE = os.environ.get("AMPERO_FAVORITES_FILE") or os.path.join(DATA_DIR, "favorites.json")
+favorites = Favorites(FAVORITES_FILE)
+
+
+def set_favorite(data: dict) -> dict:
+    kind = data.get("kind", "patch")
+    if kind not in Favorites.KINDS:
+        raise am.ProtocolError("'kind' must be patch or model")
+    if "id" not in data:
+        raise am.ProtocolError("missing 'id'")
+    starred = data.get("starred", True)
+    if not isinstance(starred, bool):
+        raise am.ProtocolError("'starred' must be true or false")
+    if kind == "patch":
+        key = str(_patch_ref(data["id"]))
+    else:
+        key = str(data["id"]).strip().upper()
+        block, _, code = key.partition(":")
+        if block not in (b.upper() for b in records.BLOCKS) or not code.isdigit() or len(code) > 4:
+            raise am.ProtocolError("a model id looks like AMP:55 (block, colon, model code)")
+        key = f"{block}:{int(code)}"
+    return favorites.set(kind, key, starred)
+
+
 def read_current_patch() -> dict:
     """Read the patch the pedal currently has selected. Reads only."""
     def run(p):
@@ -420,6 +631,315 @@ def send_sysex(frames: list[bytes], name: str):
     gate.run(name.startswith("save"), lambda: link.session(name, run))
 
 
+# --- workflows: several pedal steps in a row ---------------------------------------------
+#
+# Copying a block, backing up and restoring all walk the pedal through patches. Only one
+# of them may run at a time, because each one selects patches and the edit buffer is shared.
+
+class WorkflowBusy(Exception):
+    """A copy, backup or restore is already using the pedal."""
+
+
+workflow = threading.Lock()
+
+
+def select_patch(index: int):
+    send_midi(am.program_change(index), f"select {index}")
+    time.sleep(PEDAL_SETTLE)
+
+
+def _record(got: dict) -> bytes:
+    return records.to_bytes(got["record_hex"])
+
+
+def apply_diff(d: dict):
+    """Send the one write that fixes one difference (the caller checked it is writable)."""
+    slot, field = d["slot"], d["field"]
+    if field == "power":
+        send_midi(am.block_power(slot, d["want"]), f"block {slot}")
+    elif field == "level":
+        send_midi(am.raw_cc(records.LEVEL_CC, d["want"]), "patch level")
+    elif field == "model":
+        send_sysex([am.model_select(slot, d["want"])], "model")
+    else:
+        send_sysex([am.param_set(slot, d["model_code"], d["index"], d["want"])], "param")
+
+
+def converge(index: int, want: bytes, slots, level: bool, apply: bool = True) -> dict:
+    """Make the selected patch `index` look like `want` as far as the bridge can write.
+
+    Reads the patch, writes the power, level and model differences, reads again (a model
+    write resets the knobs), writes the param differences, then reads once more to see what
+    is still different. Nothing is saved. With apply=False it only reads and reports.
+    """
+    have = _record(read_patch(index))
+    plan = records.summarize(records.diffs(want, have, slots, level), PROVEN_MODELS, ALLOW_UNPROVEN)
+    report = {"written": 0, "param_writes_pending": False}
+    if not apply:
+        report["would_write"] = plan["writable"]
+        report["param_writes_pending"] = any(d["field"] == "model" for d in plan["writable"])
+        report["stuck"] = plan["stuck"]
+        return report
+    first = [d for d in plan["writable"] if d["field"] != "param"]
+    for d in first:
+        apply_diff(d)
+    report["written"] += len(first)
+    if any(d["field"] == "model" for d in first):
+        time.sleep(PEDAL_SETTLE)
+        have = _record(read_patch(index))
+        plan = records.summarize(records.diffs(want, have, slots, level), PROVEN_MODELS, ALLOW_UNPROVEN)
+    params = [d for d in plan["writable"] if d["field"] == "param"]
+    for d in params:
+        apply_diff(d)
+    report["written"] += len(params)
+    if first or params:
+        time.sleep(PEDAL_SETTLE)
+    final = _record(read_patch(index))
+    left = records.summarize(records.diffs(want, final, slots, level), PROVEN_MODELS, ALLOW_UNPROVEN)
+    report["stuck"] = left["stuck"]
+    report["unwritten"] = left["writable"]    # writable, yet still different after the write
+    return report
+
+
+def copy_block(data: dict) -> dict:
+    """Copy one block's model, switch and knobs from one patch onto another (edit buffer only)."""
+    for key in ("from", "to", "block"):
+        if key not in data:
+            raise am.ProtocolError(f"missing {key!r}")
+    src, dst = _patch_ref(data["from"]), _patch_ref(data["to"])
+    block = str(data["block"]).lower()
+    if block not in am.SLOTS:
+        raise am.ProtocolError(f"block must be one of {sorted(am.SLOTS)}")
+    if src == dst:
+        raise am.ProtocolError("'from' and 'to' are the same patch")
+    dry = data.get("dry_run", False)
+    if not isinstance(dry, bool):
+        raise am.ProtocolError("'dry_run' must be true or false")
+    want = f"COPY {block.upper()} {am.patch_label(src)} TO {am.patch_label(dst)}"
+    if not dry and data.get("confirm") != want:
+        raise am.ProtocolError("copying selects both patches, so unsaved edits on the pedal are lost "
+                               f'(set "dry_run": true to only look, or send "confirm": "{want}")')
+    if not workflow.acquire(blocking=False):
+        raise WorkflowBusy("a copy, backup or restore is already running")
+    try:
+        select_patch(src)
+        source = _record(read_patch(src))
+        select_patch(dst)
+        report = converge(dst, source, [block], False, apply=not dry)
+        name = records.name_of(_record(read_patch(dst))) if not dry else None
+    finally:
+        workflow.release()
+    out = {"ok": not report["stuck"] and not report.get("unwritten"), "dry_run": dry, "block": block,
+           "from": src, "from_label": am.patch_label(src), "to": dst, "to_label": am.patch_label(dst), **report}
+    if not dry:
+        out["saved"] = False
+        out["note"] = (f"changed the edit buffer of {am.patch_label(dst)} only. To keep it, POST /api/patch/save with "
+                       f'{{"index": {dst}, "name": "{name}", "confirm": "SAVE {am.patch_label(dst)}"}}')
+    return out
+
+
+class Job:
+    """A long workflow running in a thread, so the request that started it can return."""
+
+    def __init__(self, kind: str, total: int):
+        self.id = uuid.uuid4().hex[:8]
+        self.kind, self.total, self.done = kind, total, 0
+        self.state = "running"
+        self.started = time.time()
+        self.finished = None
+        self.result = None
+        self.error = None
+        self.step = ""
+
+    def view(self) -> dict:
+        return {"id": self.id, "kind": self.kind, "state": self.state, "done": self.done, "total": self.total,
+                "step": self.step, "started": self.started, "finished": self.finished,
+                "result": self.result, "error": self.error}
+
+
+last_job: Job | None = None
+
+
+def start_job(kind: str, total: int, fn) -> dict:
+    """Run fn(job) in a thread while holding the workflow lock."""
+    global last_job
+    if not workflow.acquire(blocking=False):
+        raise WorkflowBusy("a copy, backup or restore is already running")
+    job = Job(kind, total)
+    last_job = job
+
+    def run():
+        try:
+            job.result = fn(job)
+            job.state = "done"
+        except Exception as e:
+            log.warning("%s job failed: %s: %s", kind, type(e).__name__, e)
+            job.error = f"{type(e).__name__}: {e}"
+            job.state = "failed"
+        finally:
+            job.finished = time.time()
+            workflow.release()
+
+    threading.Thread(target=run, daemon=True, name=f"job-{kind}").start()
+    return job.view()
+
+
+def job_status() -> dict:
+    return last_job.view() if last_job else {"state": "none"}
+
+
+BACKUP_DIR = os.path.join(DATA_DIR, "backups")
+BACKUP_NAME = re.compile(r"ampero-backup-\d{8}-\d{6}\.json")
+
+
+def _patch_list(value, default_count: int) -> list[int]:
+    if value is None:
+        return list(range(min(default_count, am.MAX_PATCH + 1)))
+    if not isinstance(value, list) or not value:
+        raise am.ProtocolError("'patches' must be a non-empty list of indexes or labels")
+    out = sorted({_patch_ref(v) for v in value})
+    if len(out) > am.MAX_PATCH + 1:
+        raise am.ProtocolError("too many patches")
+    return out
+
+
+def _return_to(index: int | None):
+    if index is not None:
+        try:
+            select_patch(index)
+        except Exception as e:
+            log.warning("could not go back to patch %s: %s", index, e)
+
+
+def _current_index() -> int | None:
+    try:
+        return read_current_patch()["index"]
+    except Exception:
+        return None
+
+
+def start_backup(data: dict) -> dict:
+    wanted = _patch_list(data.get("patches"), PATCH_COUNT)
+
+    def run(job: Job) -> dict:
+        origin = _current_index()
+        got, skipped = [], []
+        try:
+            for i in wanted:
+                job.step = f"reading {am.patch_label(i)}"
+                try:
+                    select_patch(i)
+                    got.append(read_patch(i))
+                except (PatchNotCurrent, usb.PedalTimeout, am.ProtocolError) as e:
+                    skipped.append({"index": i, "label": am.patch_label(i), "error": str(e)})
+                job.done += 1
+        finally:
+            _return_to(origin)
+        if not got:
+            raise RuntimeError("no patch could be read, nothing was saved")
+        name = "ampero-backup-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + ".json"
+        os.makedirs(BACKUP_DIR, exist_ok=True)
+        path = os.path.join(BACKUP_DIR, name)
+        with open(path + ".tmp", "wb") as f:
+            f.write(records.dumps(records.make_backup(got, skipped)))
+        os.replace(path + ".tmp", path)
+        return {"name": name, "patches": len(got), "skipped": skipped, "bytes": os.path.getsize(path)}
+
+    return start_job("backup", len(wanted), run)
+
+
+def list_backups() -> dict:
+    rows = []
+    try:
+        for name in sorted(os.listdir(BACKUP_DIR), reverse=True):
+            if BACKUP_NAME.fullmatch(name):
+                st = os.stat(os.path.join(BACKUP_DIR, name))
+                rows.append({"name": name, "bytes": st.st_size, "modified": int(st.st_mtime)})
+    except FileNotFoundError:
+        pass
+    return {"count": len(rows), "backups": rows}
+
+
+def read_backup_file(name: str) -> bytes:
+    if not BACKUP_NAME.fullmatch(name):
+        raise LookupError("no such backup")
+    try:
+        with open(os.path.join(BACKUP_DIR, name), "rb") as f:
+            return f.read()
+    except FileNotFoundError:
+        raise LookupError("no such backup")
+
+
+def start_restore(data: dict) -> dict:
+    if "backup" in data:
+        wanted_records = records.load_backup(data["backup"])
+    elif "name" in data:
+        try:
+            wanted_records = records.load_backup(json.loads(read_backup_file(str(data["name"]))))
+        except ValueError:
+            raise records.RecordError("that backup file is not valid JSON")
+    else:
+        raise am.ProtocolError("send the backup itself as 'backup' or the name of one on the bridge as 'name'")
+    chosen = _patch_list(data.get("patches"), 0) if "patches" in data else sorted(wanted_records)
+    missing = [i for i in chosen if i not in wanted_records]
+    if missing:
+        raise am.ProtocolError("the backup has no patch " + ", ".join(am.patch_label(i) for i in missing))
+    apply = data.get("apply", False)
+    partial_ok = data.get("allow_partial", False)
+    if not isinstance(apply, bool) or not isinstance(partial_ok, bool):
+        raise am.ProtocolError("'apply' and 'allow_partial' must be true or false")
+    if apply:
+        want = f"RESTORE {len(chosen)} PATCHES"
+        if data.get("confirm") != want:
+            raise am.ProtocolError(f'restoring overwrites stored patches: send "confirm": "{want}" '
+                                   '(leave out "apply" for a dry run that only reports the differences)')
+
+    def run(job: Job) -> dict:
+        origin = _current_index()
+        rows = []
+        try:
+            for i in chosen:
+                rec = wanted_records[i]
+                name = records.name_of(rec)
+                job.step = f"{'restoring' if apply else 'checking'} {am.patch_label(i)}"
+                row = {"index": i, "label": am.patch_label(i), "name": name}
+                try:
+                    select_patch(i)
+                    rep = converge(i, rec, records.BLOCKS, True, apply=apply)
+                    row.update(rep)
+                    if not apply:
+                        row["status"] = "differs" if rep["would_write"] or rep["stuck"] else "same"
+                    elif rep["stuck"] or rep.get("unwritten"):
+                        if partial_ok:
+                            send_sysex(am.save_patch(i, name), f"save {i}")
+                            known.record(i, am.patch_label(i), name, "save")
+                            row["status"] = "saved-partial"
+                        else:
+                            row["status"] = "not-saved"
+                    else:
+                        send_sysex(am.save_patch(i, name), f"save {i}")
+                        known.record(i, am.patch_label(i), name, "save")
+                        row["status"] = "restored"
+                except (PatchNotCurrent, usb.PedalTimeout, am.ProtocolError) as e:
+                    row["status"] = "failed"
+                    row["error"] = str(e)
+                rows.append(row)
+                job.done += 1
+        finally:
+            _return_to(origin)
+        return {"apply": apply, "patches": rows}
+
+    return start_job("restore" if apply else "restore-check", len(chosen), run)
+
+
+def inspect_prst(data: dict) -> dict:
+    try:
+        raw = base64.b64decode(str(data.get("data", "")), validate=True)
+    except (binascii.Error, ValueError):
+        raise am.ProtocolError("'data' must be the file as base64")
+    return {"filename": str(data.get("filename", ""))[:120], **prst.inspect(raw)}
+
+
 def _int(data: dict, key: str) -> int:
     if key not in data:
         raise am.ProtocolError(f"missing {key!r}")
@@ -432,6 +952,18 @@ def _int(data: dict, key: str) -> int:
 
 
 def handle_post(path: str, data: dict) -> dict:
+    if path == "/api/notes":
+        return add_note(data)
+    if path == "/api/favorites":
+        return set_favorite(data)
+    if path == "/api/block/copy":
+        return copy_block(data)
+    if path == "/api/backup":
+        return start_backup(data)
+    if path == "/api/restore":
+        return start_restore(data)
+    if path == "/api/import/prst":
+        return inspect_prst(data)
     if path == "/api/patch/select":
         idx = _int(data, "index")
         send_midi(am.program_change(idx), f"select {idx}")
@@ -477,7 +1009,7 @@ def handle_post(path: str, data: dict) -> dict:
 STATUS = {
     usb.PedalNotConnected: 503, usb.PedalBusy: 503, usb.PedalGone: 503,
     usb.PedalTimeout: 504, usb.UsbMidiError: 502,
-    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409, TooFast: 429,
+    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409, WorkflowBusy: 409, TooFast: 429,
 }
 # Bad input that slipped past the checks above. Reported as 400 with a fixed message.
 BAD_INPUT = (TypeError, ValueError, OverflowError, UnicodeError)
@@ -491,18 +1023,30 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.7.4"
+    server_version = "ampero-bridge/2.9.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
         return "ampero-bridge"   # no version or Python build in the Server header
 
-    def _send(self, code: int, obj: dict, retry_after: int | None = None):
-        body = json.dumps(obj).encode()
+    def _cors(self):
+        """Let a page on an allowed origin (the model library site) call the API from the browser."""
+        origin = (self.headers.get("Origin") or "").rstrip("/")
+        if origin and origin in CORS_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
+            return True
+        return False
+
+    def _send(self, code: int, obj: dict | bytes, retry_after: int | None = None, headers: dict | None = None):
+        body = obj if isinstance(obj, bytes) else json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
+        self._cors()
         if retry_after is not None:
             self.send_header("Retry-After", str(retry_after))
+        for k, v in (headers or {}).items():
+            self.send_header(k, v)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -511,14 +1055,14 @@ class Handler(BaseHTTPRequestHandler):
         key = self.headers.get("X-Api-Key", "")
         return bool(API_KEY) and hmac.compare_digest(key.encode(), API_KEY.encode())
 
-    def _body(self) -> dict:
+    def _body(self, limit: int = MAX_BODY) -> dict:
         try:
             n = int(self.headers.get("Content-Length") or 0)
         except ValueError:
             raise am.ProtocolError("bad Content-Length")
         if n < 0:
             raise am.ProtocolError("bad Content-Length")
-        if n > MAX_BODY:
+        if n > limit:
             raise am.ProtocolError("body too large")
         if not n:
             return {}
@@ -548,6 +1092,24 @@ class Handler(BaseHTTPRequestHandler):
             self._send(code, {"error": str(e), "kind": type(e).__name__, **getattr(e, "extra", {})},
                        getattr(e, "retry_after", None))
 
+    def _run_raw(self, fn, headers: dict):
+        """Like _run for a reply that is already JSON text (a file)."""
+        try:
+            self._send(200, fn(), headers=headers)
+        except Exception as e:
+            code = status_for(e)
+            self._send(code, {"error": str(e) if code < 500 else "internal error", "kind": type(e).__name__})
+
+    def do_OPTIONS(self):
+        """Answer a browser's preflight. Nothing is allowed unless AMPERO_CORS_ORIGINS lists the origin."""
+        self.send_response(204)
+        if self._cors():
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+            self.send_header("Access-Control-Allow-Headers", "X-Api-Key, Content-Type")
+            self.send_header("Access-Control-Max-Age", "600")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/health":
@@ -563,6 +1125,19 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, known.listing())
         elif path == "/api/history":
             self._run(lambda: history_view(urlparse(self.path).query))
+        elif path == "/api/notes":
+            self._send(200, notes.listing())
+        elif path == "/api/favorites":
+            self._send(200, favorites.listing())
+        elif path == "/api/backup/status":
+            self._send(200, job_status())
+        elif path == "/api/backups":
+            self._send(200, list_backups())
+        elif path.startswith("/api/backups/") and path.count("/") == 3:
+            name = path.rsplit("/", 1)[1]
+            self._run_raw(lambda: read_backup_file(name), {"Content-Disposition": f'attachment; filename="{name}"'})
+        elif path.startswith("/api/notes/") and path.count("/") == 3:
+            self._run(lambda: notes.for_patch(_patch_ref(path.rsplit("/", 1)[1])))
         elif path == "/api/models":
             self._run(lambda: models_view(urlparse(self.path).query))
         elif path == "/api/usb":
@@ -579,7 +1154,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._authed():
             self._send(401, {"error": "unauthorized"})
             return
-        self._run(lambda: handle_post(path, self._body()))
+        limit = MAX_BIG_BODY if path in BIG_BODY_PATHS else MAX_BODY
+        self._run(lambda: handle_post(path, self._body(limit)))
 
     def log_message(self, fmt, *args):
         log.info("%s", fmt % args)

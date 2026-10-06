@@ -1,0 +1,967 @@
+{
+ "version": 1,
+ "about": "Short spec lines for the model library, written for this project. Facts about the real gear only. Models without an entry show 'more specs coming'.",
+ "models": {
+  "AMP:0": {
+   "era": "1950s",
+   "power": "Pair of 6V6 tubes, about 12 W",
+   "cab": "1x12",
+   "controls": "Volume 1, Volume 2, Tone",
+   "players": "Neil Young"
+  },
+  "AMP:1": {
+   "era": "Late 1950s",
+   "power": "Pair of 5881 tubes, about 40 W",
+   "cab": "4x10",
+   "controls": "Volume, Treble, Middle, Bass, Presence"
+  },
+  "AMP:100": {
+   "power": "120 W, four channels",
+   "cab": "4x12",
+   "controls": "Contour on the lead channel shapes the mids"
+  },
+  "AMP:101": {
+   "era": "Boutique, around 2010",
+   "power": "Four EL34 tubes, 100 W",
+   "cab": "4x12 stack",
+   "controls": "The hotter HBE channel: Gain, Bass, Mid, Treble, Presence"
+  },
+  "AMP:102": {
+   "era": "Boutique, around 2010",
+   "power": "Four EL34 tubes, 100 W",
+   "cab": "4x12 stack",
+   "controls": "The HBE channel, second variant: Gain, Bass, Mid, Treble, Presence"
+  },
+  "AMP:103": {
+   "era": "Early 1990s",
+   "power": "Four 6L6 tubes, 120 W",
+   "cab": "4x12",
+   "controls": "Pre Gain, Post Gain, Low, Mid, High, Presence, Resonance",
+   "players": "Eddie Van Halen"
+  },
+  "AMP:104": {
+   "era": "Late 1980s",
+   "power": "100 W, EL34 or 6550 tubes",
+   "cab": "4x12",
+   "players": "Eric Clapton, Steve Lukather"
+  },
+  "AMP:105": {
+   "era": "1990s",
+   "power": "6L6 tubes, about 90 W",
+   "cab": "1x12 combo or head with a 4x12"
+  },
+  "AMP:106": {
+   "era": "1990s",
+   "power": "6L6 tubes, about 90 W",
+   "cab": "1x12 combo or head with a 4x12"
+  },
+  "AMP:107": {
+   "era": "1990s",
+   "power": "6L6 tubes, about 90 W",
+   "cab": "1x12 combo or head with a 4x12"
+  },
+  "AMP:108": {
+   "era": "2000s",
+   "power": "Four EL34 tubes, 100 W (other tubes selectable)",
+   "cab": "4x12",
+   "controls": "Clean and Dirty channels, spring reverb on the real amp"
+  },
+  "AMP:109": {
+   "era": "Early 1990s",
+   "power": "100 W, mostly 6L6 tubes",
+   "cab": "4x12",
+   "controls": "Gain, Bass, Mid, Treble, Presence, Master per channel, Vintage and Modern modes"
+  },
+  "AMP:110": {
+   "era": "Early 1990s",
+   "power": "100 W, mostly 6L6 tubes",
+   "cab": "4x12",
+   "controls": "Gain, Bass, Mid, Treble, Presence, Master per channel, Vintage and Modern modes"
+  },
+  "AMP:111": {
+   "era": "1990s",
+   "power": "EL34 tubes, 100 W",
+   "cab": "4x12",
+   "controls": "Gain, Volume, Bass, Mid, Treble, Presence, Deep"
+  },
+  "AMP:112": {
+   "era": "1990s",
+   "power": "EL34 tubes, 100 W",
+   "cab": "4x12",
+   "controls": "Gain, Volume, Bass, Mid, Treble, Presence, Deep"
+  },
+  "AMP:113": {
+   "era": "1990s",
+   "power": "EL34 tubes, 100 W",
+   "cab": "4x12"
+  },
+  "AMP:160": {
+   "era": "1970s",
+   "power": "All-tube preamp, no power section",
+   "controls": "Two independent channels, each with its own tone controls"
+  },
+  "AMP:161": {
+   "era": "1960s",
+   "power": "Six 6550 tubes, 300 W",
+   "cab": "8x10"
+  },
+  "AMP:162": {
+   "era": "1960s",
+   "power": "Pair of 6L6 tubes, about 30 W",
+   "cab": "1x15, flip-top head",
+   "players": "James Jamerson"
+  },
+  "AMP:163": {
+   "era": "1960s",
+   "power": "AC100 line, roughly 80 to 100 W",
+   "cab": "2x15 cab or a Foundation Bass unit",
+   "players": "Built in the Beatles era, Paul McCartney had an early one"
+  },
+  "AMP:164": {
+   "power": "400 W class tube bass head",
+   "controls": "Two channels, tone controls, master, effects loop"
+  },
+  "AMP:192": {
+   "era": "Hotone original, no named source"
+  },
+  "AMP:193": {
+   "era": "Acoustic guitar preamp with EQ",
+   "controls": "EQ shaping for acoustic pickups"
+  },
+  "AMP:194": {
+   "era": "Name points to a Matchless DC-30 (Hotone lists no source)",
+   "power": "If so: four EL84, 30 W, class A"
+  },
+  "AMP:195": {
+   "era": "Hotone capture slot, no named amp",
+   "controls": "Makes no sound on the pedal"
+  },
+  "AMP:196": {
+   "era": "Hotone capture slot, no named amp",
+   "controls": "Makes no sound on the pedal"
+  },
+  "AMP:197": {
+   "era": "Hotone capture slot, no named amp",
+   "controls": "Makes no sound on the pedal"
+  },
+  "AMP:198": {
+   "era": "Hotone capture slot, no named amp",
+   "controls": "Makes no sound on the pedal"
+  },
+  "AMP:199": {
+   "era": "Hotone capture slot, no named amp",
+   "controls": "Makes no sound on the pedal"
+  },
+  "AMP:2": {
+   "era": "1960s",
+   "power": "Four 6L6 tubes, about 85 W",
+   "cab": "2x12",
+   "controls": "Volume, Treble, Bass, Reverb, Speed, Intensity"
+  },
+  "AMP:3": {
+   "era": "Modern handwired take on a 1960s design",
+   "power": "Four EL84 tubes, 30 W",
+   "cab": "2x12",
+   "controls": "Volume",
+   "players": "Brian May, The Edge"
+  },
+  "AMP:4": {
+   "era": "1970s",
+   "power": "Solid state, 120 W",
+   "cab": "2x12",
+   "controls": "Volume, Treble, Middle, Bass, plus chorus and vibrato",
+   "players": "Andy Summers"
+  },
+  "AMP:48": {
+   "era": "Late 1950s",
+   "power": "Pair of 5881 tubes, about 40 W",
+   "cab": "4x10",
+   "controls": "Volume, Treble, Middle, Bass, Presence"
+  },
+  "AMP:49": {
+   "era": "Modern handwired take on a 1960s design",
+   "power": "Four EL84 tubes, 30 W",
+   "cab": "2x12",
+   "controls": "Volume, Treble, Bass, Cut",
+   "players": "Brian May, The Edge"
+  },
+  "AMP:5": {
+   "era": "Late 1980s boutique design",
+   "power": "Class A, EL84 tubes",
+   "cab": "2x12"
+  },
+  "AMP:50": {
+   "era": "Late 1980s boutique design",
+   "power": "Class A, EL84 tubes",
+   "cab": "2x12"
+  },
+  "AMP:51": {
+   "era": "2000s boutique",
+   "power": "Four 6L6 tubes, switchable 10, 50 or 100 W",
+   "cab": "2x12 combo or head",
+   "controls": "Channel 2 runs clean or a cascading-gain drive"
+  },
+  "AMP:52": {
+   "era": "1960s",
+   "power": "KT66 tubes in the original, 45 W",
+   "cab": "4x12"
+  },
+  "AMP:53": {
+   "era": "1960s",
+   "power": "KT66 tubes in the original, 45 W",
+   "cab": "4x12"
+  },
+  "AMP:54": {
+   "era": "1960s",
+   "power": "KT66 tubes in the original, 45 W",
+   "cab": "4x12"
+  },
+  "AMP:55": {
+   "era": "Late 1960s and 1970s",
+   "power": "Pair of EL34 tubes, 50 W",
+   "cab": "4x12",
+   "controls": "Volume I, Volume II, Treble, Middle, Bass, Presence",
+   "players": "Angus Young, Eddie Van Halen"
+  },
+  "AMP:56": {
+   "era": "Late 1960s and 1970s",
+   "power": "Pair of EL34 tubes, 50 W",
+   "cab": "4x12",
+   "controls": "Volume I, Volume II, Treble, Middle, Bass, Presence",
+   "players": "Angus Young, Eddie Van Halen"
+  },
+  "AMP:57": {
+   "era": "Late 1960s and 1970s",
+   "power": "Pair of EL34 tubes, 50 W",
+   "cab": "4x12",
+   "controls": "Volume I, Volume II, Treble, Middle, Bass, Presence",
+   "players": "Angus Young, Eddie Van Halen"
+  },
+  "AMP:58": {
+   "era": "Boutique, 2000s",
+   "power": "Two EL34 tubes, 30 W, class A",
+   "cab": "1x12 combo",
+   "controls": "Volume, Bass, Treble, Reverb and a master per channel"
+  },
+  "AMP:59": {
+   "era": "1980s",
+   "power": "6L6 tubes, about 60 W",
+   "cab": "1x12 combo or head with a 4x12",
+   "players": "James Hetfield"
+  },
+  "AMP:6": {
+   "era": "2000s boutique",
+   "power": "Four 6L6 tubes, switchable 10, 50 or 100 W",
+   "cab": "2x12 combo or head",
+   "controls": "Channel 1 is the clean voice; reverb and FX loop on the real amp"
+  },
+  "AMP:60": {
+   "era": "1980s",
+   "power": "6L6 tubes, about 60 W",
+   "cab": "1x12 combo or head with a 4x12",
+   "players": "James Hetfield"
+  },
+  "AMP:61": {
+   "era": "1980s",
+   "power": "6L6 tubes, about 60 W",
+   "cab": "1x12 combo or head with a 4x12",
+   "players": "James Hetfield"
+  },
+  "AMP:62": {
+   "era": "Late 1980s",
+   "power": "100 W, EL34 or 6550 tubes",
+   "cab": "4x12",
+   "players": "Eric Clapton, Steve Lukather"
+  },
+  "AMP:63": {
+   "era": "1980s",
+   "power": "EL34 tubes, 50 or 100 W versions",
+   "cab": "4x12",
+   "controls": "Preamp, Master, Treble, Middle, Bass, Presence",
+   "players": "Slash, Zakk Wylde"
+  },
+  "AMP:64": {
+   "era": "Boutique, around 2010",
+   "power": "Four EL34 tubes, 100 W",
+   "cab": "4x12 stack",
+   "controls": "The BE channel: Gain, Bass, Mid, Treble, Presence"
+  },
+  "AMP:65": {
+   "era": "Boutique, around 2010",
+   "power": "Four EL34 tubes, 100 W",
+   "cab": "4x12 stack",
+   "controls": "The BE channel, second variant: Gain, Bass, Mid, Treble, Presence"
+  },
+  "AMP:66": {
+   "era": "Boutique, 20th anniversary edition",
+   "power": "EL34 (about 80 W) or KT88 (about 90 W) versions",
+   "cab": "2x12 or 4x12",
+   "controls": "Channel 2: Bass, Mid, Treble, Gain, Volume, Bright, Shift"
+  },
+  "AMP:7": {
+   "era": "Boutique, 20th anniversary edition",
+   "power": "EL34 (about 80 W) or KT88 (about 90 W) versions",
+   "cab": "2x12 or 4x12",
+   "controls": "Channel 1: Bass, Treble, Volume, Bright"
+  },
+  "AMP:8": {
+   "era": "1950s",
+   "power": "A single 6V6 tube, a few watts",
+   "cab": "1x8",
+   "controls": "Volume, Tone"
+  },
+  "AMP:9": {
+   "era": "1960s",
+   "power": "Pair of 6V6 tubes, about 12 W",
+   "cab": "1x10",
+   "controls": "Volume, Treble, Bass, reverb and tremolo on the real amp (Fender blackface Princeton, AA964 version)"
+  },
+  "AMP:96": {
+   "era": "1990s",
+   "power": "EL34 tubes, 100 W",
+   "cab": "4x12"
+  },
+  "AMP:97": {
+   "era": "1990s",
+   "power": "EL34 tubes, 100 W",
+   "cab": "4x12",
+   "controls": "Gain, Volume, Bass, Mid, Treble, Presence, Deep"
+  },
+  "AMP:98": {
+   "era": "1990s",
+   "power": "EL34 tubes, 100 W",
+   "cab": "4x12",
+   "controls": "Gain, Volume, Bass, Mid, Treble, Presence, Deep"
+  },
+  "AMP:99": {
+   "power": "120 W, four channels",
+   "cab": "4x12",
+   "controls": "Contour on the lead channel shapes the mids"
+  },
+  "CAB:144": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "Alnico Silver-style 12-inch speaker, 1966-style (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:145": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "Alnico Silver-style 12-inch speaker, 1966-style (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:146": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "Alnico Silver-style 12-inch speaker, 1966-style (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:147": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "G12M Greenback-style speaker, 1969-style (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:148": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "G12H-style Greenback speaker, 1970-style (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:149": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "C12N-style speaker with an e906 mic (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:150": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "C12N-style speaker with R121 and SM5x mics (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:151": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "M75-style speaker with an e906 mic (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:152": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "M75-style speaker with a fat SM57 mic position (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "CAB:153": {
+   "what": "Cab IR, Hotone-labeled",
+   "behavior": "M75-style speaker with R121 and SM5x mics (read from the name, not confirmed)",
+   "character": "A different mic and speaker mix"
+  },
+  "DLY:10": {
+   "what": "1980s rack-style digital delay",
+   "behavior": "Feedback is slightly downsampled, like the old rack units",
+   "character": "Clean with a little grit"
+  },
+  "DLY:11": {
+   "what": "Delay with a sweeping filter",
+   "behavior": "The repeats run through a moving filter",
+   "character": "Moving, liquid"
+  },
+  "DLY:12": {
+   "what": "Delay with tremolo on the repeats",
+   "behavior": "Repeats pulse in volume",
+   "character": "Choppy, rhythmic"
+  },
+  "DLY:13": {
+   "what": "Lo-fi delay",
+   "behavior": "Feedback is sample-reduced, so repeats get crunchier",
+   "character": "Crunchy, dirty echoes"
+  },
+  "DLY:14": {
+   "what": "Delay with ring modulation",
+   "behavior": "Feedback is ring modulated",
+   "character": "Metallic, strange"
+  },
+  "DLY:15": {
+   "what": "Delay and reverb in one block",
+   "behavior": "Echoes feed a reverb tail",
+   "character": "Big and washy"
+  },
+  "DLY:16": {
+   "what": "Modulated digital delay",
+   "behavior": "Hotone lists it as based on the TC Electronic 2290 dynamic digital delay",
+   "character": "Smooth chorused repeats"
+  },
+  "DLY:2": {
+   "what": "Clean digital delay",
+   "behavior": "Plain delay with mix, feedback and time up to 4000 ms",
+   "character": "Transparent, repeats match the source"
+  },
+  "DLY:3": {
+   "what": "Analog-style delay",
+   "behavior": "Repeats get darker as feedback builds",
+   "character": "Warm and dusty"
+  },
+  "DLY:4": {
+   "what": "Tape-style echo",
+   "behavior": "Models a vintage tape echo; mix, feedback and time",
+   "character": "Soft, slightly worn repeats"
+  },
+  "DLY:5": {
+   "what": "Tube-driven echo",
+   "behavior": "Models an echo machine driven by tubes",
+   "character": "Fat and warm"
+  },
+  "DLY:6": {
+   "what": "Reverse delay",
+   "behavior": "Repeats play backwards",
+   "character": "Swirly, psychedelic"
+  },
+  "DLY:8": {
+   "what": "Multi-head echo",
+   "behavior": "Several taps at set spacings, like a multi-head tape unit",
+   "character": "Rhythmic, patterned repeats"
+  },
+  "EQ:0": {
+   "what": "Five-band graphic EQ for guitar",
+   "behavior": "125 Hz, 400 Hz, 800 Hz, 1.6 kHz and 4 kHz bands plus a volume knob",
+   "character": "Flat in the middle, voiced for guitar"
+  },
+  "EQ:1": {
+   "what": "Graphic EQ for guitar",
+   "behavior": "A second guitar EQ voicing; band layout is not read back here",
+   "character": "An alternate set of guitar bands"
+  },
+  "EQ:2": {
+   "what": "Graphic EQ for bass",
+   "behavior": "Bands are placed lower for bass; layout not read back here",
+   "character": "Low-end shaping"
+  },
+  "EQ:3": {
+   "what": "Graphic EQ for bass",
+   "behavior": "A second bass EQ voicing; layout not read back here",
+   "character": "Alternate bass bands"
+  },
+  "EQ:4": {
+   "what": "Parametric EQ",
+   "behavior": "Choose frequency, gain and width instead of fixed bands",
+   "character": "Surgical"
+  },
+  "EQ:5": {
+   "what": "Graphic EQ",
+   "behavior": "Fixed bands, each cut or boosted",
+   "character": "Wide and general"
+  },
+  "FX1:1": {
+   "what": "Compressor",
+   "behavior": "Threshold, ratio, attack and release are all adjustable",
+   "character": "Flexible, the one to tweak by hand"
+  },
+  "FX1:131": {
+   "what": "Chorus",
+   "behavior": "Second variant of the Choruium chorus family",
+   "character": "Lush and wide"
+  },
+  "FX1:132": {
+   "what": "Detune",
+   "behavior": "Mixes a slightly pitch-shifted copy (up to 50 cents) with the dry sound",
+   "character": "Chorus-like thickness without a sweep"
+  },
+  "FX1:133": {
+   "what": "Flanger",
+   "behavior": "Classic jet-sweep with depth, rate and feedback",
+   "character": "Rich, swooshing"
+  },
+  "FX1:134": {
+   "what": "Flanger",
+   "behavior": "A second flanger voicing in the Jetter family",
+   "character": "Swooshing, slightly different color"
+  },
+  "FX1:141": {
+   "what": "Tremolo",
+   "behavior": "Adjustable tremolo with its own shape controls",
+   "character": "Choppy to smooth, set by the settings"
+  },
+  "FX1:142": {
+   "what": "Auto swell",
+   "behavior": "Attack and curve (linear, exponential, log) set how the volume rises",
+   "character": "Violin-like swells"
+  },
+  "FX1:143": {
+   "what": "Boost with noise gate and low cut",
+   "behavior": "Boost, gate threshold and low cut",
+   "character": "Tight, for modern high-gain playing"
+  },
+  "FX1:144": {
+   "what": "Polyphonic pitch shifter, up to two octaves",
+   "behavior": "Shifts chords up or down without turning to mush",
+   "character": "Clean for a digital shifter"
+  },
+  "FX1:145": {
+   "what": "Booster and overdrive",
+   "behavior": "Modeled on the Horizon Devices Precision Drive",
+   "character": "Tight, for extended-range and prog guitars"
+  },
+  "FX1:146": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX1:147": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX1:148": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX1:149": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX1:150": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX1:32": {
+   "what": "Acoustic simulator for electric guitar",
+   "behavior": "Body and top controls plus four modes: standard, jumbo, enhanced, piezo",
+   "character": "Quacky-to-airy flat-top feel"
+  },
+  "FX1:33": {
+   "what": "Envelope filter (touch wah)",
+   "behavior": "Sweeps with your picking strength; Sens, range and Q",
+   "character": "Funky, works on bass too"
+  },
+  "FX1:34": {
+   "what": "Auto wah",
+   "behavior": "Moves on its own at a set Rate and Depth; Low, High and Q shape the sweep",
+   "character": "Quacking, rhythmic"
+  },
+  "FX1:37": {
+   "what": "Hotone original with a wah mode",
+   "behavior": "Bass compressor-type effect that Hotone lists in the wah slot family",
+   "character": "Bass-oriented"
+  },
+  "FX1:38": {
+   "what": "Polyphonic octave",
+   "behavior": "Blends a lower and a higher octave under the dry signal",
+   "character": "Organ-like thickness"
+  },
+  "FX1:39": {
+   "what": "Polyphonic pitch shifter and harmonizer",
+   "behavior": "A high and a low voice, each set up to 24 half steps with its own volume",
+   "character": "Instant twin-guitar harmonies"
+  },
+  "FX1:40": {
+   "what": "Lo-fi band filter",
+   "behavior": "Narrows the tone to a small-speaker midrange",
+   "character": "Radio and phone voice"
+  },
+  "FX1:41": {
+   "what": "Tape saturation",
+   "behavior": "Saturation, mix, output and high cut",
+   "character": "Warm analog glue and mild grit"
+  },
+  "FX1:42": {
+   "what": "Four-step auto filter",
+   "behavior": "Each of four steps sets a filter frequency; Rate and tap-tempo sync",
+   "character": "Synth-like pulsing"
+  },
+  "FX1:43": {
+   "what": "Bit crusher",
+   "behavior": "Cuts bit depth and sample rate for digital breakup",
+   "character": "Crunchy retro-game fizz"
+  },
+  "FX1:44": {
+   "what": "Ring modulator",
+   "behavior": "Multiplies your signal with a tone to make inharmonic overtones",
+   "character": "Metallic and robotic"
+  },
+  "FX1:45": {
+   "what": "Monophonic pitch shifter, up to two octaves",
+   "behavior": "Position can go to the expression pedal to bend pitch",
+   "character": "Whammy-pedal style dive-bombs and octave leaps"
+  },
+  "FX1:6": {
+   "what": "Noise gate",
+   "behavior": "Closes quickly on the threshold; has two modes (I and II)",
+   "character": "Tight and quick for fast palm-muted playing"
+  },
+  "FX1:66": {
+   "what": "Overdrive",
+   "behavior": "Gain, tone and volume plus Fat and Air switches",
+   "character": "A tube-screamer type with the common mod built in"
+  },
+  "FX1:75": {
+   "what": "Bass overdrive",
+   "behavior": "Hotone lists it after a yellow bass overdrive pedal",
+   "character": "Gritty low-end drive"
+  },
+  "FX1:76": {
+   "what": "Bass drive",
+   "behavior": "Gain, tone and volume; Normal, Scoop and Edge modes",
+   "character": "Solid, with a flexible tone range"
+  },
+  "FX1:77": {
+   "what": "Overdrive",
+   "behavior": "Gain, tone and volume; modeled on a transparent-overdrive pedal known as the Timmy",
+   "character": "Open and dynamic, leaves your amp in charge"
+  },
+  "FX1:78": {
+   "what": "Low to mid gain overdrive",
+   "behavior": "Modeled on the Marshall Bluesbreaker pedal; also works as a clean boost",
+   "character": "Sweet with a bit of wildness"
+  },
+  "FX1:79": {
+   "what": "Blues overdrive",
+   "behavior": "Gain adds warm, sensitive distortion with a wide frequency response",
+   "character": "Goes from soft to Texas-loud"
+  },
+  "FX2:11": {
+   "what": "Bass overdrive",
+   "behavior": "Hotone lists it after a yellow bass overdrive pedal",
+   "character": "Gritty low-end drive"
+  },
+  "FX2:115": {
+   "what": "Chorus",
+   "behavior": "Second variant of the Choruium chorus family",
+   "character": "Lush and wide"
+  },
+  "FX2:116": {
+   "what": "Detune",
+   "behavior": "Mixes a slightly pitch-shifted copy (up to 50 cents) with the dry sound",
+   "character": "Chorus-like thickness without a sweep"
+  },
+  "FX2:117": {
+   "what": "Flanger",
+   "behavior": "Classic jet-sweep with depth, rate and feedback",
+   "character": "Rich, swooshing"
+  },
+  "FX2:118": {
+   "what": "Flanger",
+   "behavior": "A second flanger voicing in the Jetter family",
+   "character": "Swooshing, slightly different color"
+  },
+  "FX2:12": {
+   "what": "Bass drive",
+   "behavior": "Gain, tone and volume; Normal, Scoop and Edge modes",
+   "character": "Solid, with a flexible tone range"
+  },
+  "FX2:125": {
+   "what": "Tremolo",
+   "behavior": "Adjustable tremolo with its own shape controls",
+   "character": "Choppy to smooth, set by the settings"
+  },
+  "FX2:126": {
+   "what": "Auto swell",
+   "behavior": "Attack and curve (linear, exponential, log) set how the volume rises",
+   "character": "Violin-like swells"
+  },
+  "FX2:127": {
+   "what": "Boost with noise gate and low cut",
+   "behavior": "Boost, gate threshold and low cut",
+   "character": "Tight, for modern high-gain playing"
+  },
+  "FX2:128": {
+   "what": "Polyphonic pitch shifter, up to two octaves",
+   "behavior": "Shifts chords up or down without turning to mush",
+   "character": "Clean for a digital shifter"
+  },
+  "FX2:129": {
+   "what": "Booster and overdrive",
+   "behavior": "Modeled on the Horizon Devices Precision Drive",
+   "character": "Tight, for extended-range and prog guitars"
+  },
+  "FX2:13": {
+   "what": "Overdrive",
+   "behavior": "Gain, tone and volume; modeled on a transparent-overdrive pedal known as the Timmy",
+   "character": "Open and dynamic, leaves your amp in charge"
+  },
+  "FX2:130": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX2:131": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX2:132": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX2:133": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX2:134": {
+   "what": "Sound Clone slot",
+   "behavior": "Sound Clone is Hotone's capture feature; Hotone documents no source for this slot on the Mini",
+   "character": "Depends on what was loaded"
+  },
+  "FX2:14": {
+   "what": "Low to mid gain overdrive",
+   "behavior": "Modeled on the Marshall Bluesbreaker pedal; also works as a clean boost",
+   "character": "Sweet with a bit of wildness"
+  },
+  "FX2:15": {
+   "what": "Blues overdrive",
+   "behavior": "Gain adds warm, sensitive distortion with a wide frequency response",
+   "character": "Goes from soft to Texas-loud"
+  },
+  "FX2:2": {
+   "what": "Overdrive",
+   "behavior": "Gain, tone and volume plus Fat and Air switches",
+   "character": "A tube-screamer type with the common mod built in"
+  },
+  "FX2:49": {
+   "what": "Compressor",
+   "behavior": "Threshold, ratio, attack and release are all adjustable",
+   "character": "Flexible, the one to tweak by hand"
+  },
+  "FX2:54": {
+   "what": "Noise gate",
+   "behavior": "Closes quickly on the threshold; has two modes (I and II)",
+   "character": "Tight and quick for fast palm-muted playing"
+  },
+  "FX2:80": {
+   "what": "Acoustic simulator for electric guitar",
+   "behavior": "Body and top controls plus four modes: standard, jumbo, enhanced, piezo",
+   "character": "Quacky-to-airy flat-top feel"
+  },
+  "FX2:81": {
+   "what": "Envelope filter (touch wah)",
+   "behavior": "Sweeps with your picking strength; Sens, range and Q",
+   "character": "Funky, works on bass too"
+  },
+  "FX2:82": {
+   "what": "Auto wah",
+   "behavior": "Moves on its own at a set Rate and Depth; Low, High and Q shape the sweep",
+   "character": "Quacking, rhythmic"
+  },
+  "FX2:85": {
+   "what": "Hotone original with a wah mode",
+   "behavior": "Bass compressor-type effect that Hotone lists in the wah slot family",
+   "character": "Bass-oriented"
+  },
+  "FX2:86": {
+   "what": "Polyphonic octave",
+   "behavior": "Blends a lower and a higher octave under the dry signal",
+   "character": "Organ-like thickness"
+  },
+  "FX2:87": {
+   "what": "Polyphonic pitch shifter and harmonizer",
+   "behavior": "A high and a low voice, each set up to 24 half steps with its own volume",
+   "character": "Instant twin-guitar harmonies"
+  },
+  "FX2:88": {
+   "what": "Lo-fi band filter",
+   "behavior": "Narrows the tone to a small-speaker midrange",
+   "character": "Radio and phone voice"
+  },
+  "FX2:89": {
+   "what": "Tape saturation",
+   "behavior": "Saturation, mix, output and high cut",
+   "character": "Warm analog glue and mild grit"
+  },
+  "FX2:90": {
+   "what": "Four-step auto filter",
+   "behavior": "Each of four steps sets a filter frequency; Rate and tap-tempo sync",
+   "character": "Synth-like pulsing"
+  },
+  "FX2:91": {
+   "what": "Bit crusher",
+   "behavior": "Cuts bit depth and sample rate for digital breakup",
+   "character": "Crunchy retro-game fizz"
+  },
+  "FX2:92": {
+   "what": "Ring modulator",
+   "behavior": "Multiplies your signal with a tone to make inharmonic overtones",
+   "character": "Metallic and robotic"
+  },
+  "FX2:93": {
+   "what": "Monophonic pitch shifter, up to two octaves",
+   "behavior": "Position can go to the expression pedal to bend pitch",
+   "character": "Whammy-pedal style dive-bombs and octave leaps"
+  },
+  "FX3:11": {
+   "what": "Vibrato",
+   "behavior": "Name points to a vibrato; Hotone gives no source",
+   "character": "Pitch wobble"
+  },
+  "FX3:16": {
+   "what": "Tremolo",
+   "behavior": "Adjustable tremolo with its own shape controls",
+   "character": "Choppy to smooth, set by the settings"
+  },
+  "FX3:3": {
+   "what": "Chorus",
+   "behavior": "Second variant of the Choruium chorus family",
+   "character": "Lush and wide"
+  },
+  "FX3:4": {
+   "what": "Detune",
+   "behavior": "Mixes a slightly pitch-shifted copy (up to 50 cents) with the dry sound",
+   "character": "Chorus-like thickness without a sweep"
+  },
+  "FX3:5": {
+   "what": "Flanger",
+   "behavior": "Classic jet-sweep with depth, rate and feedback",
+   "character": "Rich, swooshing"
+  },
+  "FX3:6": {
+   "what": "Flanger",
+   "behavior": "A second flanger voicing in the Jetter family",
+   "character": "Swooshing, slightly different color"
+  },
+  "FX3:64": {
+   "what": "Acoustic enhancer",
+   "behavior": "One Shape knob sets the tone",
+   "character": "A more natural, woody sound"
+  },
+  "FX3:65": {
+   "what": "Acoustic simulator for electric guitar",
+   "behavior": "Body and top controls plus four modes: standard, jumbo, enhanced, piezo",
+   "character": "Quacky-to-airy flat-top feel"
+  },
+  "FX3:66": {
+   "what": "Envelope filter (touch wah)",
+   "behavior": "Sweeps with your picking strength; Sens, range and Q",
+   "character": "Funky, works on bass too"
+  },
+  "FX3:67": {
+   "what": "Auto wah",
+   "behavior": "Moves on its own at a set Rate and Depth; Low, High and Q shape the sweep",
+   "character": "Quacking, rhythmic"
+  },
+  "FX3:68": {
+   "what": "Polyphonic octave",
+   "behavior": "Blends a lower and a higher octave under the dry signal",
+   "character": "Organ-like thickness"
+  },
+  "FX3:69": {
+   "what": "Polyphonic pitch shifter and harmonizer",
+   "behavior": "A high and a low voice, each set up to 24 half steps with its own volume",
+   "character": "Instant twin-guitar harmonies"
+  },
+  "FX3:7": {
+   "what": "Flanger with negative feedback",
+   "behavior": "Feedback is inverted, which changes the notches",
+   "character": "Underwater, hollow"
+  },
+  "FX3:70": {
+   "what": "Lo-fi band filter",
+   "behavior": "Narrows the tone to a small-speaker midrange",
+   "character": "Radio and phone voice"
+  },
+  "FX3:71": {
+   "what": "Tape saturation",
+   "behavior": "Saturation, mix, output and high cut",
+   "character": "Warm analog glue and mild grit"
+  },
+  "FX3:72": {
+   "what": "Four-step auto filter",
+   "behavior": "Each of four steps sets a filter frequency; Rate and tap-tempo sync",
+   "character": "Synth-like pulsing"
+  },
+  "FX3:73": {
+   "what": "Bit crusher",
+   "behavior": "Cuts bit depth and sample rate for digital breakup",
+   "character": "Crunchy retro-game fizz"
+  },
+  "FX3:74": {
+   "what": "Ring modulator",
+   "behavior": "Multiplies your signal with a tone to make inharmonic overtones",
+   "character": "Metallic and robotic"
+  },
+  "FX3:75": {
+   "what": "Auto swell",
+   "behavior": "Attack and curve (linear, exponential, log) set how the volume rises",
+   "character": "Violin-like swells"
+  },
+  "FX3:76": {
+   "what": "Monophonic pitch shifter, up to two octaves",
+   "behavior": "Position can go to the expression pedal to bend pitch",
+   "character": "Whammy-pedal style dive-bombs and octave leaps"
+  },
+  "FX3:8": {
+   "what": "Flanger and tremolo in one block",
+   "behavior": "Flanger depth, rate, feedback, plus tremolo depth and rate",
+   "character": "Moving and pulsing at once"
+  },
+  "NR:1": {
+   "what": "Noise gate",
+   "behavior": "Threshold plus two modes (I and II)",
+   "character": "Quick and tight"
+  },
+  "RVB:10": {
+   "what": "Ambient reverb",
+   "behavior": "A large soft tail; Hotone lists no source",
+   "character": "Blurry, cloud-like"
+  },
+  "RVB:5": {
+   "what": "Special-tuned reverb",
+   "behavior": "Hotone describes liquid-like decays and deep lows",
+   "character": "Liquid and deep"
+  },
+  "RVB:6": {
+   "what": "Special-tuned reverb",
+   "behavior": "Hotone describes lush, bright decays",
+   "character": "Lush and bright"
+  },
+  "RVB:7": {
+   "what": "Special-tuned reverb",
+   "behavior": "Hotone describes huge, deep decays",
+   "character": "Huge and dark"
+  },
+  "RVB:8": {
+   "what": "Modulated reverb",
+   "behavior": "Gentle motion in the tail",
+   "character": "Lush, ambient"
+  },
+  "RVB:9": {
+   "what": "Shimmer reverb",
+   "behavior": "Pitched-up bloom on the tail",
+   "character": "Bright and airy"
+  }
+ }
+}

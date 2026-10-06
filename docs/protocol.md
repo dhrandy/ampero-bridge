@@ -31,8 +31,8 @@ frames from those projects do not apply.
 | save, frame A | `00 02 06 07 01 <idx>` |
 | save, frame B | `10 00 00 00 01 <idx> <name, 18 bytes, NUL padded>` |
 
-Slot AA: 01 FX1, 02 FX2, 03 AMP, 05 CAB, 06 EQ, 08 DLY, 09 probably RVB
-(04 and 07 are probably NR and FX3, never seen).
+Slot AA: 01 FX1, 02 FX2, 03 AMP, 04 NR, 05 CAB, 06 EQ, 07 FX3, 08 DLY, 09 probably RVB
+(Param writes to 04 and 07 were written and read back on the pedal. Model select on those two slots has not been tried on a pedal yet; their codes were read from the record by stepping through the lists.)
 
 EQ slot (06) model codes: 0 Guitar EQ1, 1 Guitar EQ2, 2 Bass EQ1, 3 Bass EQ2,
 4 Para EQ (15 params), 5 Graphic EQ (11), 6 V-EQ (5).

@@ -1,0 +1,53 @@
+/* Bridge panel: settings, presets, block copy, backup and import. Loaded after the page's own styles. */
+.gear{margin-left:auto;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font:inherit;font-size:13px;letter-spacing:0;text-transform:none;font-weight:600;cursor:pointer}
+.gear:hover,.gear:focus-visible{border-color:var(--acc);outline:none}
+.gear .dot{width:8px;height:8px;border-radius:50%;background:#4a5262}
+.gear .dot.on{background:var(--ok)}
+.tabs{display:flex;gap:6px;margin:14px 0 4px;border-bottom:1px solid var(--line)}
+.tab{min-height:44px;padding:0 16px;border:0;border-bottom:3px solid transparent;background:none;color:var(--mute);font:inherit;font-weight:600;cursor:pointer}
+.tab[aria-selected=true]{color:var(--text);border-bottom-color:var(--acc)}
+.tabs[hidden],.pane[hidden]{display:none}
+.star{min-width:44px;min-height:44px;margin:-8px -10px -8px 0;border:0;background:none;color:var(--mute);font-size:24px;line-height:1;cursor:pointer;border-radius:8px}
+.star[aria-pressed=true]{color:var(--acc)}
+.star:focus-visible{outline:2px solid var(--acc)}
+.card.has-star{grid-template-columns:1fr auto auto}
+.sect{margin:18px 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.panel p{margin:0 0 10px;color:var(--mute);font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pbtn{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.pbtn.pri{background:var(--acc);border-color:var(--acc);color:#111}
+.pbtn.danger{border-color:#d9534f;color:#ff8f8b}
+.pbtn:disabled{opacity:.45;cursor:default}
+.pbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.patch{display:grid;grid-template-columns:auto 1fr auto auto;gap:4px 10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.patch .lbl{font-weight:700;font-variant-numeric:tabular-nums;min-width:48px}
+.patch .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.patch .pbtn{min-height:44px}
+.msg{font-size:13px;margin:8px 0;color:var(--mute)}
+.msg.bad{color:#ff8f8b}
+.msg.good{color:var(--ok)}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--acc);width:0}
+dialog{width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+.dlg{padding:16px;display:grid;gap:10px}
+.dlg h2{margin:0;font-size:18px}
+.dlg label{display:grid;gap:4px;font-size:13px;color:var(--mute)}
+.dlg input[type=text],.dlg input[type=password],.dlg input[type=url],.dlg select{width:100%;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font:inherit;font-size:16px}
+.dlg input:focus-visible,.dlg select:focus-visible{outline:2px solid var(--acc);border-color:transparent}
+.chk{display:flex!important;grid-auto-flow:column;align-items:center;gap:10px!important;min-height:44px;color:var(--text)!important;font-size:14px!important}
+.chk input{width:22px;height:22px;flex:none}
+.chk small{display:block;color:var(--mute)}
+.list2{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.list2 li{border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--panel);font-size:13px}
+.list2 li b{color:var(--text)}
+.chipx{font-size:11px;border-radius:4px;padding:1px 7px;border:1px solid var(--line);color:var(--mute);margin-left:6px}
+.chipx.ok{color:var(--ok);border-color:var(--ok)}
+.chipx.warn{color:var(--warn);border-color:var(--warn)}
+.chipx.bad{color:#ff8f8b;border-color:#d9534f}
+.why{color:var(--warn);font-size:12px;display:block}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+@media(max-width:560px){dialog{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:0}.patch{grid-template-columns:auto 1fr auto}.patch .copy{grid-column:1/-1}}
+.list2 .mono{word-break:break-all}
+.chipx{white-space:nowrap;display:inline-block}

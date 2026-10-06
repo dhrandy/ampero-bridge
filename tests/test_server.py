@@ -378,7 +378,7 @@ def test_every_pedal_read_code_is_accepted_and_only_those(monkeypatch):
         for m in b["models"]:
             assert (m["code"] in server.PROVEN_MODELS[slot]) == (m["status"] == "pedal-proven"), (slot, m["screen"])
     counts = {s: len(c) for s, c in server.PROVEN_MODELS.items()}
-    assert counts == {"fx1": 60, "fx2": 60, "amp": 60, "cab": 70, "eq": 7, "dly": 17, "rvb": 11}
+    assert counts == {"fx1": 60, "fx2": 60, "amp": 60, "cab": 70, "eq": 7, "dly": 17, "rvb": 11, "fx3": 30, "nr": 2}
 
 
 def test_writes_are_spaced_and_reads_are_not_delayed(monkeypatch):
@@ -479,3 +479,94 @@ def test_read_current_patch_settles_before_it_touches_the_pedal(monkeypatch):
     monkeypatch.setattr(server.link, "session", lambda name, fn: order.append("pedal") or got)
     assert server.read_current_patch() == got
     assert order == ["settle", "pedal"]
+
+
+def test_notes_add_and_read_back(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "notes", server.Notes(str(tmp_path / "n.json")))
+    assert call(base, "/api/notes")[1] == {"count": 0, "patches": []}
+    code, out = call(base, "/api/notes", {"patch": 75, "note": "  clean, spring  ", "source": "todd"})
+    assert code == 200 and out["label"] == "P26-1" and out["count"] == 1
+    assert out["note"]["note"] == "clean, spring" and out["note"]["source"] == "todd" and out["note"]["n"] == 1
+    code, out = call(base, "/api/notes", {"patch": "P26-1", "note": "second"})
+    assert code == 200 and out["note"]["n"] == 2 and out["index"] == 75
+    call(base, "/api/notes", {"patch": 3, "note": "other"})
+    assert [n["note"] for n in call(base, "/api/notes/75")[1]["notes"]] == ["clean, spring", "second"]
+    assert call(base, "/api/notes/P26-1")[1]["count"] == 2
+    assert call(base, "/api/notes/9")[1] == {"index": 9, "label": "P4-1", "count": 0, "notes": []}
+    allv = call(base, "/api/notes")[1]
+    assert allv["count"] == 3 and [p["index"] for p in allv["patches"]] == [3, 75]
+    assert Fake.sent == []   # notes never touch the pedal
+    srv.shutdown()
+
+
+def test_notes_need_the_key_and_have_no_delete(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "notes", server.Notes(str(tmp_path / "n.json")))
+    assert call(base, "/api/notes", key="")[0] == 401
+    assert call(base, "/api/notes/75", key="x")[0] == 401
+    assert call(base, "/api/notes", {"patch": 1, "note": "a"}, key="")[0] == 401
+    for method in ("DELETE", "PUT"):
+        req = urllib.request.Request(base + "/api/notes/1", method=method, headers={"X-Api-Key": "k"})
+        try:
+            urllib.request.urlopen(req, timeout=5)
+            raise AssertionError("should not succeed")
+        except HTTPError as e:
+            assert e.code in (404, 501)
+    assert call(base, "/api/notes")[1]["count"] == 0
+    srv.shutdown()
+
+
+def test_notes_limits_and_bad_input(monkeypatch, tmp_path):
+    srv, base = start(monkeypatch)
+    monkeypatch.setattr(server, "notes", server.Notes(str(tmp_path / "n.json")))
+    assert call(base, "/api/notes", {"patch": 1, "note": "x" * 2000})[0] == 200
+    assert call(base, "/api/notes", {"patch": 1, "note": "x" * 2001})[0] == 400
+    for bad in ({"note": "a"}, {"patch": 1}, {"patch": 1, "note": ""}, {"patch": 1, "note": "  "},
+                {"patch": 1, "note": 5}, {"patch": -1, "note": "a"}, {"patch": 200, "note": "a"},
+                {"patch": "P0-1", "note": "a"}, {"patch": "P5-4", "note": "a"}, {"patch": "abc", "note": "a"},
+                {"patch": True, "note": "a"}, {"patch": 1, "note": "a", "source": "s" * 61},
+                {"patch": 1, "note": "a", "source": 3}):
+        assert call(base, "/api/notes", bad)[0] == 400, bad
+    assert call(base, "/api/notes/zzz")[0] == 400
+    monkeypatch.setattr(server, "NOTES_PER_PATCH", 3)
+    for i in range(2):
+        assert call(base, "/api/notes", {"patch": 2, "note": f"n{i}"})[0] == 200
+    assert call(base, "/api/notes", {"patch": 2, "note": "n2"})[0] == 200
+    code, out = call(base, "/api/notes", {"patch": 2, "note": "n3"})
+    assert code == 400 and "already has 3 notes" in out["error"]
+    assert call(base, "/api/notes/2")[1]["count"] == 3
+    srv.shutdown()
+
+
+def test_notes_survive_a_restart_and_a_broken_file_is_ignored(monkeypatch, tmp_path):
+    f = tmp_path / "n.json"
+    n = server.Notes(str(f))
+    n.add(75, "keep me", "test")
+    again = server.Notes(str(f))
+    assert again.for_patch(75)["notes"][0]["note"] == "keep me"
+    assert again.add(75, "next", "")["note"]["n"] == 2
+    f.write_text("{not json")
+    assert server.Notes(str(f)).listing() == {"count": 0, "patches": []}
+    bad = server.Notes(str(tmp_path / "missing-dir" / "n.json"))
+    try:
+        bad.add(1, "a", "")
+        raise AssertionError("expected failure")
+    except OSError:
+        pass
+    assert bad.for_patch(1)["count"] == 0   # a failed write is not kept in memory
+
+
+def test_default_notes_file_sits_in_the_data_folder():
+    assert server.NOTES_FILE == os.path.join(server.DATA_DIR, "preset-notes.json")
+
+
+def test_blank_env_values_count_as_unset():
+    """An unfilled ${VAR} in compose arrives as an empty string and must not crash the start."""
+    import subprocess, sys, os
+    env = {**os.environ, "API_KEY": "x" * 30, "AMPERO_PATCH_COUNT": "", "AMPERO_WRITE_GAP_S": " ",
+           "AMPERO_CORS_ORIGINS": "", "PORT": ""}
+    out = subprocess.run([sys.executable, "-c", "import server; print(server.PATCH_COUNT, server.WRITE_GAP, server.PORT, len(server.CORS_ORIGINS))"],
+                         cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))), env=env,
+                         capture_output=True, text=True, timeout=30)
+    assert out.stdout.split() == ["100", "0.5", "8080", "0"], out.stderr

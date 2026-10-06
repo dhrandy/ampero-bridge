@@ -20,9 +20,9 @@ KIND_DATA = 0x12
 KIND_QUERY = 0x11
 
 # Effect slots as they appear in the slot byte of model/param frames.
-# 04 and 07 are probably NR and FX3 (never seen on the wire), 09 is probably RVB.
-SLOTS = {"fx1": 0x01, "fx2": 0x02, "amp": 0x03, "cab": 0x05,
-         "eq": 0x06, "dly": 0x08, "rvb": 0x09}
+# 04 is NR and 07 is FX3 (param writes verified on the pedal), 09 is probably RVB.
+SLOTS = {"fx1": 0x01, "fx2": 0x02, "amp": 0x03, "nr": 0x04, "cab": 0x05,
+         "eq": 0x06, "fx3": 0x07, "dly": 0x08, "rvb": 0x09}
 
 # Block on/off is plain CC on channel 1, value 0 = off, 127 = on. Verified on screen.
 BLOCK_CC = {"fx1": 48, "fx2": 49, "amp": 50, "nr": 51, "cab": 52,

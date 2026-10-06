@@ -45,6 +45,8 @@ with the compose file, is under [Run it](#run-it).
   * [Models](#models)
   * [Example calls](#example-calls)
 * [API](#api)
+* [Favorites, block copy, backup and restore](#favorites-block-copy-backup-and-restore)
+* [Bridge panel on the site](#bridge-panel-on-the-site)
 * [Safety](#safety)
 * [Settings](#settings)
 * [Develop](#develop)
@@ -161,8 +163,12 @@ The repo has both (`.env.example` is the template for `.env`).
 `.env` (copy `.env.example` and fill it in):
 
     API_KEY=paste-a-long-random-string-here
+    AMPERO_CORS_ORIGINS=
+    AMPERO_PATCH_COUNT=
+    AMPERO_ALLOW_UNPROVEN_MODELS=
 
-Make the key with `openssl rand -hex 32`. Anyone who has it can change your pedal,
+Only `API_KEY` is needed. The other lines are optional and can stay blank: a blank
+value counts as not set. Make the key with `openssl rand -hex 32`. Anyone who has it can change your pedal,
 so the service will not start with a key under 24 characters or with the
 placeholder. The compose file reads it as a plain `${API_KEY}`, so the key never
 goes in the compose file.
@@ -191,7 +197,10 @@ port, so moving it to another port is fine.
 
 Create a stack from `docker-compose.yml`. Set `API_KEY` in the stack's
 **Environment** tab instead of a `.env` file. Dockhand fills in the `${API_KEY}`
-when it deploys. Do not paste the key into the compose file.
+when it deploys. Do not paste the key into the compose file. The optional
+`AMPERO_CORS_ORIGINS`, `AMPERO_PATCH_COUNT`, `AMPERO_ALLOW_UNPROVEN_MODELS` and
+`DATA_DIR` go in the same tab, with the same names as in `.env.example`. To let the
+site's Bridge panel reach the bridge, set `AMPERO_CORS_ORIGINS` there to the page's origin.
 
 ### Putting it on the internet: reverse proxy (Synology example)
 
@@ -387,6 +396,12 @@ amp opens short notes on its tone and what it is known for. Codes that have been
 back from a real pedal are marked; every row in the library is now read from a real pedal
 (firmware V2.2). Re-check a code after a firmware update.
 
+Every model has a Details panel: tone notes where there are some, plus a few short lines from
+`site/info.json`. Amps get era, tubes and power, cab, controls and who used it. Effects, delays,
+reverbs, EQs and cabs get what it is, how it behaves and its character. The text is original, and where
+Hotone names no source the entry says so. A test checks every entry is short and every key is a real
+model. The panel can be switched off under Settings on the page.
+
 The same data is in `site/models.json`, for tools and agents: block, screen, code, name,
 what it is based on, how well the code is verified, and short notes. The bridge serves
 that file at `GET /api/models` (needs the API key, reads no pedal), so an agent can get it
@@ -410,6 +425,18 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `GET /api/patches/known` | | slot, label, name and when it was last seen, for every patch the bridge has read so far. Answers from memory, never touches the pedal |
 | `GET /api/models` | | the model library: every model with block, screen, code, name, what it is based on, how well the code is verified, and short notes. Optional `?block=AMP` (one of fx1 fx2 amp nr cab eq fx3 dly rvb) and `?q=text` (matches name or based-on). Same data as `site/models.json`. Reads no pedal |
 | `GET /api/history` | | the last few minutes of the pedal's edit buffer, one entry per change, with the byte offsets that changed. Optional `?since=<epoch seconds>` and `?hex=0` (leave out `record_hex`). Answers from memory, see "Catching a state that went by" |
+| `POST /api/notes` | `{"patch": 75, "note": "...", "source": "todd"}` | add a note about a preset. `patch` is the 0 based index or a label like `"P26-1"`. `note` is up to 2000 characters, `source` (optional) up to 60. Notes are only added, never edited or deleted. Reads and writes no pedal |
+| `GET /api/notes` | | every note, grouped by patch |
+| `GET /api/notes/<patch>` | | the notes for one patch (index or label). Empty list if none |
+| `GET /api/favorites` | | starred presets and models. Reads no pedal |
+| `POST /api/favorites` | `{"kind": "patch", "id": 75, "starred": true}` | star or unstar. `kind` is `patch` (index or label) or `model` (`"AMP:55"`, block and code). `starred` defaults to true. Answers with the full list |
+| `POST /api/block/copy` | `{"from": 75, "to": 78, "block": "dly", "confirm": "COPY DLY P26-1 TO P27-1"}` | copy one block (fx1 fx2 amp cab eq dly rvb) from one patch onto another, into the pedal's edit buffer. `"dry_run": true` reports what would be written and needs no `confirm`. Nothing is saved |
+| `POST /api/backup` | `{}` or `{"patches": [0, "P2-1"]}` | start a dump of the patches to one file on the bridge. Answers at once; follow it at `GET /api/backup/status` |
+| `GET /api/backup/status` | | state of the last backup or restore job: `running`, `done` or `failed`, with progress and result |
+| `GET /api/backups` | | the dump files on the bridge |
+| `GET /api/backups/<name>` | | download one dump file |
+| `POST /api/restore` | `{"name": "ampero-backup-....json"}` or `{"backup": {...}}` | compare a dump with the pedal, patch by patch. Add `"apply": true`, `"patches": [...]` and `"confirm": "RESTORE 3 PATCHES"` to write and save them. Runs as a job like backup |
+| `POST /api/import/prst` | `{"filename": "x.prst", "data": "<base64>"}` | look inside a Hotone `.prst` file. Read only, see `docs/prst.md` |
 | `POST /api/patch/select` | `{"index": 75}` | Program Change (0 based, 75 = P26-1) |
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
 | `POST /api/midi/cc` | `{"cc": 22}` | send one Control Change on channel 1. Any CC 0 to 127 is accepted (optional `value`, 0-127, default 127). Proven on a real Mini so far: 22 bank down, 23 bank up, 24 patch down, 25 patch up (patch navigation, not model scrolling). Not for AI preset building |
@@ -423,12 +450,74 @@ connected or busy, 504 pedal silent, 502 other USB error.
 The record is 460 bytes: the name, then nine blocks (fx1, fx2, amp, nr, cab, eq,
 fx3, dly, rvb) with their model and parameters. The layout is in `docs/protocol.md`.
 
+## Preset notes
+
+Presets cannot hold a description on the pedal, so the bridge keeps short notes next to it: what a preset is for, what was tried, what to change next.
+An agent adds one with `POST /api/notes` and reads them back with `GET /api/notes` or `GET /api/notes/<patch>`.
+
+    curl -X POST -H "X-Api-Key: $KEY" -H "Content-Type: application/json" \
+      -d '{"patch": "P26-1", "note": "Clean with a little spring. Mix at 25.", "source": "todd"}' \
+      http://localhost:8080/api/notes
+
+- Every note gets a number, a UTC timestamp and the `source` you gave.
+- Limits: 2000 characters per note, 200 notes per patch. Past that the call is a `400`.
+- There is no edit and no delete call. To correct something, add a newer note. To remove one, edit the JSON file.
+- Notes are tied to the patch slot, not the name. If the patch in that slot is replaced, the old notes stay.
+- They live in `preset-notes.json` in the data folder (the same `/data` mount as the remembered patch names). Set `AMPERO_NOTES_FILE` to put the file somewhere else.
+- Notes never touch the pedal.
+
+## Favorites, block copy, backup and restore
+
+**Favorites.** Stars live on the bridge (`favorites.json` in the data folder), so every browser
+and every agent sees the same ones. A star is either a preset (`patch`) or a model (`model`,
+like `AMP:55`). Nothing here touches the pedal.
+
+**Block copy.** `POST /api/block/copy` selects the source patch, reads it, selects the target
+patch, then writes only what differs: the block's switch, its model, then its knobs. It reads
+the target again afterwards and reports anything that did not take. The result sits in the
+pedal's edit buffer and is **not saved**; the reply carries the `/api/patch/save` call that
+keeps it. Selecting the two patches throws away unsaved edits on the pedal, which is why a
+`confirm` is needed. `dry_run` only reads. The bridge can only write what it can write today:
+knob values above 127 cannot be sent (the Sweller's attack time is one), and the cab's
+position Z and cuts are not writable. Those come back under `stuck` with the reason.
+
+**Backup.** `POST /api/backup` walks the patches from index 0 (`AMPERO_PATCH_COUNT`, default 100),
+selecting each one and reading its full 460-byte record, then writes one JSON file to
+`<data folder>/backups/`. It takes a few minutes and puts the pedal back on the patch it started on.
+Patches that cannot be read are listed under `skipped`. Download a file from
+`GET /api/backups/<name>`.
+
+**Restore.** `POST /api/restore` compares a dump with what is on the pedal and, only with
+`"apply": true` and the exact `confirm`, writes the difference and saves each patch. It writes
+what the bridge can write (switches, patch level, models and knobs of fx1 fx2 amp cab eq dly rvb,
+the name through the save). Whatever it cannot write is reported per patch, and a patch that
+could not be fully restored is **not saved** unless you send `"allow_partial": true`. The reply to
+`GET /api/patch/current` is also accepted as a one patch backup.
+
+Only one of copy, backup and restore runs at a time (`409` otherwise), because each moves the
+pedal between patches. Do not touch the pedal while one runs.
+
+## Bridge panel on the site
+
+The model library page can talk to your own bridge. Open **Settings** on the page, enter the
+bridge address and API key, and the page gains a **Presets** tab: stars, block copy, backup and
+restore, and a `.prst` inspector. Models get a star too. Each of those four can be switched off
+under Settings, and the page looks like before when none is connected.
+
+The address and key are kept in this browser only (the tab, or the device if you tick
+"Remember"), and the key is only sent to the bridge. Favorites live on the bridge.
+
+A page on `github.io` can only call your bridge if the bridge allows that origin. Set
+`AMPERO_CORS_ORIGINS` to the page's origin (for example `https://dhrandy.github.io`) and serve the
+bridge over https. It is off by default, so nothing changes unless you set it.
+
 ## Safety
 
 * **Save is always the last step.** A save stores whatever is in the pedal's edit
   buffer at that moment. Make every change, read it back, then save.
 * A save needs the exact `confirm` text, so a stray call cannot overwrite a patch.
 * `/api/model` only takes model numbers that were checked on a real pedal, because an unknown one can crash it. To try others, set `AMPERO_ALLOW_UNPROVEN_MODELS=1`.
+* Never write 6 to Classic PS parameter 0 (its range is 0-5). It locks the block until the pedal is power cycled.
 * Keep `API_KEY` private and do not expose the port to the internet.
 
 ## Settings
@@ -447,6 +536,11 @@ Set these in `.env` (or Dockhand's Environment tab).
 | `AMPERO_WRITE_GAP_S` | 0.5 | least seconds between two writes to the pedal. Writes go out one at a time, in the order they came in |
 | `AMPERO_WRITE_SAVE_GAP_S` | 3 | quiet time before a save and after it. A save waits this long after the last write, and the next write waits this long after the save |
 | `AMPERO_WRITE_QUEUE_MAX` | 30 | writes allowed in line at once. More get `429` with a `Retry-After` header and nothing is sent. Health, history and refused requests are never held up. Reads that touch the pedal (`/api/patch/current`, the history poller) do not wait in line, but they hold off until the write before them has finished and the quiet time has passed |
+| `AMPERO_NOTES_FILE` | `<data folder>/preset-notes.json` | where preset notes are kept (see "Preset notes") |
+| `AMPERO_CORS_ORIGINS` | off | comma separated page origins allowed to call the API from a browser, for the site's bridge panel. Empty means no browser page can |
+| `AMPERO_FAVORITES_FILE` | `<data folder>/favorites.json` | where stars are kept |
+| `AMPERO_PATCH_COUNT` | 100 | how many patches a backup walks through, from index 0. Raise it if your pedal has more |
+| `AMPERO_PEDAL_SETTLE_S` | 0.4 | pause after selecting a patch before reading it, in copy, backup and restore |
 | `AMPERO_ALLOW_UNPROVEN_MODELS` | off | set to `1` to let `/api/model` send model codes not listed as proven |
 
 More options (USB timeouts and so on) are listed in `docs/usb-lockups.md`.
@@ -463,6 +557,9 @@ captured from the editor and the pedal.
 
 * `docs/protocol.md`: the USB and SysEx protocol, record layout, order of a preset write
 * `docs/models.md`: model numbers checked on a real pedal
+* `docs/knobs.md`: which parameter is which, per model, and how sure each entry is
+* `docs/param-map.json`: the machine-readable parameter map for agents. Every param is tagged write-verified, confirmed at its address only, inferred or not swept. Getting this map right took many hours of live probing against a real pedal.
+* `docs/prst.md`: the `.prst` import
 * `site/`: the model library page and `site/models.json` (see Model library above)
 * `docs/usb-lockups.md`: USB stability notes and the less common settings
 

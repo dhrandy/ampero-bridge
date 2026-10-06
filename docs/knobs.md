@@ -24,6 +24,9 @@ How sure each entry is:
 | Code | Model | Knobs in order | Status |
 | --- | --- | --- | --- |
 | 137 | 90 Phaser | 0 Rate, 1 Sync | Checked |
+| 45 | Classic PS | 0 Range (enum 0-5), 1 Position, 2 Mix | p0 write-verified (0-5); p1 and p2 not swept |
+
+**Classic PS (FX1 code 45, FX2 code 93): p0 is a 0-5 enum. Never write 6.** The value 6 wedges the block until the pedal is power cycled. p0 write-verified on FX1 (0-5); FX2 uses the same bound, and 6 was left unwritten there on purpose.
 
 ## FX2 (drive, distortion, chorus)
 
@@ -53,6 +56,7 @@ The first table is Checked or Manual. The remaining FX2 models, with their param
 
 | Model | Code | Knobs in order | Status |
 | --- | --- | --- | --- |
+| Jazz Clean | 4 | 1 Bright (switch, 0 off, 1 on); other positions in `docs/param-map.json` | p1 write-verified |
 | Marshell 50 (normal channel) | 55 | 0 Volume, 1 Presence, 2 Master, 3 Bass, 4 Middle, 5 Treble | Checked (positions 3 and 5 are Bass and Treble) |
 
 Other amps in the manual use the same names in one of two layouts: Volume, Presence, Master, Bass, Middle, Treble for the older style amps, or Gain, Presence, Master, Bass, Middle, Treble for the high gain ones. Treat any amp other than the one above as Manual at best until it has been read back.
@@ -108,18 +112,28 @@ The five bands show -50 to +50 on the pedal and are stored as the shown value pl
 
 ## FX3
 
+The full per-parameter map, with every param tagged write-verified, confirmed at its address only, inferred or not swept, is in `docs/param-map.json`. A record byte at offset 459 changes on every edit; it is a trailer, not a parameter. Turning any Sync switch on rewrites the linked Rate to 40.
+
 FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in FX2) and they do not follow the screen number past screen 17 (see the list in `docs/models.md`). Read each model's code from the record.
 
 | Code | Model (screen number) | Knobs in order | Status |
 | --- | --- | --- | --- |
 | 2 | Liquid C (03) | 0 Mode (stored as the shown mode minus 1; mode 3 read as 2) | Checked for one value |
 | 6 | Jetter B (07) | 0 Depth, 1 Rate, 2 Pre Delay, 3 Feedback, 4 Sync (Off/On) | Checked |
-| 16 | Custom Trem (17) | 6 slots read [70, 20, 80, 50, 0, 50]; knob labels not mapped | Code checked, knobs not mapped |
+| 16 | Custom Trem (17) | 0 Depth, 1 Rate, 2 Volume, 3 Color, 4 Shape (0 sine, 1 triangle, 2 square, 3 sawtooth), 5 Bias, 6 Sync (0/1) | Rate, Shape and Sync write-verified; Depth, Volume, Color and Bias confirmed at their address only. Turning Sync on resets Rate to 40 |
+| 64 | Acoustic Refiner (18) | 0 Shape (0-100) | p0 write-verified; other positions not mapped |
+| 69 | Harmony (23) | 0 Hi pitch, 1 Low pitch, 2 Dry, 3 Hi volume, 4 Low volume | Hi and Low pitch write-verified; Dry, Hi volume and Low volume confirmed at their address only (0-100 range from the manual) |
 | 73 | Bit Krusher (27) | 0 Mix, 1 Krush, 2 Bit, 3 Hi Cut, 4 Lo Cut | Checked |
-| 75 | Sweller (29) | Attack (14 bits, see below), 1 Curve (0 Line, 1 Exp, 2 Log) | Checked |
+| 75 | Sweller (29) | Attack (14 bits, see below), 1 Curve (0 Line, 1 Exp, 2 Log) | Attack (14-bit) and Curve write-verified; the bridge cannot send the 14-bit attack yet |
 
 Jetter B: all ranges 0-100 raw. Rate read 20 before Sync was turned on and 40 after, with no knob turn recorded. That change is observed but unexplained. Other FX3 models were not checked.
 
-Sweller: Attack runs 80 to 4000 ms and does not fit in one byte. The high 7 bits sit in the block's header byte 3 and the low 7 bits in the low byte of knob 0, so Attack ms = 80 + (byte3 * 128 + low byte). Read back at 80, 1000, 2353 and 4000. Curve was read as 0, 1 and 2 for Line, Exp and Log.
+Harmony: Hi pitch runs 0 to +24 on the screen and is stored as shown. Low pitch runs 0 to -24 on the screen and is stored as the shown value plus 24 (screen 0 is stored 24, screen -24 is stored 0). Hotone draws the Low pitch slider backwards, with 0 at the far left. Dry, Hi volume and Low volume are 0-100.
+
+Parameter writes to FX3 and NR go through slots 07 and 04. NR has only Smart Gate p0 (Threshold) write-verified; Fast Gate and the rest of NR are not swept.
+
+Custom Trem: the Shape enum is 0-3 only. Sync is 0 or 1, and turning it on sets Rate to 40.
+
+Sweller: Attack is 80 to 4000 ms; stored raw = ms - 80, split into 7-bit halves, high half at record byte 296 and low half at byte 297. So ms = 80 + (byte 296 * 128 + byte 297). Read back at 80, 1000, 2353 and 4000. Curve was read as 0, 1 and 2 for Line, Exp and Log.
 
 The pedal screen splits the knobs over pages, the record is one flat list. Selecting a model can reload its defaults (Sweller went back to Attack 1000, Curve Line after leaving the screen and coming back). It did not always do this.

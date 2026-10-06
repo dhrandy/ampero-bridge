@@ -19,6 +19,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-a
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:5px 11px;font:inherit;font-size:13px;cursor:pointer}
 .chip[aria-pressed=true]{background:var(--acc);color:#111;border-color:var(--acc)}
+.chips[hidden]{display:none}
 .chip small{color:var(--mute);margin-left:4px}
 .chip[aria-pressed=true] small{color:#333}
 .opts{display:flex;flex-wrap:wrap;gap:14px;color:var(--mute);font-size:13px;margin:6px 0 12px}
@@ -72,6 +73,7 @@ details dt{font-weight:600;color:var(--text)}details dd{margin:0}
 @media(min-width:720px){.list{grid-template-columns:1fr 1fr}}
 @media(max-width:380px){.card{grid-template-columns:1fr}.codebox{text-align:left}}
 </style>
+<link rel="stylesheet" href="bridge.css">
 </head>
 <body>
 <div class="top"><div class="wrap">
@@ -80,37 +82,35 @@ details dt{font-weight:600;color:var(--text)}details dd{margin:0}
 <p class="lede">Every model on firmware V2.2, with the code the pedal stores for it and the real-world gear it is based on.</p>
 <ul class="stats" id="stats"><li><b>317</b>models</li><li><b>9</b>blocks</li><li><b>V2.2</b>firmware</li></ul>
 <div class="btns"><a class="btn pri" href="models.json">models.json</a><a class="btn" href="https://github.com/dhrandy/ampero-bridge">GitHub</a></div>
-<p class="note">Unofficial and not affiliated with Hotone. Codes are labeled by how well they are verified.</p>
+<p class="note">Every code was read from a real pedal on firmware V2.2. Unofficial and not affiliated with Hotone.</p>
 </div></div>
 <div class="wrap">
+<div id="view-models" class="pane">
 <details><summary>How to read this</summary>
 <dl>
 <dt>Screen</dt><dd>position in the editor's list for that block, starting at 1.</dd>
 <dt>Code</dt><dd>the number stored in the preset record for the model. FX1, FX2 and FX3 use different codes even for the same name.</dd>
-<dt>pedal-proven</dt><dd>code read from the record on a real pedal with that model selected.</dd>
-<dt>inferred</dt><dd>sits between two codes that were read, in an unbroken run of the list; not read itself.</dd>
-<dt>Codes without a tag</dt><dd>follow from the list order and a rule that held everywhere it was checked (FX2 codes come from scrolling the list). Treat them as likely, and read a record back before relying on one. Only the green pedal-proven tag means a read-back on a real pedal.</dd>
-<dt>Dash</dt><dd>the code has not been read yet.</dd>
 <dt>firmware-added</dt><dd>in the editor's list, not in the manufacturer's effect list.</dd>
 <dt>Details</dt><dd>short notes in our own words about the real-world gear. General background, not measurements.</dd>
 </dl></details>
 <input id="q" type="search" placeholder="Search, e.g. tube screamer" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search models">
 <div class="chips" id="chips" role="group" aria-label="Filter by block"></div>
+<div class="chips styles" id="styles" role="group" aria-label="Filter by style" hidden></div>
 <div class="opts">
-<label><input type="checkbox" id="proven"> pedal-proven only</label>
 <label><input type="checkbox" id="added"> firmware-added only</label>
 </div>
 <div id="count" aria-live="polite"></div>
 <div class="list" id="list"></div>
+</div>
 <footer>
-Beta. Not affiliated with or endorsed by Hotone. Product and brand names belong to their owners and appear only to say which real-world gear a model is based on. Codes without a pedal-proven tag can be wrong, so read a record back before relying on one. MIT licensed, copyright dhrandy.
+Beta. Not affiliated with or endorsed by Hotone. Product and brand names belong to their owners and appear only to say which real-world gear a model is based on. MIT licensed, copyright dhrandy.
 </footer>
 </div>
+<script src="bridge.js"></script>
 <script>
 (function(){
-var data=null,all=[],block='ALL';
+var data=null,all=[],block='ALL',style='',info={};
 var $=function(i){return document.getElementById(i)};
-var STAT={'pedal-proven':['pedal-proven','ok'],'scroll-derived':['scroll-derived','warn'],'inferred':['inferred','warn'],'list-order':['list order','warn'],'code-unknown':['code unknown','']};
 function norm(s){return (s||'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim()}
 function subseq(q,t){var i=0;for(var j=0;j<t.length&&i<q.length;j++)if(t[j]===q[i])i++;return i===q.length}
 function lev(a,b,max){if(Math.abs(a.length-b.length)>max)return max+1;var p=[],i,j;for(j=0;j<=b.length;j++)p[j]=j;for(i=1;i<=a.length;i++){var c=[i],mn=i;for(j=1;j<=b.length;j++){c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));if(c[j]<mn)mn=c[j]}if(mn>max)return max+1;p=c}return p[b.length]}
@@ -130,36 +130,68 @@ function score(m,q,qt){
   else if(t.length>=4){var a=tri(t),b=m._t,c=0,n=0;for(var x in a){n++;if(b[x])c++}if(n&&c/n>=.6)best=10}
   if(!best)return 0;s+=best}
  return s}
+var AMPT={'Cleans':['Tweed Lux','Baseman Norm','Black Twin','Voxy 30HW Norm','Jazz Clean','Emperor Clean','Superstar Clean','Glacian Clean'],
+'Edge of breakup':['Baseman Bright','Voxy 30HW TB','Emperor Drive','Hot Kitty Drive','Superstar Drive','Glacian Drive'],
+'Crunch':['Marshell 45','Marshell 45+','Marshell 45 Jump','Marshell 50','Marshell 50+','Marshell 50 Jump','Marshell 800','Fryman B1','Fryman B2'],
+'Mid gain':['Messe IIC+ 1','Messe IIC+ 2','Messe IIC+ 3','Soloist 100 Crunch','Marshell 900'],
+'High gain':['Dizzle VH B','Dizzle VH S','Engle Saga 1','Fryman HB','Fryman HB+','Soloist 100 Lead','Messe IV Lead 1','Messe IV Lead 2','Messe IV Lead 3','Tangerine R100','Boger XT Blue M'],
+'Metal & djent':['Eddie 51','Engle Saga 2','Rector Dual V','Rector Dual M','Dizzle VH+ B','Dizzle VH+ S'],
+'Bass':['Alchemy Pre','Ampage Classic','Ampage Flip','Voxy Bass','Messe Bass 400'],
+'Acoustic':['Acoustic Preamp 1','Acoustic Preamp 2']};
+var FXT={'Drive':['Overdrive','Fuzz/Dist','Distortion','Bass Drive','Boost','Saturation'],'Dynamics':['Dynamic','Gate','Swell'],'Modulation':['Chorus','Flanger','Flanger/Trem','Vibrato','Phaser','Uni-Vibe','Tremolo','Ring Mod'],'Filter & wah':['Filter','Wah'],'Pitch':['Octave/Pitch'],'Lo-fi':['Lo-Fi','Bit Crusher'],'Acoustic':['Acoustic']};
+var CABA=['Dreadnought 1','Dreadnought 2','Orchestal','Jumbo','Hum Bird','Auditorium','Classical','Mandolin','Fretless Bass','Double Bass'];
+function styleOf(m){
+ var b=m.block,k,t;
+ if(b==='AMP'){for(k in AMPT)if(AMPT[k].indexOf(m.name)>=0)return k;return ''}
+ if(b==='FX1'||b==='FX2'||b==='FX3'){for(k in FXT)if(FXT[k].indexOf(m.category)>=0)return k;return ''}
+ if(b==='DLY'||b==='RVB'||b==='EQ')return m.category||'';
+ if(b==='CAB'){if(CABA.indexOf(m.name)>=0)return 'Acoustic sim';t=/(\d+)x(\d+)/.exec(m.name);return t?t[0]:''}
+ return ''}
+function styleOrder(b){if(b==='AMP')return Object.keys(AMPT);if(b==='FX1'||b==='FX2'||b==='FX3')return Object.keys(FXT);return null}
+function drawStyles(){
+ var el=$('styles');el.innerHTML='';
+ if(block==='ALL'){el.hidden=true;return}
+ var cnt={},order=[];all.forEach(function(m){if(m.block===block&&m._s){if(!cnt[m._s]){cnt[m._s]=0;order.push(m._s)}cnt[m._s]++}});
+ var o=styleOrder(block);if(o)order=o.filter(function(x){return cnt[x]});else order.sort(function(a,b){return a.localeCompare(b,undefined,{numeric:true})});
+ if(!order.length){el.hidden=true;return}
+ el.hidden=false;
+ [''].concat(order).forEach(function(x){var b=document.createElement('button');b.className='chip';b.type='button';b.setAttribute('aria-pressed',x===style);b.innerHTML=(x||'All styles')+(x?'<small>'+cnt[x]+'</small>':'');b.onclick=function(){style=x;render()};el.appendChild(b)})}
 function build(){
  data.blocks.forEach(function(b){b.models.forEach(function(m){
-  m.block=b.block;m._n=norm(m.name);m._ba=norm(m.based_on);
-  m._h=norm([m.block,m.name,m.based_on,m.category,m.status,m.firmware_added?'firmware added':'',m.renamed,m.caveat,m.notes?[m.notes.tone,m.notes.known_for,m.notes.tip].join(' '):''].join(' '));
+  m.block=b.block;m._s=styleOf(m);m._i=(info.models||{})[b.block+':'+m.code];m._n=norm(m.name);m._ba=norm(m.based_on);
+  m._h=norm([m.block,m.name,m.based_on,m.category,m.firmware_added?'firmware added':'',m.renamed,m.caveat,m.notes?[m.notes.tone,m.notes.known_for,m.notes.tip].join(' '):''].join(' '));
   m._t=tri(m._n);m._w=m._h.split(' ');all.push(m)})});
  var chips=$('chips');
- function chip(id,label,n){var b=document.createElement('button');b.className='chip';b.type='button';b.setAttribute('aria-pressed',id===block);b.innerHTML=label+'<small>'+n+'</small>';b.onclick=function(){block=id;render()};b.dataset.id=id;chips.appendChild(b)}
+ function chip(id,label,n){var b=document.createElement('button');b.className='chip';b.type='button';b.setAttribute('aria-pressed',id===block);b.innerHTML=label+'<small>'+n+'</small>';b.onclick=function(){block=id;style='';render()};b.dataset.id=id;chips.appendChild(b)}
  chip('ALL','All',all.length);data.blocks.forEach(function(b){chip(b.block,b.block,b.count)});
  render()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function card(m){
  var known=!(m.code===null||m.code===undefined);
- var h='<div class="card"><div><span class="blk">'+esc(m.block)+'</span><span class="name">'+esc(m.name)+'</span></div>'+
- '<div class="codebox">'+(known?'<div class="code">'+esc(m.code)+'</div><div class="sub">code</div>':'<div class="code dim">\u2013</div>')+'</div>';
+ var star=window.AmperoBridge?AmperoBridge.modelStarHtml(m):'';
+ var h='<div class="card'+(star?' has-star':'')+'"><div><span class="blk">'+esc(m.block)+'</span><span class="name">'+esc(m.name)+'</span></div>'+
+ '<div class="codebox">'+(known?'<div class="code">'+esc(m.code)+'</div><div class="sub">code</div>':'<div class="code dim">\u2013</div>')+'</div>'+star;
  if(m.based_on)h+='<div class="based"><span>Based on</span> '+esc(m.based_on)+'</div>';
  h+='<div class="meta">';
- if(m.status==='pedal-proven')h+='<span class="tag ok">pedal-proven</span>';
  h+='<span class="tag">screen '+m.screen+'</span>';
  if(m.id)h+='<span class="tag">list ID '+m.id+'</span>';
  if(m.firmware_added)h+='<span class="tag new">firmware-added</span>';
  if(m.renamed)h+='<span class="tag">'+esc(m.renamed)+'</span>';
  h+='</div>';
  if(m.caveat)h+='<div class="based"><span>Heads up</span> '+esc(m.caveat)+'</div>';
- if(m.notes){h+='<details class="exp"><summary>Details</summary><dl><dt>Tone</dt><dd>'+esc(m.notes.tone)+'</dd><dt>Known for</dt><dd>'+esc(m.notes.known_for)+'</dd><dt>Worth knowing</dt><dd>'+esc(m.notes.tip)+'</dd></dl></details>'}
+ if(window.AmperoBridge&&!AmperoBridge.detailsOn())return h+'</div>';
+ var i=m._i,rows='';
+ if(m.notes)rows+='<dt>Tone</dt><dd>'+esc(m.notes.tone)+'</dd><dt>Known for</dt><dd>'+esc(m.notes.known_for)+'</dd><dt>Worth knowing</dt><dd>'+esc(m.notes.tip)+'</dd>';
+ if(i)[['what','What it is'],['behavior','How it behaves'],['character','Character'],['era','Era'],['power','Tubes and power'],['cab','Cab'],['controls','Controls'],['players','Used by']].forEach(function(f){if(i[f[0]])rows+='<dt>'+f[1]+'</dt><dd>'+esc(i[f[0]])+'</dd>'});
+ if(rows)h+='<details class="exp"><summary>Details</summary><dl>'+rows+'</dl></details>';
+ else if(m.block==='AMP')h+='<div class="based"><span>More specs coming</span></div>';
  return h+'</div>'}
 function render(){
+ drawStyles();
  [].forEach.call($('chips').children,function(c){c.setAttribute('aria-pressed',c.dataset.id===block)});
  var qraw=$('q').value,q=norm(qraw),qt=q?q.split(' '):[];
- var pr=$('proven').checked,ad=$('added').checked;
- var res=all.filter(function(m){return (block==='ALL'||m.block===block)&&(!pr||m.status==='pedal-proven')&&(!ad||m.firmware_added)});
+ var ad=$('added').checked;
+ var res=all.filter(function(m){return (block==='ALL'||m.block===block)&&(!style||m._s===style)&&(!ad||m.firmware_added)&&(!window.AmperoBridge||AmperoBridge.modelPasses(m))});
  if(q){res=res.map(function(m){return [score(m,q,qt),m]}).filter(function(x){return x[0]>0}).sort(function(a,b){return b[0]-a[0]}).map(function(x){return x[1]})}
  $('count').textContent=res.length+' of '+all.length+' models';
  $('list').innerHTML=res.length?res.slice(0,400).map(card).join(''):'<div class="empty">No match.</div>';
@@ -168,8 +200,9 @@ function init(){
  var h=decodeURIComponent((location.hash||'').slice(1)).split('/');
  if(h[0]&&h[0]!=='ALL')block=h[0];if(h[1])$('q').value=h.slice(1).join('/');
  var t;$('q').addEventListener('input',function(){clearTimeout(t);t=setTimeout(render,80)});
- $('proven').onchange=render;$('added').onchange=render;
- fetch('models.json').then(function(r){return r.json()}).then(function(d){data=d;build()}).catch(function(){$('list').innerHTML='<div class="empty">Could not load models.json.</div>'})}
+ $('added').onchange=render;
+ if(window.AmperoBridge)AmperoBridge.start({rerender:function(){if(data)render()}});
+ fetch('models.json').then(function(r){return r.json()}).then(function(d){data=d;if(window.AmperoBridge)AmperoBridge.setModels(d);return fetch('info.json').then(function(r){return r.ok?r.json():{}}).catch(function(){return {}})}).then(function(i){info=i||{};build()}).catch(function(){$('list').innerHTML='<div class="empty">Could not load models.json.</div>'})}
 init();
 })();
 </script>

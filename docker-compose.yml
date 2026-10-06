@@ -7,12 +7,16 @@ services:
     environment:
       - PORT=8080
       - API_KEY=${API_KEY}
-      # Optional overrides, only after checking GET /api/usb on the real pedal:
+      # Optional. Leave these blank (or unset) and the defaults apply. Fill them in
+      # the .env file next to this one, or in Dockhand's Environment tab.
+      - AMPERO_CORS_ORIGINS=${AMPERO_CORS_ORIGINS}
+      - AMPERO_PATCH_COUNT=${AMPERO_PATCH_COUNT}
+      - AMPERO_ALLOW_UNPROVEN_MODELS=${AMPERO_ALLOW_UNPROVEN_MODELS}
+      # More that can be set the same way (see the Settings table in the readme):
       # - AMPERO_USB_INTERFACE=3
-      # - AMPERO_USB_MODE=midi   (midi = USB-MIDI 4-byte packets, raw = bytes as-is)
+      # - AMPERO_USB_MODE=midi
       # - AMPERO_USB_TIMEOUT_MS=1000
-      # - AMPERO_HISTORY_POLL_S=2   (base seconds between the background reads behind /api/history; 0 turns them off)
-      # - AMPERO_ALLOW_UNPROVEN_MODELS=1   (let /api/model send model codes not yet proven)
+      # - AMPERO_HISTORY_POLL_S=2
     ports:
       # Published on every host interface so a reverse proxy on another machine
       # can reach it. This port speaks plain HTTP, so limit it with a firewall

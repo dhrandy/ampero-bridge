@@ -23,7 +23,7 @@ Everything here is a snapshot of firmware V2.2. Hotone can add, rename or reorde
 | DLY | 10 | Slapback | 9 |
 | RVB | 05 | Spring | 4 |
 
-`POST /api/model` accepts only the codes in this table (per slot), plus every code in the FX1, FX2, AMP, CAB, EQ, DLY and RVB tables below (all read on a real pedal by stepping through each list). FX3 and NR are read the same way but have no write slot in the bridge. Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
+`POST /api/model` accepts only the codes in this table (per slot), plus every code in the FX1, FX2, AMP, CAB, EQ, DLY and RVB tables below (all read on a real pedal by stepping through each list). FX3 (slot 07) and NR (slot 04) are accepted too. Their param writes are pedal-verified; model select on those two slots is not yet. Set `AMPERO_ALLOW_UNPROVEN_MODELS=1` to send others.
 
 Writing a model from the bridge (`POST /api/model`) gave the same record as picking it on the pedal (checked for FX2).
 
@@ -98,7 +98,7 @@ The FX2 list has 60 models, in the editor's order. The codes jump in groups (0-1
 
 ## FX3 list (screen number, code, name)
 
-FX3 has its own list of 30 models, in the editor's order. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). Codes are screen minus 1 for screens 1 to 17 and screen plus 46 from 18 onwards. All 30 codes were read from the record while stepping through the pedal's FX3 list by hand, and the pattern held at every stop (0-16, then 64-76). `/api/model` accepts only the codes in the proven table above.
+FX3 has its own list of 30 models, in the editor's order. It is not the FX2 list (Liquid C is code 114 in FX2, 2 in FX3). Codes are screen minus 1 for screens 1 to 17 and screen plus 46 from 18 onwards. All 30 codes were read from the record while stepping through the pedal's FX3 list by hand, and the pattern held at every stop (0-16, then 64-76). `/api/model` accepts every code in this table.
 
 | Screen | Code | Name | Source |
 | --- | --- | --- | --- |
