@@ -105,6 +105,8 @@ The repo has both (`.env.example` is the template for `.env`).
         environment:
           - PORT=8080
           - API_KEY=${API_KEY}
+          # Optional: origins allowed to use the site's bridge panel.
+          - AMPERO_CORS_ORIGINS=${AMPERO_CORS_ORIGINS}
           # Optional overrides, only after checking GET /api/usb on the real pedal:
           # - AMPERO_USB_INTERFACE=3
           # - AMPERO_USB_MODE=midi   (midi = USB-MIDI 4-byte packets, raw = bytes as-is)
@@ -200,7 +202,9 @@ Create a stack from `docker-compose.yml`. Set `API_KEY` in the stack's
 when it deploys. Do not paste the key into the compose file. The optional
 `AMPERO_CORS_ORIGINS`, `AMPERO_PATCH_COUNT`, `AMPERO_ALLOW_UNPROVEN_MODELS` and
 `DATA_DIR` go in the same tab, with the same names as in `.env.example`. To let the
-site's Bridge panel reach the bridge, set `AMPERO_CORS_ORIGINS` there to the page's origin.
+site's Bridge panel reach the bridge, set `AMPERO_CORS_ORIGINS` there to the page's origin,
+then rebuild and redeploy the stack. See [Bridge panel on the site](#bridge-panel-on-the-site)
+for the full setup.
 
 ### Putting it on the internet: reverse proxy (Synology example)
 
@@ -499,17 +503,76 @@ pedal between patches. Do not touch the pedal while one runs.
 
 ## Bridge panel on the site
 
-The model library page can talk to your own bridge. Open **Settings** on the page, enter the
-bridge address and API key, and the page gains a **Presets** tab: stars, block copy, backup and
-restore, and a `.prst` inspector. Models get a star too. Each of those four can be switched off
-under Settings, and the page looks like before when none is connected.
+The [model library](https://dhrandy.github.io/ampero-bridge/) can talk to your own bridge.
+Without a connection, it is still a model library. With one, it gains a **Presets** tab:
+stars, block copy, backup and restore, and a `.prst` inspector. Models get a star too.
+Each of those four features can be switched off under **Settings**.
 
-The address and key are kept in this browser only (the tab, or the device if you tick
-"Remember"), and the key is only sent to the bridge. Favorites live on the bridge.
+### Connect the site to your bridge
 
-A page on `github.io` can only call your bridge if the bridge allows that origin. Set
-`AMPERO_CORS_ORIGINS` to the page's origin (for example `https://dhrandy.github.io`) and serve the
-bridge over https. It is off by default, so nothing changes unless you set it.
+1. Give the bridge an **HTTPS** address with a valid certificate, using a reverse proxy
+   as described under [Run it](#run-it). The stock site uses HTTPS, so a browser will
+   block calls to a plain HTTP bridge as mixed content. Use the bridge's base address,
+   such as `https://your-bridge.example`, not an `/api/...` endpoint.
+2. Allow the **site's origin** in the bridge's environment. For the stock site, put this
+   in `.env` beside `docker-compose.yml`:
+
+       AMPERO_CORS_ORIGINS=https://dhrandy.github.io
+
+   An origin is the scheme, hostname and port (if non-default), with **no path**.
+   Do not add `/ampero-bridge/`, and do not use the bridge's address here. If you host
+   the site yourself, use its origin instead, for example `https://pedal.example` or
+   `http://localhost:8000` for a local development server. The scheme and port must match
+   the page you actually open. For several sites, use a comma-separated list:
+
+       AMPERO_CORS_ORIGINS=https://dhrandy.github.io,https://pedal.example,http://localhost:8000
+
+   The Compose `environment` section must pass the value into the container:
+
+       - AMPERO_CORS_ORIGINS=${AMPERO_CORS_ORIGINS}
+
+   The supplied `docker-compose.yml` and the example above already include that line.
+   In a stack manager such as Dockhand, set `AMPERO_CORS_ORIGINS` in the stack's
+   **Environment** tab instead of a `.env` file.
+3. Rebuild and redeploy after changing the environment:
+
+       docker compose up -d --build --force-recreate
+
+   In Dockhand, rebuild and redeploy the stack. Restarting the existing container alone
+   does not apply new environment values.
+4. Open the model library's **Settings**, enter the HTTPS **Bridge address** and your
+   **API key** (the same `API_KEY` set on the bridge), then click **Connect**. A successful
+   connection shows **Connected.** and enables the selected bridge features.
+
+The address and key stay in this browser: by default they are forgotten when the tab
+closes; **Remember on this device** keeps them across sessions. Use Remember only on a
+trusted device. The key is sent to the bridge, not stored in this repository. Favorites
+live on the bridge. Use **Forget** in Settings to remove the saved connection.
+
+### What CORS does, and what it does not do
+
+CORS is a browser rule for calls between different origins. `AMPERO_CORS_ORIGINS` tells
+the bridge which website origins may make those calls from a browser. It is off by
+default. Allow only sites you trust with your key; an origin covers every page under
+that scheme, hostname and port, not just one repository's path.
+
+CORS is **not authentication** and does not stop clients such as curl from calling the
+API. The API key still protects `/api` calls, and HTTPS protects the key in transit.
+Adding a site origin does not remove the key requirement. Keep the key private, avoid
+untrusted scripts on the site, and keep the bridge's plain HTTP port behind your proxy
+and firewall rather than forwarding it to the internet.
+
+### If the site cannot connect
+
+* **Cannot reach the bridge:** check the HTTPS address and certificate, that the bridge
+  is running and reachable from this device, and that the reverse proxy passes `/api`
+  requests and `OPTIONS` requests through to it.
+* **CORS error:** check that `AMPERO_CORS_ORIGINS` matches the site's exact origin, without
+  a path, is passed into the container, and that you redeployed after changing it.
+* **401 / unauthorized:** re-enter the API key configured on the bridge. Allowing an
+  origin does not fix a wrong key.
+* **Mixed content:** use an HTTPS bridge address, not `http://...`.
+
 
 ## Safety
 
