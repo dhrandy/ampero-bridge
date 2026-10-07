@@ -1,0 +1,551 @@
+{
+ "description": "Ampero Mini preset roster: which preset name lives in which slot. Names only, no settings. Agents read this to know where things are.",
+ "notes": [
+  "Source: bridge GET /api/patches/known (names the bridge has read or saved; not a live pedal scan).",
+  "Slots in not_yet_read have never been read by the bridge: unknown, not necessarily empty.",
+  "P8-3 is published as AcouSim; the pedal keeps its own name for that slot.",
+  "Control characters are stripped from names.",
+  "index is the 0-based program change number; 3 patches per bank; label is P<bank>-<slot>."
+ ],
+ "generated_at": "2026-10-07T00:44:48Z",
+ "known_count": 87,
+ "patches": [
+  {
+   "index": 0,
+   "label": "P1-1",
+   "name": "RG F-Twin 1",
+   "last_seen": "2026-10-04T21:57:48+00:00"
+  },
+  {
+   "index": 1,
+   "label": "P1-2",
+   "name": "RG F-Twin 2",
+   "last_seen": "2026-10-04T21:57:54+00:00"
+  },
+  {
+   "index": 2,
+   "label": "P1-3",
+   "name": "RG F-Twin 3",
+   "last_seen": "2026-10-04T21:57:59+00:00"
+  },
+  {
+   "index": 3,
+   "label": "P2-1",
+   "name": "RG F- Bassman 1",
+   "last_seen": "2026-10-04T21:58:03+00:00"
+  },
+  {
+   "index": 4,
+   "label": "P2-2",
+   "name": "RG F- Bassman 2",
+   "last_seen": "2026-10-04T22:33:27+00:00"
+  },
+  {
+   "index": 5,
+   "label": "P2-3",
+   "name": "RG F- Bassman 3",
+   "last_seen": "2026-10-04T16:09:30+00:00"
+  },
+  {
+   "index": 6,
+   "label": "P3-1",
+   "name": "RG JCM800 L",
+   "last_seen": "2026-10-04T16:09:33+00:00"
+  },
+  {
+   "index": 7,
+   "label": "P3-2",
+   "name": "RG JCM800 M",
+   "last_seen": "2026-10-04T16:09:36+00:00"
+  },
+  {
+   "index": 8,
+   "label": "P3-3",
+   "name": "RG JCM800 H",
+   "last_seen": "2026-10-04T16:09:39+00:00"
+  },
+  {
+   "index": 9,
+   "label": "P4-1",
+   "name": "RG SOLDANO  L",
+   "last_seen": "2026-10-04T22:42:01+00:00"
+  },
+  {
+   "index": 12,
+   "label": "P5-1",
+   "name": "RG FRIEDMAN L",
+   "last_seen": "2026-10-04T16:09:54+00:00"
+  },
+  {
+   "index": 13,
+   "label": "P5-2",
+   "name": "RG FRIEDMAN M",
+   "last_seen": "2026-10-04T16:09:58+00:00"
+  },
+  {
+   "index": 14,
+   "label": "P5-3",
+   "name": "RG FRIEDMAN H",
+   "last_seen": "2026-10-04T16:10:05+00:00"
+  },
+  {
+   "index": 15,
+   "label": "P6-1",
+   "name": "RG DIEZEL L",
+   "last_seen": "2026-10-04T22:42:13+00:00"
+  },
+  {
+   "index": 16,
+   "label": "P6-2",
+   "name": "RG DIEZEL M",
+   "last_seen": "2026-10-04T16:10:11+00:00"
+  },
+  {
+   "index": 17,
+   "label": "P6-3",
+   "name": "RG DIEZEL H",
+   "last_seen": "2026-10-04T16:10:14+00:00"
+  },
+  {
+   "index": 18,
+   "label": "P7-1",
+   "name": "RG ORANGE L",
+   "last_seen": "2026-10-04T16:10:17+00:00"
+  },
+  {
+   "index": 19,
+   "label": "P7-2",
+   "name": "RG ORANGE M",
+   "last_seen": "2026-10-04T16:10:20+00:00"
+  },
+  {
+   "index": 20,
+   "label": "P7-3",
+   "name": "RG ORANGE H",
+   "last_seen": "2026-10-04T16:10:23+00:00"
+  },
+  {
+   "index": 21,
+   "label": "P8-1",
+   "name": "RG Worship 1",
+   "last_seen": "2026-10-04T22:42:25+00:00"
+  },
+  {
+   "index": 22,
+   "label": "P8-2",
+   "name": "RG Worship 2",
+   "last_seen": "2026-10-04T16:10:30+00:00"
+  },
+  {
+   "index": 23,
+   "label": "P8-3",
+   "name": "AcouSim",
+   "last_seen": "2026-10-04T16:10:33+00:00"
+  },
+  {
+   "index": 24,
+   "label": "P9-1",
+   "name": "RG TeenSpt Intro",
+   "last_seen": "2026-10-04T16:10:36+00:00"
+  },
+  {
+   "index": 25,
+   "label": "P9-2",
+   "name": "RG TeenSpt Dist",
+   "last_seen": "2026-10-04T16:10:39+00:00"
+  },
+  {
+   "index": 26,
+   "label": "P9-3",
+   "name": "RG TeenSpt Cln",
+   "last_seen": "2026-10-04T16:10:42+00:00"
+  },
+  {
+   "index": 27,
+   "label": "P10-1",
+   "name": "RG Cbersome L",
+   "last_seen": "2026-10-04T22:42:37+00:00"
+  },
+  {
+   "index": 28,
+   "label": "P10-2",
+   "name": "RG Cbersome H",
+   "last_seen": "2026-10-04T16:10:48+00:00"
+  },
+  {
+   "index": 29,
+   "label": "P10-3",
+   "name": "RG STP",
+   "last_seen": "2026-10-04T16:10:52+00:00"
+  },
+  {
+   "index": 30,
+   "label": "P11-1",
+   "name": "RG OK SM Show",
+   "last_seen": "2026-10-04T16:10:55+00:00"
+  },
+  {
+   "index": 31,
+   "label": "P11-2",
+   "name": "RG Matchless Cl",
+   "last_seen": "2026-10-04T16:10:58+00:00"
+  },
+  {
+   "index": 32,
+   "label": "P11-3",
+   "name": "RG Matchless Dr",
+   "last_seen": "2026-10-04T16:11:01+00:00"
+  },
+  {
+   "index": 33,
+   "label": "P12-1",
+   "name": "RG PJ Black",
+   "last_seen": "2026-10-04T22:42:48+00:00"
+  },
+  {
+   "index": 34,
+   "label": "P12-2",
+   "name": "RG PJ BetMan",
+   "last_seen": "2026-10-04T16:11:07+00:00"
+  },
+  {
+   "index": 35,
+   "label": "P12-3",
+   "name": "RG BASS",
+   "last_seen": "2026-10-04T16:11:10+00:00"
+  },
+  {
+   "index": 36,
+   "label": "P13-1",
+   "name": "RG SMPMKIN",
+   "last_seen": "2026-10-04T16:11:13+00:00"
+  },
+  {
+   "index": 37,
+   "label": "P13-2",
+   "name": "RG Monster Hvy",
+   "last_seen": "2026-10-04T16:11:17+00:00"
+  },
+  {
+   "index": 38,
+   "label": "P13-3",
+   "name": "RG MGBand",
+   "last_seen": "2026-10-04T16:11:20+00:00"
+  },
+  {
+   "index": 39,
+   "label": "P14-1",
+   "name": "RG Duc&Run",
+   "last_seen": "2026-10-04T22:43:00+00:00"
+  },
+  {
+   "index": 40,
+   "label": "P14-2",
+   "name": "RG Badcat",
+   "last_seen": "2026-10-04T16:11:26+00:00"
+  },
+  {
+   "index": 41,
+   "label": "P14-3",
+   "name": "RG Bush",
+   "last_seen": "2026-10-04T16:11:29+00:00"
+  },
+  {
+   "index": 42,
+   "label": "P15-1",
+   "name": "RG Foo F Cl",
+   "last_seen": "2026-10-04T16:11:32+00:00"
+  },
+  {
+   "index": 43,
+   "label": "P15-2",
+   "name": "RG Foo F Dr",
+   "last_seen": "2026-10-04T16:11:35+00:00"
+  },
+  {
+   "index": 44,
+   "label": "P15-3",
+   "name": "RG Burning Man",
+   "last_seen": "2026-10-04T16:11:39+00:00"
+  },
+  {
+   "index": 45,
+   "label": "P16-1",
+   "name": "RG Chevelle",
+   "last_seen": "2026-10-04T22:43:12+00:00"
+  },
+  {
+   "index": 46,
+   "label": "P16-2",
+   "name": "RG ColSl Shine",
+   "last_seen": "2026-10-04T16:11:45+00:00"
+  },
+  {
+   "index": 47,
+   "label": "P16-3",
+   "name": "RG Heart Shaped",
+   "last_seen": "2026-10-04T16:11:48+00:00"
+  },
+  {
+   "index": 48,
+   "label": "P17-1",
+   "name": "Runn Dn a Dream",
+   "last_seen": "2026-10-04T16:11:51+00:00"
+  },
+  {
+   "index": 49,
+   "label": "P17-2",
+   "name": "Mindtrain Riff",
+   "last_seen": "2026-10-04T16:11:54+00:00"
+  },
+  {
+   "index": 50,
+   "label": "P17-3",
+   "name": "Satellite",
+   "last_seen": "2026-10-04T16:11:57+00:00"
+  },
+  {
+   "index": 51,
+   "label": "P18-1",
+   "name": "Satellite",
+   "last_seen": "2026-10-04T22:43:24+00:00"
+  },
+  {
+   "index": 52,
+   "label": "P18-2",
+   "name": "RG HIGHER C",
+   "last_seen": "2026-10-04T16:12:04+00:00"
+  },
+  {
+   "index": 53,
+   "label": "P18-3",
+   "name": "RG HIGHER H",
+   "last_seen": "2026-10-04T16:12:07+00:00"
+  },
+  {
+   "index": 54,
+   "label": "P19-1",
+   "name": "RG LOSER C",
+   "last_seen": "2026-10-04T16:12:10+00:00"
+  },
+  {
+   "index": 55,
+   "label": "P19-2",
+   "name": "RG LOSER H",
+   "last_seen": "2026-10-04T16:12:13+00:00"
+  },
+  {
+   "index": 56,
+   "label": "P19-3",
+   "name": "Dire Brothers",
+   "last_seen": "2026-10-04T16:12:16+00:00"
+  },
+  {
+   "index": 57,
+   "label": "P20-1",
+   "name": "Got the Blues",
+   "last_seen": "2026-10-04T22:43:35+00:00"
+  },
+  {
+   "index": 58,
+   "label": "P20-2",
+   "name": "Europa",
+   "last_seen": "2026-10-04T16:12:23+00:00"
+  },
+  {
+   "index": 59,
+   "label": "P20-3",
+   "name": "ZZ's Garage",
+   "last_seen": "2026-10-04T16:12:26+00:00"
+  },
+  {
+   "index": 60,
+   "label": "P21-1",
+   "name": "AC Sim for LP 1",
+   "last_seen": "2026-10-04T16:12:29+00:00"
+  },
+  {
+   "index": 61,
+   "label": "P21-2",
+   "name": "AC Sim for LP 2",
+   "last_seen": "2026-10-04T16:12:32+00:00"
+  },
+  {
+   "index": 62,
+   "label": "P21-3",
+   "name": "AC Sim for LP 3",
+   "last_seen": "2026-10-04T16:12:35+00:00"
+  },
+  {
+   "index": 63,
+   "label": "P22-1",
+   "name": "AC Sim for ST 1",
+   "last_seen": "2026-10-04T22:43:47+00:00"
+  },
+  {
+   "index": 64,
+   "label": "P22-2",
+   "name": "AC Sim for ST 2",
+   "last_seen": "2026-10-04T16:12:42+00:00"
+  },
+  {
+   "index": 65,
+   "label": "P22-3",
+   "name": "AC Sim for ST 3",
+   "last_seen": "2026-10-04T16:12:45+00:00"
+  },
+  {
+   "index": 66,
+   "label": "P23-1",
+   "name": "Comp'd Piezo PU",
+   "last_seen": "2026-10-04T16:12:48+00:00"
+  },
+  {
+   "index": 67,
+   "label": "P23-2",
+   "name": "Boosted D-Type",
+   "last_seen": "2026-10-04T16:12:51+00:00"
+  },
+  {
+   "index": 68,
+   "label": "P23-3",
+   "name": "Balanced OM",
+   "last_seen": "2026-10-04T16:12:54+00:00"
+  },
+  {
+   "index": 69,
+   "label": "P24-1",
+   "name": "Mic'd Jumbo",
+   "last_seen": "2026-10-04T22:43:59+00:00"
+  },
+  {
+   "index": 70,
+   "label": "P24-2",
+   "name": "Grand A",
+   "last_seen": "2026-10-04T16:13:01+00:00"
+  },
+  {
+   "index": 71,
+   "label": "P24-3",
+   "name": "Hummin'",
+   "last_seen": "2026-10-04T16:13:04+00:00"
+  },
+  {
+   "index": 72,
+   "label": "P25-1",
+   "name": "Lush Acoustic",
+   "last_seen": "2026-10-04T16:13:07+00:00"
+  },
+  {
+   "index": 73,
+   "label": "P25-2",
+   "name": "Widely Spreaded",
+   "last_seen": "2026-10-04T16:13:10+00:00"
+  },
+  {
+   "index": 74,
+   "label": "P25-3",
+   "name": "Time Wrap",
+   "last_seen": "2026-10-04T16:13:13+00:00"
+  },
+  {
+   "index": 75,
+   "label": "P26-1",
+   "name": "TREATY OAK",
+   "last_seen": "2026-10-04T22:44:11+00:00"
+  },
+  {
+   "index": 76,
+   "label": "P26-2",
+   "name": "DEXTER MOONROCKS",
+   "last_seen": "2026-10-07T00:42:38+00:00"
+  },
+  {
+   "index": 77,
+   "label": "P26-3",
+   "name": "K. WEST CIRCLES",
+   "last_seen": "2026-10-04T16:13:23+00:00"
+  },
+  {
+   "index": 78,
+   "label": "P27-1",
+   "name": "CHERUB ROCK",
+   "last_seen": "2026-10-07T00:42:26+00:00"
+  },
+  {
+   "index": 79,
+   "label": "P27-2",
+   "name": "FREAKIN OUT",
+   "last_seen": "2026-10-07T00:42:55+00:00"
+  },
+  {
+   "index": 80,
+   "label": "P27-3",
+   "name": "Rich Bass/Env",
+   "last_seen": "2026-10-04T21:00:11+00:00"
+  },
+  {
+   "index": 81,
+   "label": "P28-1",
+   "name": "Boomy Bass",
+   "last_seen": "2026-10-04T21:54:36+00:00"
+  },
+  {
+   "index": 82,
+   "label": "P28-2",
+   "name": "Storyteller",
+   "last_seen": "2026-10-04T21:52:08+00:00"
+  },
+  {
+   "index": 83,
+   "label": "P28-3",
+   "name": "60's Brit Bass",
+   "last_seen": "2026-10-05T01:42:08+00:00"
+  },
+  {
+   "index": 84,
+   "label": "P29-1",
+   "name": "5AM PECOS",
+   "last_seen": "2026-10-07T00:30:47+00:00"
+  },
+  {
+   "index": 85,
+   "label": "P29-2",
+   "name": "ROOFTOPS",
+   "last_seen": "2026-10-07T00:30:59+00:00"
+  },
+  {
+   "index": 87,
+   "label": "P30-1",
+   "name": "LIKE MOVIES CLN",
+   "last_seen": "2026-10-07T00:30:30+00:00"
+  },
+  {
+   "index": 88,
+   "label": "P30-2",
+   "name": "LIKE MOVIES DRV",
+   "last_seen": "2026-10-07T00:31:11+00:00"
+  },
+  {
+   "index": 89,
+   "label": "P30-3",
+   "name": "LIKE MOVIES LEAD",
+   "last_seen": "2026-10-07T00:31:22+00:00"
+  }
+ ],
+ "not_yet_read": [
+  10,
+  11,
+  86,
+  90,
+  91,
+  92,
+  93,
+  94,
+  95,
+  96,
+  97,
+  98,
+  99
+ ]
+}
