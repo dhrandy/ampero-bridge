@@ -283,7 +283,7 @@ Rule: code = ID - 107. Both checked. The editor's NR list has these 2 models.
 
 ### AMP models
 
-The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly in the first pass and the other three (screens 22, 28 and 36) were read in a second pass: codes 59, 65 and 102, exactly what the unbroken run predicted. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. Sound Clone 6 to 10 (screens 56 to 60) produce no sound on the pedal; this was confirmed on a real pedal.
+The editor's AMP list has 60 models, in this screen order. All 60 were stepped through on the pedal and the record read at each stop: 57 codes were read directly in the first pass and the other three (screens 22, 28 and 36) were read in a second pass: codes 59, 65 and 102, exactly what the unbroken run predicted. The codes run in groups: screens 1-10 are 0-9, 11-21 are 48-58, 22-29 are 59-66, 30-47 are 96-113, 48-52 are 160-164 and 53-60 are 192-199. They do not follow the manufacturer's ID order, because the editor has eight amps the ID list lacks (Tweed Prince, Black Prince, Match 30 Clean and Sound Clone 6 to 10) and calls one Boger XT Blue M where the ID list says Red M. Sound Clone 6 to 10 (screens 56 to 60) produced no sound with the contents loaded during the prior test. The firmware V2.2 manual describes imported tone files for these slots; the editor defines Gain, VOL, Bass, Middle and Treble. They are not generally unusable placeholders.
 
 | Screen | Name | Code |
 | --- | --- | --- |
@@ -342,11 +342,11 @@ The editor's AMP list has 60 models, in this screen order. All 60 were stepped t
 | 53 | Acoustic Preamp 1 | 192 |
 | 54 | Acoustic Preamp 2 | 193 |
 | 55 | Match 30 Clean | 194 |
-| 56 | Sound Clone 6 | 195 (no sound on the pedal) |
-| 57 | Sound Clone 7 | 196 (no sound on the pedal) |
-| 58 | Sound Clone 8 | 197 (no sound on the pedal) |
-| 59 | Sound Clone 9 | 198 (no sound on the pedal) |
-| 60 | Sound Clone 10 | 199 (no sound on the pedal) |
+| 56 | Sound Clone 6 | 195 (imported-tone slot; prior loaded contents were silent) |
+| 57 | Sound Clone 7 | 196 (imported-tone slot; prior loaded contents were silent) |
+| 58 | Sound Clone 8 | 197 (imported-tone slot; prior loaded contents were silent) |
+| 59 | Sound Clone 9 | 198 (imported-tone slot; prior loaded contents were silent) |
+| 60 | Sound Clone 10 | 199 (imported-tone slot; prior loaded contents were silent) |
 
 ### FX1, FX2 and FX3 models
 

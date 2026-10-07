@@ -169,10 +169,10 @@ function build(){
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 var pmap={};
 function paramRows(m){
- var b=pmap[String(m.block).toLowerCase()],e=b&&b.models&&b.models[m.code];
+ var b=pmap[String(m.block).toLowerCase()],e=b&&b.models&&(b.models[m.code]||b.models.ALL);
  if(!e||!e.params)return '';var ks=Object.keys(e.params);if(!ks.length)return '';
  var t='<table class="pt"><tr><th>#</th><th>Knob</th><th>Range</th><th>Checked</th></tr>';
- ks.forEach(function(k){var p=e.params[k];t+='<tr><td>'+esc(k)+'</td><td>'+esc(p.name||'')+(p.note?'<div class="pn">'+esc(p.note)+'</div>':'')+'</td><td>'+(p.valid_range?esc(p.valid_range.join(' to ')):'')+'</td><td>'+(p.status==='write-verified'?'written and read back':p.status==='address-confirmed-only'?'address only':esc(p.status))+'</td></tr>'});
+ ks.forEach(function(k){var p=e.params[k];t+='<tr><td>'+esc(k)+'</td><td>'+esc(p.name||'')+(p.name_source?'<div class="pn">'+esc(p.name_source)+'</div>':'')+(p.note?'<div class="pn">'+esc(p.note)+'</div>':'')+'</td><td>'+(p.valid_range?esc(p.valid_range.join(' to ')):p.editor_enum?esc(p.editor_enum.map(function(a){return a.value+'='+a.label}).join(', ')):p.editor_display_range?'editor display '+esc(p.editor_display_range.join(' to ')):'')+'</td><td>'+(p.status==='write-verified'?'written and read back':p.status==='address-confirmed-only'?'address only':esc(p.status))+'</td></tr>'});
  return '<dt>Parameters</dt><dd>'+t+'</table></dd>'}
 function card(m){
  var known=!(m.code===null||m.code===undefined);

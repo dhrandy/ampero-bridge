@@ -18,7 +18,7 @@ select,input{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid va
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 table{width:100%;border-collapse:collapse;margin:6px 0 0;font-size:14px}
 td,th{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-.write-verified{color:var(--ok)}.address-confirmed-only,.inferred{color:var(--warn)}.unswept{color:var(--mute)}
+.write-verified{color:var(--ok)}.address-confirmed-only,.inferred{color:var(--warn)}.editor-defined,.unswept{color:var(--mute)}
 .model{font-weight:600}
 </style>
 </head>
@@ -26,7 +26,7 @@ td,th{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);vertic
 <div class="wrap">
 <p><a href="index.html">&larr; Model library</a></p>
 <h1>Parameter map</h1>
-<p class="mute">Which knob is which for each model, where it sits in the preset record, and how sure we are. Unofficial; firmware V2.2 on an Ampero Mini. Also as <a href="param-map.json">param-map.json</a>.</p>
+<p class="mute">Which knob is which for each model, where it sits in the preset record, and how sure we are. Unofficial; firmware V2.2 on an Ampero Mini. Editor names and UI bounds are separate from live write verification. Also as <a href="param-map.json">param-map.json</a>.</p>
 <div class="box mute" id="conv"></div>
 <div class="bar"><select id="blk" aria-label="Block"></select><input id="q" placeholder="Filter by model name" aria-label="Filter by model name"></div>
 <div id="out"></div>
@@ -42,7 +42,7 @@ function render(){
   var ps=Object.keys(m.params||{});
   h+='<div class="box"><span class="model">'+esc(m.name)+'</span> <span class="mute">code '+esc(code)+'</span>';
   if(ps.length){h+='<table><tr><th>#</th><th>Param</th><th>Status</th><th>Range</th><th>Notes</th></tr>';
-   ps.forEach(function(p){var x=m.params[p];h+='<tr><td>'+esc(p)+'</td><td>'+esc(x.name||'')+'</td><td class="'+esc(x.status)+'">'+esc(x.status)+'</td><td>'+(x.valid_range?esc(x.valid_range.join(' to ')):'')+'</td><td>'+esc(x.note||'')+'</td></tr>'});
+   ps.forEach(function(p){var x=m.params[p];h+='<tr><td>'+esc(p)+'</td><td>'+esc(x.name||'')+(x.name_source?'<div class="mute">'+esc(x.name_source)+'</div>':'')+'</td><td class="'+esc(x.status)+'">'+esc(x.status)+'</td><td>'+(x.valid_range?esc(x.valid_range.join(' to ')):x.editor_enum?esc(x.editor_enum.map(function(a){return a.value+'='+a.label}).join(', ')):x.editor_display_range?'editor display '+esc(x.editor_display_range.join(' to ')):'')+'</td><td>'+esc(x.note||'')+'</td></tr>'});
    h+='</table>'}else h+='<div class="mute">No params mapped yet.</div>';
   h+='</div>'});
  out.innerHTML=h||'<p class="mute">No match.</p>';

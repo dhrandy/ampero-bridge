@@ -559,7 +559,7 @@ captured from the editor and the pedal.
 * `docs/models.md`: model numbers checked on a real pedal
 * `docs/knobs.md`: which parameter is which, per model, and how sure each entry is
 * `site/params.html`: the same map as a searchable page (dhrandy.github.io/ampero-bridge/params.html)
-* `docs/param-map.json`: the machine-readable parameter map for agents. Every param is tagged write-verified, confirmed at its address only, inferred or not swept. Getting this map right took many hours of live probing against a real pedal.
+* `docs/param-map.json`: the machine-readable parameter map for agents. Every param keeps its live status: write-verified, confirmed at its address only, inferred or not swept. New unprobed params are editor-defined. Names, defaults, UI ranges and dropdown labels also come from Hotone's official Mini editor database (V1.6.0), separately from live verification. Getting this map right took many hours of live probing against a real pedal.
 * `docs/prst.md`: the `.prst` import
 * `site/`: the model library page and `site/models.json` (see Model library above)
 * `docs/usb-lockups.md`: USB stability notes and the less common settings
@@ -570,3 +570,7 @@ shared. jpfaria's Stage work (github.com/jpfaria/hotone-ampero-2) was a useful
 reference for what is possible on the Stage.
 
 MIT licensed, see `LICENSE`.
+
+### Official parameter definitions
+
+The agent-readable map includes names for every model from Hotone Ampero Editor V1.6.0 (Mini firmware V2.2). See [the ordered controls and source cautions](docs/editor-parameters.md) and [the full machine-readable editor definitions](docs/editor-parameters.json). The editor corrects the manual's Classic PS range to enum 0-5. Pedal-proven Trem Jet offsets win over an editor duplicate-ID bug. Display ranges are not automatically raw API bounds. No new live verification is claimed by this data update.
