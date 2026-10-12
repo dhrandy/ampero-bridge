@@ -16,7 +16,8 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   POST /api/block                  {"block": "rvb", "on": true}
   POST /api/midi/cc                {"cc": 22}   one Control Change, any CC 0-127 (22-25 = patch navigation)
   POST /api/model                  {"slot": "eq", "code": 4}
-  POST /api/param                  {"slot": "eq", "model_code": 4, "param": 3, "value": 30}
+  POST /api/param                  {"slot": "eq", "model_code": 0, "param": 0, "value": 30}  checked against GET /api/rules first
+  GET  /api/rules                  ?slot=fx1&model_code=77  what each param of a model may be set to (raw values)
   POST /api/patch/save             {"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}
   GET  /api/patches/known          slot, label and name of every patch seen so far (no pedal access)
   GET  /api/history                states the bridge saw while polling the pedal (no pedal access)
@@ -30,7 +31,7 @@ Auth: X-Api-Key header, except GET /health (liveness only).
   POST /api/restore                put patches from a dump back on the pedal (dry run unless "apply": true)
   POST /api/import/prst            {"filename": "x.prst", "data": "<base64>"}  look inside a .prst file (read only)
 
-Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 429 too many
+Errors are JSON: {"error": "..."} with 400 bad request, 401 key, 422 a param value the rules refuse, 429 too many
 writes waiting (see Retry-After), 503 pedal missing or busy, 504 pedal silent, 502 other USB trouble.
 
 Nothing here can leave the process stuck: see usbmidi.Link and docs/usb-lockups.md.
@@ -52,6 +53,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 import ampero_mini as am
+import paramrules
 import prst
 import records
 import usbmidi as usb
@@ -988,8 +990,19 @@ def handle_post(path: str, data: dict) -> dict:
         send_sysex([am.model_select(slot, code)], "model")
         return {"ok": True}
     if path == "/api/param":
-        frame = am.param_set(data.get("slot"), _int(data, "model_code"),
-                             _int(data, "param"), _int(data, "value"))
+        slot, code = data.get("slot"), _int(data, "model_code")
+        param, value = _int(data, "param"), _int(data, "value")
+        if isinstance(data.get("value"), (float, str)) and str(data["value"]).strip() != str(value):
+            raise paramrules.ValueRejected(f"value must be a whole number, got {data['value']!r}",
+                                           reason="not_an_integer", value=str(data["value"]))
+        proven = PROVEN_MODELS.get(slot) if isinstance(slot, str) else None
+        if paramrules.MODE != "off" and not ALLOW_UNPROVEN and slot in am.SLOTS and \
+                (proven is None or code not in proven):
+            raise paramrules.ValueRejected(
+                f"model code {code} is not proven for slot {slot!r}, so its params are not written",
+                reason="model_not_proven", slot=slot, model_code=code)
+        paramrules.validate(slot, code, param, value, unverified_ok=data.get("unverified_ok") is True)
+        frame = am.param_set(slot, code, param, value)
         send_sysex([frame], "param")
         return {"ok": True}
     if path == "/api/patch/save":
@@ -1009,7 +1022,7 @@ def handle_post(path: str, data: dict) -> dict:
 STATUS = {
     usb.PedalNotConnected: 503, usb.PedalBusy: 503, usb.PedalGone: 503,
     usb.PedalTimeout: 504, usb.UsbMidiError: 502,
-    am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409, WorkflowBusy: 409, TooFast: 429,
+    paramrules.ValueRejected: 422, am.ProtocolError: 400, LookupError: 404, PatchNotCurrent: 409, WorkflowBusy: 409, TooFast: 429,
 }
 # Bad input that slipped past the checks above. Reported as 400 with a fixed message.
 BAD_INPUT = (TypeError, ValueError, OverflowError, UnicodeError)
@@ -1138,6 +1151,8 @@ class Handler(BaseHTTPRequestHandler):
             self._run_raw(lambda: read_backup_file(name), {"Content-Disposition": f'attachment; filename="{name}"'})
         elif path.startswith("/api/notes/") and path.count("/") == 3:
             self._run(lambda: notes.for_patch(_patch_ref(path.rsplit("/", 1)[1])))
+        elif path == "/api/rules":
+            self._run(lambda: rules_for(urlparse(self.path).query))
         elif path == "/api/models":
             self._run(lambda: models_view(urlparse(self.path).query))
         elif path == "/api/usb":
@@ -1199,6 +1214,16 @@ def models_view(query: str) -> dict:
     out["blocks"] = blocks
     out["counts"] = {b["block"]: b["count"] for b in blocks}
     return out
+
+
+def rules_for(query: str) -> dict:
+    q = parse_qs(query)
+    slot = (q.get("slot") or [""])[0]
+    try:
+        code = int((q.get("model_code") or [""])[0])
+    except ValueError:
+        raise am.ProtocolError("give slot and model_code, e.g. /api/rules?slot=fx1&model_code=77")
+    return paramrules.rules_view(slot, code)
 
 
 def history_view(query: str) -> dict:

@@ -100,7 +100,7 @@ def test_select_block_param(monkeypatch):
     srv, base = start(monkeypatch)
     assert call(base, "/api/patch/select", {"index": 75})[1]["label"] == "P26-1"
     assert call(base, "/api/block", {"block": "rvb", "on": True})[0] == 200
-    assert call(base, "/api/param", {"slot": "eq", "model_code": 4, "param": 3, "value": 30})[0] == 200
+    assert call(base, "/api/param", {"slot": "eq", "model_code": 0, "param": 0, "value": 30})[0] == 200
     assert Fake.sent[0] == ("midi", bytes([0xC0, 75]))
     assert Fake.sent[1] == ("midi", bytes([0xB0, 56, 127]))
     assert Fake.sent[2][0] == "sysex"
@@ -570,3 +570,29 @@ def test_blank_env_values_count_as_unset():
                          cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))), env=env,
                          capture_output=True, text=True, timeout=30)
     assert out.stdout.split() == ["100", "0.5", "8080", "0"], out.stderr
+
+
+def test_param_rules_reject_before_the_pedal(monkeypatch):
+    srv, base = start(monkeypatch)
+    # Magic T treble is a 3-position control on the wire: 65 crashed the pedal once.
+    code, out = call(base, "/api/param", {"slot": "fx1", "model_code": 77, "param": 3, "value": 65})
+    assert code == 422 and out["reason"] == "not_in_enum" and out["rule"]["allowed"] == [0, 1, 2]
+    assert call(base, "/api/param", {"slot": "fx1", "model_code": 45, "param": 0, "value": 6})[0] == 422
+    assert call(base, "/api/param", {"slot": "fx1", "model_code": 0, "param": 0, "value": 1.5})[0] == 422
+    assert call(base, "/api/param", {"slot": "fx1", "model_code": 4000, "param": 0, "value": 1})[0] == 422
+    assert call(base, "/api/param", {"slot": "dly", "model_code": 16, "param": 2, "value": 50})[0] == 422
+    assert Fake.sent == []
+    assert call(base, "/api/param", {"slot": "dly", "model_code": 16, "param": 2, "value": 50,
+                                     "unverified_ok": True})[0] == 200
+    assert call(base, "/api/param", {"slot": "fx1", "model_code": 77, "param": 3, "value": 2})[0] == 200
+    assert len(Fake.sent) == 2
+    srv.shutdown()
+
+
+def test_rules_endpoint(monkeypatch):
+    srv, base = start(monkeypatch)
+    code, out = call(base, "/api/rules?slot=fx1&model_code=77")
+    assert code == 200 and out["params"]["3"]["allowed"] == [0, 1, 2]
+    assert call(base, "/api/rules?slot=fx1&model_code=9999")[0] == 404
+    assert call(base, "/api/rules?slot=fx1")[0] == 400
+    srv.shutdown()

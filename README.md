@@ -445,7 +445,8 @@ Send `X-Api-Key`. Only `/health` is open, and it only returns `{"ok": true}`.
 | `POST /api/block` | `{"block": "rvb", "on": true}` | block on/off (fx1 fx2 amp nr cab eq fx3 dly rvb) |
 | `POST /api/midi/cc` | `{"cc": 22}` | send one Control Change on channel 1. Any CC 0 to 127 is accepted (optional `value`, 0-127, default 127). Proven on a real Mini so far: 22 bank down, 23 bank up, 24 patch down, 25 patch up (patch navigation, not model scrolling). Not for AI preset building |
 | `POST /api/model` | `{"slot": "rvb", "code": 4}` | pick a model for a slot. Only codes listed in `docs/models.md` as proven or read from the pedal are accepted (see Settings) |
-| `POST /api/param` | `{"slot": "rvb", "model_code": 4, "param": 0, "value": 15}` | set one parameter (0-127) |
+| `POST /api/param` | `{"slot": "rvb", "model_code": 4, "param": 0, "value": 15}` | set one parameter. Checked against the rules first (see `GET /api/rules`): a value outside the model's range, an enum value that is not allowed, or a param that is not write-verified answers 422 and sends nothing. Add `"unverified_ok": true` to write a param that is only address-confirmed |
+| `GET /api/rules?slot=fx1&model_code=77` | | the raw ranges, allowed values and trust level for every param of a model |
 | `POST /api/patch/save` | `{"index": 75, "name": "WADE", "confirm": "SAVE P26-1"}` | save to a slot; needs the exact confirm text |
 
 Errors come back as `{"error", "kind"}`: 400 bad input, 401 key, 429 too many writes in line (see `Retry-After`), 503 pedal not
