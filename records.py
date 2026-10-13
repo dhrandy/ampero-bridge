@@ -49,11 +49,49 @@ def to_bytes(record_hex: str) -> bytes:
     return rec
 
 
-def block_fields(rec: bytes, slot: str) -> dict:
-    """On/off, model code and the 14 param values of one block."""
+# Where some fields really live. The generic layout (two bytes per param, low byte first) is right for
+# most knobs, but a few fields are stored differently and the generic read then mixes up neighbours.
+# Everything here is reading only: it changes what a record decodes to, not what the bridge may write.
+#   DLY: Feedback is the single byte at block offset 6. Time is a 14-bit value, high 7 bits at offset 7
+#        and low 7 bits at offset 8 (the generic read glued Feedback's byte to Time's high half).
+#   FX3 Sweller: Attack is 14 bits, high half at offset 3 (the header byte before slot 0), low half at 4.
+#   CAB: Position Z is the single byte at offset 12. Low Cut is offset 13 (high 7) and 14 (low 7), High Cut
+#        is 15 and 16, so Z must not be read together with the byte after it.
+#   EQ Para EQ: Volume is a 15th control, one byte at offset 32, the last byte of the block. A two-byte
+#        read would run into the next block's state byte.
+DLY_FEEDBACK, DLY_TIME = 1, 2
+SWELLER_FX3 = 75
+PARA_EQ = 4
+EQ_EXTRA_PARAM = 14
+
+
+def _wide(rec: bytes, hi: int, lo: int) -> int:
+    return rec[hi] * 128 + rec[lo]
+
+
+def decode_params(rec: bytes, slot: str, code: int) -> list[int]:
+    """Param values of one block as the pedal stores them (raw, not shown units)."""
     off = BLOCK_OFFSETS[slot]
     params = [rec[off + 4 + 2 * i] | (rec[off + 5 + 2 * i] << 8) for i in range(PARAM_SLOTS)]
-    return {"on": rec[off] == 1, "code": rec[off + 1] * 128 + rec[off + 2], "params": params}
+    if slot == "dly":
+        params[DLY_FEEDBACK] = rec[off + 6]
+        params[DLY_TIME] = _wide(rec, off + 7, off + 8)
+    elif slot == "fx3" and code == SWELLER_FX3:
+        params[0] = _wide(rec, off + 3, off + 4)
+    elif slot == "cab":
+        params[4] = rec[off + 12]
+        params[5] = _wide(rec, off + 13, off + 14)
+        params[6] = _wide(rec, off + 15, off + 16)
+    elif slot == "eq" and code == PARA_EQ:
+        params.append(rec[off + 32])
+    return params
+
+
+def block_fields(rec: bytes, slot: str) -> dict:
+    """On/off, model code and the param values of one block (14, or 15 for Para EQ)."""
+    off = BLOCK_OFFSETS[slot]
+    code = rec[off + 1] * 128 + rec[off + 2]
+    return {"on": rec[off] == 1, "code": code, "params": decode_params(rec, slot, code)}
 
 
 def name_of(rec: bytes) -> str:

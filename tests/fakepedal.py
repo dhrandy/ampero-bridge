@@ -26,6 +26,9 @@ def make_record(idx, name, blocks=None, level=60):
         rec[off + 1], rec[off + 2] = code >> 7, code & 0x7F
         for i, v in enumerate(params):
             rec[off + 4 + 2 * i], rec[off + 5 + 2 * i] = v & 0xFF, v >> 8
+        if slot == "dly" and len(params) > 2:
+            # the pedal's real layout: Feedback is one byte, Time is two 7-bit halves right after it
+            rec[off + 6], rec[off + 7], rec[off + 8], rec[off + 9] = params[1], params[2] >> 7, params[2] & 0x7F, 0
     return bytes(rec)
 
 
