@@ -101,7 +101,9 @@ class Pedal:
             off = records.BLOCK_OFFSETS[SLOT_NAMES[body[1]]]
             if buf[off + 1] * 128 + buf[off + 2] == body[4] * 128 + body[5]:
                 i = body[6]
-                buf[off + 4 + 2 * i], buf[off + 5 + 2 * i] = body[8], body[7]
+                buf[off + 4 + 2 * i] = body[8]
+                if off + 5 + 2 * i < off + 33:       # Para EQ Volume is the last byte of its block
+                    buf[off + 5 + 2 * i] = body[7]
         elif body[:5] == bytes([0x10, 0x00, 0x00, 0x00, 0x01]):
             idx = body[5]
             name = body[6:6 + am.NAME_LEN]

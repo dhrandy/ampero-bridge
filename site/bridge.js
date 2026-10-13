@@ -13,7 +13,7 @@
     ['copy', 'Block copy', 'Copy one block from a preset onto another.'],
     ['backup', 'Backup and restore', 'Dump every patch to a file and put patches back.'],
     ['import', 'Import', 'Look inside a .prst file or load a bridge backup.'],
-    ['tone', 'Tone editor', 'Set amp and cab models and knobs on the pedal. Edit buffer only, never saves.']
+    ['tone', 'Tone editor', 'Set the model and knobs of any block on the pedal. Edit buffer only, never saves.']
   ];
   var COPY_BLOCKS = ['fx1', 'fx2', 'amp', 'cab', 'eq', 'dly', 'rvb'];
   var $ = function (id) { return document.getElementById(id); };

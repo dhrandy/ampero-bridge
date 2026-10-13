@@ -16,6 +16,7 @@ function recordHex(blocks, idx, name) {
   return b.map((x) => x.toString(16).padStart(2, '0')).join('');
 }
 
+const rec2 = (slot, code, set) => { const b = recordHex({ [slot]: [true, code, []] }, 3, 'T').match(/../g).map((h) => parseInt(h, 16)); set(b, T.OFFSETS[slot]); return b.map((x) => x.toString(16).padStart(2, '0')).join(''); };
 const tests = [];
 const test = (name, fn) => tests.push([name, fn]);
 
@@ -46,7 +47,8 @@ test('controlSpec: range, enum with labels, blocked', () => {
   assert.strictEqual(en.note, 'wire values are 0/1/2');
   assert.strictEqual(T.controlSpec({ kind: 'blocked', note: 'packed' }).type, 'blocked');
   assert.strictEqual(T.controlSpec(undefined).type, 'blocked');
-  assert.strictEqual(T.controlSpec({ kind: 'range', min: 0, max: 127, trust: 'unverified', editor_raw_max: 3980 }).wide, 3980);
+  const wide = T.controlSpec({ kind: 'range', min: 0, max: 127, trust: 'unverified', editor_raw_max: 3980 });
+  assert.strictEqual(wide.type, 'blocked'); assert.ok(wide.note.includes('14-bit'));
   assert.strictEqual(T.controlSpec({ kind: 'range', min: 0, max: 5, trust: 'unverified' }).trust, 'unverified');
 });
 
@@ -96,6 +98,62 @@ test('the panel offers no save, backup or restore control', () => {
   const src = fs.readFileSync(path.join(__dirname, '..', 'site', 'tone.js'), 'utf8');
   assert.ok(!/\/api\/(patch\/save|backup|restore|block\/copy|midi)/.test(src));
   assert.ok(!/[\u2014\u2013]/.test(src));
+});
+
+test('every block is offered, amp and cab first', () => {
+  assert.deepStrictEqual(T.BLOCKS.map((b) => b.slot), ['amp', 'cab', 'fx1', 'fx2', 'fx3', 'dly', 'rvb', 'nr', 'eq']);
+  const data = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'site', 'models.json'), 'utf8'));
+  const counts = {}; T.BLOCKS.forEach((b) => { counts[b.slot] = T.modelsFor(data, b.key).length; });
+  assert.deepStrictEqual(counts, { amp: 60, cab: 70, fx1: 60, fx2: 60, fx3: 30, dly: 17, rvb: 11, nr: 2, eq: 7 });
+  T.BLOCKS.forEach((b) => assert.ok(T.OFFSETS[b.slot] > 0));
+});
+
+test('decoders match the bridge: delay feedback and time, sweller attack, cab z and cuts, para eq volume', () => {
+  let r = T.parseRecord(rec2('dly', 0, (b, o) => { b[o + 6] = 50; b[o + 7] = 3; b[o + 8] = 46; }));
+  assert.strictEqual(r.blocks.dly.params[1], 50); assert.strictEqual(r.blocks.dly.params[2], 430);
+  r = T.parseRecord(rec2('dly', 16, (b, o) => { b[o + 6] = 20; b[o + 7] = 3; b[o + 8] = 96; }));
+  assert.deepStrictEqual([r.blocks.dly.params[1], r.blocks.dly.params[2]], [20, 480]);
+  r = T.parseRecord(rec2('fx3', 75, (b, o) => { b[o + 3] = 7; b[o + 4] = 24; }));
+  assert.strictEqual(r.blocks.fx3.params[0], 920);
+  r = T.parseRecord(rec2('fx3', 6, (b, o) => { b[o + 3] = 7; b[o + 4] = 24; }));
+  assert.strictEqual(r.blocks.fx3.params[0], 24);
+  r = T.parseRecord(rec2('cab', 5, (b, o) => { b[o + 12] = 100; b[o + 13] = 15; b[o + 14] = 61; b[o + 15] = 14; b[o + 16] = 9; }));
+  assert.deepStrictEqual(r.blocks.cab.params.slice(4, 7), [100, 1981, 1801]);
+  r = T.parseRecord(rec2('eq', 4, (b, o) => { b[o + 32] = 50; }));
+  assert.strictEqual(r.blocks.eq.params.length, 15); assert.strictEqual(r.blocks.eq.params[14], 50);
+  r = T.parseRecord(rec2('eq', 1, (b, o) => { b[o + 32] = 50; }));
+  assert.strictEqual(r.blocks.eq.params.length, 14);
+});
+
+const blockedRule = { kind: 'blocked', note: 'not swept', verify_range: { min: 0, max: 24 } };
+
+test('verify-only params are offered only when the bridge reports verify mode', () => {
+  assert.strictEqual(T.controlSpec(blockedRule, [], false).type, 'blocked');
+  assert.strictEqual(T.controlSpec(blockedRule, undefined, undefined).type, 'blocked');
+  const on = T.controlSpec(blockedRule, [], true);
+  assert.deepStrictEqual([on.type, on.min, on.max, on.verify, on.trust], ['range', 0, 24, true, 'verify mode']);
+  assert.strictEqual(T.checkValue(on, '24'), null); assert.ok(T.checkValue(on, '25'));
+  const en = T.controlSpec({ kind: 'blocked', verify_range: { allowed: [0, 1] } }, [], true);
+  assert.deepStrictEqual(en.options.map((o) => o.value), [0, 1]);
+  assert.strictEqual(T.controlSpec({ kind: 'blocked', note: 'packed cab field' }, [], true).type, 'blocked');
+});
+
+test('a Rate that follows a Sync switch goes through verify mode and says so', () => {
+  const rate = { kind: 'range', min: 0, max: 100, trust: 'proven', sync_param: 4, synced_values: [0, 10, 20] };
+  const on = T.controlSpec(rate, [], true);
+  assert.strictEqual(on.verify, true); assert.ok(on.note.includes('0, 10, 20'));
+  const off = T.controlSpec({ kind: 'range', min: 0, max: 100, trust: 'proven' }, [], true);
+  assert.strictEqual(off.verify, false);
+  assert.strictEqual(T.controlSpec(Object.assign({}, rate, { sync_param: -1 }), [], true).type, 'blocked');
+});
+
+test('a normal param is not sent through verify mode', () => {
+  assert.strictEqual(T.controlSpec({ kind: 'range', min: 0, max: 100, trust: 'unverified' }, [], true).verify, false);
+});
+
+test('the panel sends verify:true only for verify specs', () => {
+  const src = fs.readFileSync(path.join(__dirname, '..', 'site', 'tone.js'), 'utf8');
+  assert.ok(/if \(spec\.verify\) b\.verify = true; else b\.unverified_ok = true;/.test(src));
 });
 
 let failed = 0;

@@ -52,8 +52,8 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
 .tbanner{margin:12px 0 0;padding:10px 12px;border:1px solid var(--acc);border-radius:8px;background:rgba(240,180,41,.1);font-size:14px}
 .tpatch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;margin-bottom:0}
 .tpatch .lbl{font-weight:700;font-variant-numeric:tabular-nums;margin-right:6px}
-.seg{display:flex;gap:8px}
-.seg .pbtn{flex:1}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg .pbtn{flex:1 0 auto}
 .trow{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
 .trow .msg{margin:4px 0 0}
 .thead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
@@ -69,3 +69,4 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
 @media(max-width:560px){dialog{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:0}.patch{grid-template-columns:auto 1fr auto}.patch .copy{grid-column:1/-1}}
 .list2 .mono{word-break:break-all}
 .chipx{white-space:nowrap;display:inline-block}
+.tchips{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}

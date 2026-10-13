@@ -12,7 +12,11 @@
   'use strict';
 
   var OFFSETS = { fx1: 95, fx2: 128, amp: 161, nr: 194, cab: 227, eq: 260, fx3: 293, dly: 326, rvb: 359 };
-  var BLOCKS = [{ slot: 'amp', key: 'AMP', label: 'Amp' }, { slot: 'cab', key: 'CAB', label: 'Cab' }];
+  var BLOCKS = [{ slot: 'amp', key: 'AMP', label: 'Amp' }, { slot: 'cab', key: 'CAB', label: 'Cab' },
+    { slot: 'fx1', key: 'FX1', label: 'FX1' }, { slot: 'fx2', key: 'FX2', label: 'FX2' }, { slot: 'fx3', key: 'FX3', label: 'FX3' },
+    { slot: 'dly', key: 'DLY', label: 'Delay' }, { slot: 'rvb', key: 'RVB', label: 'Reverb' },
+    { slot: 'nr', key: 'NR', label: 'Noise gate' }, { slot: 'eq', key: 'EQ', label: 'EQ' }];
+  var SWELLER = 75, PARA_EQ = 4, UNPAIRED = -1;
   var PARAM_SLOTS = 14, RECORD_LEN = 460, GAP_MS = 700, SETTLE_MS = 900;
 
   function patchLabel(i) { return 'P' + (Math.floor(i / 3) + 1) + '-' + (i % 3 + 1); }
@@ -25,11 +29,24 @@
     for (i = 4; i < 22 && b[i]; i++) name += String.fromCharCode(b[i]);
     var out = { index: b[1], label: patchLabel(b[1]), name: name, blocks: {} };
     Object.keys(OFFSETS).forEach(function (slot) {
-      var o = OFFSETS[slot], params = [];
-      for (var p = 0; p < PARAM_SLOTS; p++) params.push(b[o + 4 + 2 * p] | (b[o + 5 + 2 * p] << 8));
-      out.blocks[slot] = { on: b[o] === 1, code: b[o + 1] * 128 + b[o + 2], params: params };
+      var o = OFFSETS[slot], code = b[o + 1] * 128 + b[o + 2];
+      out.blocks[slot] = { on: b[o] === 1, code: code, params: decodeParams(b, slot, o, code) };
     });
     return out;
+  }
+
+  /* The same field ownership as records.decode_params in the bridge (2.9.3). Most params are two bytes,
+     low first. Delay Feedback is one byte and Time is 14 bits right after it. Sweller Attack is 14 bits,
+     high half before slot 0. Cab Z is one byte and the two cuts are 14 bits. Para EQ has a 15th control,
+     Volume, as the last byte of its block. */
+  function decodeParams(b, slot, o, code) {
+    var params = [], wide = function (hi, lo) { return b[o + hi] * 128 + b[o + lo]; };
+    for (var p = 0; p < PARAM_SLOTS; p++) params.push(b[o + 4 + 2 * p] | (b[o + 5 + 2 * p] << 8));
+    if (slot === 'dly') { params[1] = b[o + 6]; params[2] = wide(7, 8); }
+    else if (slot === 'fx3' && code === SWELLER) params[0] = wide(3, 4);
+    else if (slot === 'cab') { params[4] = b[o + 12]; params[5] = wide(13, 14); params[6] = wide(15, 16); }
+    else if (slot === 'eq' && code === PARA_EQ) params.push(b[o + 32]);
+    return params;
   }
 
   function modelsFor(data, key) {
@@ -49,18 +66,34 @@
   // Notes the bridge leaves over from deriving a rule that a hand-written rule then replaced.
   function cleanNote(n) { return n && n !== 'no range in the map' ? n : ''; }
 
-  /* One control description per param, from the bridge's rule for it. */
-  function controlSpec(rule, labels) {
-    if (!rule || rule.kind === 'blocked') return { type: 'blocked', note: (rule && rule.note) || 'The bridge cannot write this one yet.' };
-    var trust = rule.trust === 'proven' ? 'verified' : 'unverified';
-    if (rule.kind === 'enum') {
-      var allowed = rule.allowed || [];
+  /* One control description per param, from the bridge's rule for it.
+     verifyMode is the bridge's own verify_mode flag from /api/rules. A param the strict rules block but
+     the vendor editor documents (rule.verify_range) is only offered when it is true, and is written with
+     verify:true. So is a Rate that follows a Sync switch, because only verify mode checks that pairing. */
+  function controlSpec(rule, labels, verifyMode) {
+    if (!rule) return { type: 'blocked', note: 'The bridge cannot write this one yet.' };
+    var viaVerify = false, kind = rule.kind, trust = rule.trust === 'proven' ? 'verified' : 'unverified', lo = rule.min, hi = rule.max, allowed = rule.allowed;
+    if (kind === 'blocked') {
+      if (!(verifyMode && rule.verify_range)) return { type: 'blocked', note: rule.note || 'The bridge cannot write this one yet.' };
+      viaVerify = true; trust = 'verify mode'; rule = Object.assign({}, rule, { note: '' });
+      if (rule.verify_range.allowed) { kind = 'enum'; allowed = rule.verify_range.allowed; }
+      else { kind = 'range'; lo = rule.verify_range.min; hi = rule.verify_range.max; }
+    }
+    if (rule.editor_raw_max) return { type: 'blocked', note: 'A 14-bit value (0 to ' + rule.editor_raw_max + '). The bridge has no 14-bit writer yet.' };
+    var syncNote = '';
+    if (verifyMode && rule.sync_param !== undefined && rule.sync_param !== null) {
+      if (rule.sync_param === UNPAIRED) return { type: 'blocked', note: 'The map cannot tie this Rate to one Sync switch, so verify mode will not write it.' };
+      viaVerify = true;
+      syncNote = 'With Sync on, Rate takes only the steps ' + (rule.synced_values || []).join(', ') + '. The bridge reads Sync first.';
+    }
+    var note = [cleanNote(rule.note), syncNote].filter(Boolean).join(' ');
+    if (kind === 'enum') {
       return {
-        type: 'enum', trust: trust, note: cleanNote(rule.note),
-        options: allowed.map(function (v) { return { value: v, label: labels && labels.length > v && labels[v] ? labels[v] : String(v) }; })
+        type: 'enum', trust: trust, verify: viaVerify, note: note,
+        options: (allowed || []).map(function (v) { return { value: v, label: labels && labels.length > v && labels[v] ? labels[v] : String(v) }; })
       };
     }
-    return { type: 'range', trust: trust, min: rule.min, max: rule.max, note: cleanNote(rule.note), wide: rule.editor_raw_max || null };
+    return { type: 'range', trust: trust, verify: viaVerify, min: lo, max: hi, note: note, wide: null };
   }
 
   /* A preflight only. The bridge decides; this just avoids sending a value it will refuse. */
@@ -101,7 +134,7 @@
   /* ---- the panel -------------------------------------------------------------------- */
 
   function mount(el, ctx) {
-    var S = { slot: 'amp', patch: null, rules: null, spec: {}, code: null, busy: false, status: '', bad: false, last: 0 };
+    var S = { slot: 'amp', patch: null, rules: null, spec: {}, code: null, busy: false, status: '', bad: false, last: 0, verifyMode: false };
     var esc = ctx.esc;
 
     function blockInfo() { return BLOCKS.filter(function (b) { return b.slot === S.slot; })[0]; }
@@ -127,10 +160,11 @@
     }
 
     function buildSpecs() {
+      S.verifyMode = S.rules.verify_mode === true;
       var model = findModel(ctx.models(), blockInfo().key, S.code);
       S.spec = {};
       Object.keys(S.rules.params).forEach(function (p) {
-        S.spec[p] = controlSpec(S.rules.params[p], optionLabels(model, Number(p)));
+        S.spec[p] = controlSpec(S.rules.params[p], optionLabels(model, Number(p)), S.verifyMode);
       });
     }
 
@@ -153,7 +187,7 @@
     function paramRow(p) {
       var spec = S.spec[p], blk = S.patch.blocks[S.slot], cur = blk.params[Number(p)];
       var name = (S.rules.params[p] && S.rules.params[p].name) || ('Param ' + p);
-      var h = '<div class="trow" data-p="' + p + '"><div class="thead"><b>' + esc(name) + '</b><span class="chipx ' + (spec.trust === 'verified' ? 'ok' : spec.trust ? 'warn' : '') + '">' + esc(spec.trust || 'blocked') + '</span></div>';
+      var h = '<div class="trow" data-p="' + p + '"><div class="thead"><b>' + esc(name) + '</b><span class="tchips"><span class="chipx ' + (spec.trust === 'verified' ? 'ok' : spec.trust ? 'warn' : '') + '">' + esc(spec.trust || 'blocked') + '</span>' + (spec.verify ? '<span class="chipx warn">verify:true</span>' : '') + '</span></div>';
       if (spec.type === 'blocked') return h + '<div class="msg">' + esc(spec.note) + '</div></div>';
       h += '<div class="tctl">';
       if (spec.type === 'enum') {
@@ -167,7 +201,7 @@
       }
       h += '<button type="button" class="pbtn" id="tone-set' + p + '" data-set="' + p + '">Set</button></div>';
       h += '<div class="msg">' + (spec.type === 'range' ? 'Range ' + spec.min + ' to ' + spec.max + '. ' : '') + 'Pedal has <span id="tone-cur' + p + '">' + cur + '</span>. ' + esc(spec.note || '') +
-        (spec.wide ? ' The pedal goes to ' + spec.wide + ' but this bridge sends 0 to ' + spec.max + ' for now.' : '') + '</div><div class="msg" id="tone-m' + p + '" role="status"></div></div>';
+        (spec.verify ? ' Written in verify mode.' : '') + '</div><div class="msg" id="tone-m' + p + '" role="status"></div></div>';
       return h;
     }
 
@@ -185,6 +219,7 @@
           '<button type="button" class="pbtn pri" id="tone-model-set">Set model</button></div>' +
           '<div class="msg">' + info.label + ' block is ' + (blk.on ? 'on' : 'off') + ' on the pedal. Setting a model resets that block\'s knobs to the model defaults.</div></div>';
         h += '<div class="sect">Parameters</div>';
+        if (S.verifyMode) h += '<div class="msg">Verify mode is on for this bridge. Params marked verify:true are checked against the vendor ranges, and a synced Rate takes only division steps.</div>';
         h += S.rules ? Object.keys(S.spec).sort(function (a, b) { return a - b; }).map(paramRow).join('') : '<div class="empty">No rules for this model.</div>';
       }
       h += '<div class="msg" id="tone-status" role="status"></div>';
@@ -214,7 +249,7 @@
       var value = Number(raw), code = S.code;
       lock(true);
       msg.textContent = 'Writing...'; msg.className = 'msg';
-      call('/api/param', { slot: S.slot, model_code: code, param: Number(p), value: value, unverified_ok: true })
+      call('/api/param', (function () { var b = { slot: S.slot, model_code: code, param: Number(p), value: value }; if (spec.verify) b.verify = true; else b.unverified_ok = true; return b; })())
         .then(function () { return sleep(SETTLE_MS); }).then(readPatch).then(function (rec) {
           var r = readBack(rec, S.slot, code, Number(p), value);
           msg.textContent = r.text; msg.className = 'msg ' + (r.ok ? 'good' : 'bad');
@@ -241,6 +276,6 @@
     return { show: function () { render(); if (ctx.connected()) refresh(); }, state: S };
   }
 
-  return { parseRecord: parseRecord, modelsFor: modelsFor, findModel: findModel, controlSpec: controlSpec, checkValue: checkValue,
+  return { parseRecord: parseRecord, modelsFor: modelsFor, findModel: findModel, controlSpec: controlSpec, decodeParams: decodeParams, checkValue: checkValue,
     readBack: readBack, errorText: errorText, optionLabels: optionLabels, patchLabel: patchLabel, mount: mount, BLOCKS: BLOCKS, OFFSETS: OFFSETS };
 });
