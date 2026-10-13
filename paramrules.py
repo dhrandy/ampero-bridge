@@ -27,10 +27,20 @@ import ampero_mini as am
 log = logging.getLogger("ampero-bridge")
 
 MAX_RAW = 127   # the largest value the 7-bit param frame carries (phase 1)
-PROVEN, UNVERIFIED, BLOCKED = "proven", "unverified", "blocked"
+PROVEN, UNVERIFIED, BLOCKED, DOCUMENTED = "proven", "unverified", "blocked", "documented"
 MODE = os.environ.get("AMPERO_VALIDATE", "strict").strip().lower()
 if MODE not in ("strict", "warn", "off"):
     MODE = "strict"
+
+
+# Verify mode (docs/verify-mode.md). Off unless AMPERO_VERIFY_MODE=1 and then only for a write that says
+# "verify": true. It never changes the strict path above. It admits params whose range comes from the
+# vendor editor database or manual (including ones the map still marks "unswept"), and it holds a
+# synced Rate to the eleven division steps the map documents.
+VERIFY_ENABLED = os.environ.get("AMPERO_VERIFY_MODE", "").strip() == "1"
+DIVISIONS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]   # 1/1 .. 1/16 stored as index x 10
+SYNC_ON = 1
+UNPAIRED = -1          # a Rate in a model with a Sync switch the map cannot tie to it
 
 
 class ValueRejected(am.ProtocolError):
@@ -83,7 +93,11 @@ def _derive(entry: dict) -> dict:
     status = entry.get("status")
     trust = PROVEN if status == "write-verified" else UNVERIFIED
     if status == "unswept":
-        return {"kind": "blocked", "note": "not swept"}
+        rule = {"kind": "blocked", "note": "not swept"}
+        doc = _documented(entry)
+        if doc:
+            rule["verify_rule"] = doc
+        return rule
     vr = entry.get("valid_range")
     enum = entry.get("editor_enum")
     ed = entry.get("editor_definition") or {}
@@ -115,6 +129,17 @@ def _derive(entry: dict) -> dict:
     return {"kind": "range", "lo": lo, "hi": hi, "trust": trust}
 
 
+def _documented(entry: dict) -> dict | None:
+    """A range or enum taken from the vendor editor database, for an entry the map has not swept."""
+    ed = entry.get("editor_definition")
+    if not ed:
+        return None
+    probe = _derive({**entry, "status": "editor-defined", "valid_range": entry.get("valid_range")})
+    if probe["kind"] not in ("range", "enum") or probe.get("wide"):
+        return None
+    return {**probe, "trust": DOCUMENTED, "note": "range from the vendor editor database, never written on the pedal"}
+
+
 def build(map_path: str | None = None) -> dict:
     """{(slot, model_code, param): rule}. Cab entries are keyed with model_code 'ALL'."""
     path = map_path or _map_path()
@@ -129,6 +154,18 @@ def build(map_path: str | None = None) -> dict:
                 rule["name"] = entry.get("name")
                 rule["model"] = model.get("name")
                 table[(slot, key_code, int(p))] = rule
+    for slot, block in data["blocks"].items():
+        for code, model in block["models"].items():
+            key_code = "ALL" if code == "ALL" else int(code)
+            names = {int(p): e.get("name") for p, e in model["params"].items()}
+            has_sync = any(n and "Sync" in n for n in names.values())
+            for rp, rn in names.items():
+                if not rn or not rn.endswith("Rate") or not has_sync:
+                    continue
+                # "Rate" pairs with "Sync", "Flg Rate" with "Flg Sync". Anything else is left unresolved,
+                # and verify mode refuses a Rate it cannot pair (Sweep Eko, 2290 Mod).
+                mine = [p for p, n in names.items() if n == rn[:-4] + "Sync"]
+                table[(slot, key_code, rp)]["sync_param"] = mine[0] if len(mine) == 1 else UNPAIRED
     for key, rule in OVERRIDES.items():
         base = table.get(key, {})
         merged = {**base, **rule}
@@ -159,6 +196,12 @@ def _view(rule: dict) -> dict:
             out["editor_raw_max"] = rule["wide"]
     elif rule["kind"] == "enum":
         out["allowed"] = rule["allowed"]
+    if VERIFY_ENABLED:
+        if rule.get("verify_rule"):
+            v = rule["verify_rule"]
+            out["verify_range"] = {"min": v["lo"], "max": v["hi"]} if v["kind"] == "range" else {"allowed": v["allowed"]}
+        if rule.get("sync_param") is not None:
+            out["sync_param"], out["synced_values"] = rule["sync_param"], DIVISIONS
     return out
 
 
@@ -173,7 +216,7 @@ def rules_view(slot: str, model_code: int) -> dict:
     if not params:
         raise LookupError(f"no rules for {slot} model {model_code}")
     model = next((r.get("model") for (s, c, _), r in RULES.items() if s == slot and c == model_code), None)
-    return {"slot": slot, "model_code": model_code, "model": model, "mode": MODE, "params": params,
+    return {"slot": slot, "model_code": model_code, "model": model, "mode": MODE, "verify_mode": VERIFY_ENABLED, "params": params,
             "note": "values are raw wire values; unverified params need \"unverified_ok\": true"}
 
 
@@ -223,3 +266,51 @@ def _check(slot, model_code, param, value, unverified_ok):
         _reject("unverified", f"{rule.get('name')} ({slot} {rule.get('model')} p{param}) is not "
                 "write-verified on the pedal; send \"unverified_ok\": true to write it anyway",
                 slot, model_code, param, value, rule)
+
+
+def validate_verify(slot, model_code: int, param: int, value: int, read_sync=None) -> int:
+    """Verify-mode check for one write. Returns the value to send or raises ValueRejected.
+
+    Always runs in full, whatever AMPERO_VALIDATE says. `read_sync(param)` returns the Sync switch of the
+    block as the pedal holds it now, or None when it cannot be read; a Rate that follows a Sync switch is
+    refused when the state is unknown.
+    """
+    if not VERIFY_ENABLED:
+        raise ValueRejected("verify mode is off on this bridge (set AMPERO_VERIFY_MODE=1 to turn it on)",
+                            reason="verify_mode_off")
+    if not isinstance(slot, str) or slot not in am.SLOTS:
+        raise ValueRejected(f"unknown slot {slot!r}", reason="unknown_slot", slot=str(slot))
+    rule = rule_for(slot, model_code, param)
+    if rule is None:
+        _reject("unknown_param", f"no rule for {slot} model {model_code} param {param}: refused",
+                slot, model_code, param, value)
+    eff = rule.get("verify_rule") if rule["kind"] == "blocked" else rule
+    if not eff or eff["kind"] == "blocked":
+        _reject("blocked_param", f"{rule.get('name') or 'param'} ({slot} {rule.get('model') or model_code} "
+                f"p{param}) has no documented range, so verify mode will not write it: "
+                f"{rule.get('note', 'no safe rule')}", slot, model_code, param, value, rule)
+    if rule.get("wide"):
+        _reject("wide_param", f"{rule.get('name')} ({slot} {rule.get('model')} p{param}) is a "
+                f"0-{rule['wide']} value and the bridge has no 14-bit writer, so verify mode will not write it",
+                slot, model_code, param, value, rule)
+    if eff["kind"] == "enum":
+        if value not in eff["allowed"]:
+            _reject("not_in_enum", f"{value} is not allowed for {rule.get('name')} ({slot} {rule.get('model')} "
+                    f"p{param}); allowed {eff['allowed']}", slot, model_code, param, value, rule)
+    elif not eff["lo"] <= value <= eff["hi"]:
+        _reject("out_of_range", f"{value} is outside {eff['lo']}-{eff['hi']} for {rule.get('name')} "
+                f"({slot} {rule.get('model')} p{param})", slot, model_code, param, value, rule)
+    sync_param = rule.get("sync_param")
+    if sync_param == UNPAIRED:
+        _reject("sync_unknown", f"{rule.get('name')} ({slot} {rule.get('model')} p{param}) sits in a model "
+                "whose Sync switch the map cannot tie to this Rate, so it is not written", slot, model_code,
+                param, value, rule)
+    if sync_param is not None:
+        state = read_sync(sync_param) if read_sync else None
+        if state is None:
+            _reject("sync_unknown", f"cannot tell whether Sync is on for {rule.get('model')}, so "
+                    f"{rule.get('name')} is not written", slot, model_code, param, value, rule)
+        if state == SYNC_ON and value not in DIVISIONS:
+            _reject("not_a_division", f"Sync is on, so {rule.get('name')} takes a division step "
+                    f"{DIVISIONS}, not {value}", slot, model_code, param, value, rule, sync=True)
+    return value

@@ -620,6 +620,28 @@ def read_patch(index: int) -> dict:
     return got
 
 
+def verify_param(slot, code: int, param: int, value: int, proven) -> dict:
+    """One verify-mode param write (docs/verify-mode.md). The strict path never gets here."""
+    if not paramrules.VERIFY_ENABLED:
+        paramrules.validate_verify(slot, code, param, value)        # raises verify_mode_off
+    if proven is None or code not in proven:         # not bypassable, unlike AMPERO_ALLOW_UNPROVEN_MODELS
+        raise paramrules.ValueRejected(
+            f"model code {code} is not proven for slot {slot!r}, so verify mode does not write its params",
+            reason="model_not_proven", slot=slot, model_code=code)
+
+    def read_sync(sync_param):
+        f = records.block_fields(_record(read_current_patch()), slot)
+        if f["code"] != code:
+            raise paramrules.ValueRejected(
+                f"{slot} holds model {f['code']} on the pedal, not {code}", reason="model_mismatch",
+                slot=slot, model_code=code, held=f["code"])
+        return f["params"][sync_param] if sync_param < len(f["params"]) else None
+
+    paramrules.validate_verify(slot, code, param, value, read_sync)
+    send_sysex([am.param_set(slot, code, param, value)], "param")
+    return {"ok": True, "verify": True}
+
+
 def send_midi(msg: bytes, name: str):
     gate.run(False, lambda: link.session(name, lambda p: p.send_midi(msg)))
 
@@ -996,6 +1018,8 @@ def handle_post(path: str, data: dict) -> dict:
             raise paramrules.ValueRejected(f"value must be a whole number, got {data['value']!r}",
                                            reason="not_an_integer", value=str(data["value"]))
         proven = PROVEN_MODELS.get(slot) if isinstance(slot, str) else None
+        if data.get("verify") is True:
+            return verify_param(slot, code, param, value, proven)
         if paramrules.MODE != "off" and not ALLOW_UNPROVEN and slot in am.SLOTS and \
                 (proven is None or code not in proven):
             raise paramrules.ValueRejected(
@@ -1036,7 +1060,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.9.3"
+    server_version = "ampero-bridge/2.10.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
