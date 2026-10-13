@@ -26,7 +26,7 @@ def test_site_files_carry_no_personal_data():
     import re
     patterns = [r"[\w.+-]+@[\w-]+\.[a-z]{2,}", r"\b(10|192\.168|172\.(1[6-9]|2\d|3[01]))\.\d+\.\d+(\.\d+)?\b",
                 r"\.(local|lan|internal)\b", r"/(home|users|mnt|volume\d*)/\w+"]
-    for name in ("index.html", "bridge.js", "bridge.css", "info.json"):
+    for name in ("index.html", "bridge.js", "bridge.css", "info.json", "tone.js"):
         text = open(os.path.join(SITE, name), encoding="utf-8").read().lower()
         for pat in patterns:
             assert not re.search(pat, text), (name, pat)

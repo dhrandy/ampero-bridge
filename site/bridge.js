@@ -12,14 +12,16 @@
     ['favorites', 'Favorites', 'Stars on presets and models, kept on the bridge so every browser sees them.'],
     ['copy', 'Block copy', 'Copy one block from a preset onto another.'],
     ['backup', 'Backup and restore', 'Dump every patch to a file and put patches back.'],
-    ['import', 'Import', 'Look inside a .prst file or load a bridge backup.']
+    ['import', 'Import', 'Look inside a .prst file or load a bridge backup.'],
+    ['tone', 'Tone editor', 'Set amp and cab models and knobs on the pedal. Edit buffer only, never saves.']
   ];
   var COPY_BLOCKS = ['fx1', 'fx2', 'amp', 'cab', 'eq', 'dly', 'rvb'];
   var $ = function (id) { return document.getElementById(id); };
 
   var state = {
     url: '', key: '', remember: false,
-    features: { details: true, favorites: true, copy: true, backup: true, import: true },
+    features: { details: true, favorites: true, copy: true, backup: true, import: true, tone: true },
+    modelData: null, tone: null,
     connected: false, favPatches: {}, favModels: {}, known: [], models: null,
     onlyStarred: false, tab: 'models', hooks: {}
   };
@@ -74,6 +76,7 @@
         if (!r.ok) {
           var e = new Error(j.error || ('The bridge answered ' + r.status));
           e.status = r.status;
+          e.detail = j;
           throw e;
         }
         return j;
@@ -105,6 +108,7 @@
   }
 
   function setModels(data) {
+    state.modelData = data;
     var map = {};
     (data.blocks || []).forEach(function (b) {
       b.models.forEach(function (m) { if (m.code !== null && m.code !== undefined) map[b.block + ':' + m.code] = m.name; });
@@ -174,7 +178,9 @@
     gear.querySelector('.dot').className = 'dot' + (state.connected ? ' on' : '');
     var showTabs = state.connected && anyFeature();
     $('tabs').hidden = !showTabs;
-    if (!showTabs && state.tab !== 'models') selectTab('models');
+    var toneTab = $('tabs').querySelector('[data-tab=tone]');
+    if (toneTab) toneTab.hidden = !state.features.tone || !window.AmperoTone;
+    if ((!showTabs || (state.tab === 'tone' && toneTab && toneTab.hidden)) && state.tab !== 'models') selectTab('models');
     var starFilter = $('starfilter');
     if (starFilter) starFilter.hidden = !(state.connected && state.features.favorites);
     if (!(state.connected && state.features.favorites)) state.onlyStarred = false;
@@ -185,7 +191,9 @@
     [].forEach.call($('tabs').children, function (b) { b.setAttribute('aria-selected', b.dataset.tab === name); });
     $('view-models').hidden = name !== 'models';
     $('view-presets').hidden = name !== 'presets';
+    $('view-tone').hidden = name !== 'tone';
     if (name === 'presets') refreshPresets();
+    if (name === 'tone') showTone();
   }
 
   function openSettings() {
@@ -237,7 +245,8 @@
     var tabs = document.createElement('div');
     tabs.id = 'tabs'; tabs.className = 'tabs'; tabs.hidden = true; tabs.setAttribute('role', 'tablist');
     tabs.innerHTML = '<button type="button" class="tab" role="tab" data-tab="models" aria-selected="true">Models</button>' +
-      '<button type="button" class="tab" role="tab" data-tab="presets" aria-selected="false">Presets</button>';
+      '<button type="button" class="tab" role="tab" data-tab="presets" aria-selected="false">Presets</button>' +
+      '<button type="button" class="tab" role="tab" data-tab="tone" aria-selected="false" hidden>Tone</button>';
     tabs.onclick = function (e) { var t = e.target.closest('.tab'); if (t) selectTab(t.dataset.tab); };
     var wrap = document.querySelector('.top').nextElementSibling;
     wrap.insertBefore(tabs, wrap.firstChild);
@@ -245,6 +254,9 @@
     var presets = document.createElement('div');
     presets.id = 'view-presets'; presets.className = 'pane'; presets.hidden = true;
     wrap.insertBefore(presets, wrap.querySelector('footer'));
+    var tone = document.createElement('div');
+    tone.id = 'view-tone'; tone.className = 'pane'; tone.hidden = true;
+    wrap.insertBefore(tone, wrap.querySelector('footer'));
 
     var dlg = document.createElement('dialog');
     dlg.id = 'settings';
@@ -282,6 +294,18 @@
       if (b) toggleStar('model', b.dataset.starModel, b);
     });
     document.addEventListener('visibilitychange', function () { if (!document.hidden) loadFavorites().catch(function () {}); });
+  }
+
+  // ---- tone pane (the logic is in tone.js) ----------------------------------------------------
+
+  function showTone() {
+    if (!window.AmperoTone) return;
+    if (!state.tone) {
+      state.tone = window.AmperoTone.mount($('view-tone'), {
+        api: api, esc: esc, models: function () { return state.modelData; }, connected: function () { return state.connected; }
+      });
+    }
+    state.tone.show();
   }
 
   // ---- presets pane -------------------------------------------------------------------------
