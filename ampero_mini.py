@@ -132,12 +132,13 @@ def param_set(slot: str | int, model_code: int, param: int, value: int) -> bytes
     """Set one parameter:  10 AA 00 02 HH LL SS HI LO
 
     HH LL is the model code the slot currently holds, SS the parameter number
-    in the manual's order for that model. Only 0-127 values have been seen on
-    the wire, so that is all this accepts.
+    in the manual's order for that model. HI LO holds a 14-bit raw value.
+    Model-specific safety limits belong to paramrules, not this encoder.
     """
     hi, lo = split14(model_code)
+    vhi, vlo = split14(value)
     return frame(KIND_DATA, bytes([0x10, _slot(slot), 0x00, 0x02, hi, lo,
-                                   _check7(param, "param"), 0x00, _check7(value, "value")]))
+                                   _check7(param, "param"), vhi, vlo]))
 
 
 def encode_name(name: str) -> bytes:

@@ -156,6 +156,18 @@ test('the panel sends verify:true only for verify specs', () => {
   assert.ok(/if \(spec\.verify\) b\.verify = true; else b\.unverified_ok = true;/.test(src));
 });
 
+test('read-confirmed wide controls render bounded inputs, not an old writer warning', () => {
+  const c = T.controlSpec({kind: 'range', min: 0, max: 3980, trust: 'unverified',
+    sync_param: 3, synced_values: [0, 398, 796]}, [], true);
+  assert.strictEqual(c.type, 'range');
+  assert.strictEqual(c.max, 3980);
+  assert.strictEqual(c.verify, true);
+  assert.ok(c.note.includes('398'));
+  const unknown = T.controlSpec({kind: 'range', min: 0, max: 1980,
+    sync_param: 3, synced_values: []}, [], true);
+  assert.ok(unknown.note.includes('Turn Sync off'));
+});
+
 let failed = 0;
 tests.forEach(([name, fn]) => { try { fn(); console.log('ok   ' + name); } catch (e) { failed++; console.log('FAIL ' + name + '\n' + e.stack); } });
 process.exit(failed ? 1 : 0);

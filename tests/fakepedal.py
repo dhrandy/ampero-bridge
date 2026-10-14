@@ -26,10 +26,31 @@ def make_record(idx, name, blocks=None, level=60):
         rec[off + 1], rec[off + 2] = code >> 7, code & 0x7F
         for i, v in enumerate(params):
             rec[off + 4 + 2 * i], rec[off + 5 + 2 * i] = v & 0xFF, v >> 8
-        if slot == "dly" and len(params) > 2:
-            # the pedal's real layout: Feedback is one byte, Time is two 7-bit halves right after it
-            rec[off + 6], rec[off + 7], rec[off + 8], rec[off + 9] = params[1], params[2] >> 7, params[2] & 0x7F, 0
+        for i, value in enumerate(params):
+            store_param(rec, slot, code, i, value)
     return bytes(rec)
+
+
+def store_param(buf, slot, code, param, value):
+    """Synthetic record storage, matching the captured read layout (not a hardware oracle)."""
+    off = records.BLOCK_OFFSETS[slot]
+    if slot == "dly" and param == 1:
+        buf[off + 6] = value
+    elif slot == "dly" and param == 2:
+        buf[off + 7], buf[off + 8] = am.split14(value)
+        buf[off + 9] = 0
+    elif slot == "fx3" and code == 75 and param == 0:
+        buf[off + 3], buf[off + 4] = am.split14(value)
+        buf[off + 5] = 0
+    elif slot == "cab" and param == 4:
+        buf[off + 12] = value
+    elif slot == "cab" and param in (5, 6):
+        hi = off + (13 if param == 5 else 15)
+        buf[hi], buf[hi + 1] = am.split14(value)
+    else:
+        buf[off + 4 + 2 * param] = value & 255
+        if off + 5 + 2 * param < off + 33:
+            buf[off + 5 + 2 * param] = value >> 8
 
 
 def default_params(code):
@@ -100,10 +121,8 @@ class Pedal:
         elif body[0] == 0x10 and body[1] in SLOT_NAMES and body[3] == 0x02:
             off = records.BLOCK_OFFSETS[SLOT_NAMES[body[1]]]
             if buf[off + 1] * 128 + buf[off + 2] == body[4] * 128 + body[5]:
-                i = body[6]
-                buf[off + 4 + 2 * i] = body[8]
-                if off + 5 + 2 * i < off + 33:       # Para EQ Volume is the last byte of its block
-                    buf[off + 5 + 2 * i] = body[7]
+                slot = SLOT_NAMES[body[1]]
+                store_param(buf, slot, body[4] * 128 + body[5], body[6], body[7] * 128 + body[8])
         elif body[:5] == bytes([0x10, 0x00, 0x00, 0x00, 0x01]):
             idx = body[5]
             name = body[6:6 + am.NAME_LEN]

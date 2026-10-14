@@ -20,7 +20,7 @@ def bad(slot, code, param, value, reason, **kw):
     return e.value
 
 
-def test_every_param_in_the_map_has_a_rule_and_no_rule_exceeds_seven_bits():
+def test_every_param_in_the_map_has_a_rule_and_ranges_fit_their_encoder():
     with open(os.path.join(HERE, "..", "docs", "param-map.json")) as f:
         m = json.load(f)
     for slot, block in m["blocks"].items():
@@ -29,17 +29,17 @@ def test_every_param_in_the_map_has_a_rule_and_no_rule_exceeds_seven_bits():
                 rule = pr.rule_for(slot, 0 if code == "ALL" else int(code), int(p))
                 assert rule is not None, (slot, code, p)
                 if rule["kind"] == "range":
-                    assert 0 <= rule["lo"] <= rule["hi"] <= pr.MAX_RAW
+                    assert 0 <= rule["lo"] <= rule["hi"] <= (16383 if rule.get("encoding") == "14bit" else pr.MAX_RAW)
                 if rule["kind"] == "enum":
-                    assert rule["allowed"] and max(rule["allowed"]) <= pr.MAX_RAW
+                    assert rule["allowed"] and max(rule["allowed"]) <= (16383 if rule.get("encoding") == "14bit" else pr.MAX_RAW)
 
 
-def test_magic_t_treble_only_takes_0_1_2():
+def test_magic_t_treble_is_a_knob_but_new_writes_stay_unverified():
     for slot, code in (("fx1", 77), ("fx2", 13)):
-        for v in (0, 1, 2):
-            assert pr.validate(slot, code, 3, v) == v
-        for v in (3, 50, 65, 100):
-            bad(slot, code, 3, v, "not_in_enum")
+        for v in (0, 1, 2, 50, 65, 100):
+            assert pr.validate(slot, code, 3, v, unverified_ok=True) == v
+        bad(slot, code, 3, 101, "out_of_range", unverified_ok=True)
+        bad(slot, code, 3, 65, "unverified")
 
 
 def test_classic_ps_range_stops_at_5():
@@ -54,17 +54,13 @@ def test_out_of_range_and_negative_values_are_refused():
     bad("fx1", 0, 0, -1, "out_of_range")
 
 
-def test_slapback_time_stays_in_seven_bits():
-    assert pr.validate("dly", 9, 2, 110) == 110
-    bad("dly", 9, 2, 128, "out_of_range")
-
-
-def test_wide_params_are_capped_and_not_proven():
-    # 2290 Time is raw 0-3980: only the part a 7-bit frame can carry, and only on request.
-    bad("dly", 16, 2, 100, "unverified")
-    assert pr.validate("dly", 16, 2, 100, unverified_ok=True) == 100
-    bad("dly", 16, 2, 480, "out_of_range", unverified_ok=True)
-    bad("fx3", 75, 0, 1000, "out_of_range", unverified_ok=True)   # Sweller attack raw is 14-bit
+def test_wide_fields_use_only_captured_or_editor_documented_ranges():
+    for slot, code, p, hi in (("dly", 9, 2, 280), ("fx3", 75, 0, 3920)):
+        assert pr.validate(slot, code, p, hi, unverified_ok=True) == hi
+        bad(slot, code, p, hi + 1, "out_of_range", unverified_ok=True)
+        bad(slot, code, p, 100, "unverified")
+    bad("dly", 3, 2, 3980, "sync_unknown", unverified_ok=True)
+    assert pr.validate("dly", 3, 2, 3980, unverified_ok=True, read_sync=lambda p: 0) == 3980
 
 
 def test_shimmer_range_is_raw_and_unverified():
@@ -73,11 +69,12 @@ def test_shimmer_range_is_raw_and_unverified():
     bad("rvb", 9, 3, 101, "out_of_range", unverified_ok=True)
 
 
-def test_cab_packed_fields_are_blocked_and_basic_ones_are_not():
+def test_cab_fields_have_separate_bounded_rules():
     assert pr.validate("cab", 34, 1, 50) == 50
-    bad("cab", 34, 1, 101, "out_of_range")
-    for p in (4, 5, 6):
-        bad("cab", 34, p, 10, "blocked_param", unverified_ok=True)
+    for p, hi in ((4, 100), (5, 1981), (6, 1801)):
+        assert pr.validate("cab", 34, p, hi, unverified_ok=True) == hi
+        bad("cab", 34, p, hi + 1, "out_of_range", unverified_ok=True)
+        bad("cab", 34, p, 10, "unverified")
 
 
 def test_unknown_things_are_refused():
@@ -110,7 +107,7 @@ def test_every_value_the_map_says_was_written_still_passes():
 
 def test_rules_view_lists_a_model():
     out = pr.rules_view("fx1", 77)
-    assert out["model"] == "Magic T" and out["params"]["3"]["allowed"] == [0, 1, 2]
+    assert out["model"] == "Magic T" and out["params"]["3"]["max"] == 100
     with pytest.raises(LookupError):
         pr.rules_view("fx1", 9999)
     with pytest.raises(am.ProtocolError):

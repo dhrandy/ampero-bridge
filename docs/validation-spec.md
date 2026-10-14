@@ -41,6 +41,14 @@ Trust policy (env `AMPERO_VALIDATE=strict|warn|off`, default strict):
 
 ## 3. Encoding rules for the known gaps
 
+Historical design table below, not the current API contract. v2.12.0 implements a
+14-bit raw encoder and bounded opt-in overrides in `paramrules.py`. Read captures
+confirmed Magic T Treble is 0-100, separate from Mode, and cab/delay/Sweller storage
+units. They do not prove the outgoing frame. New rules stay unverified. No `ms`,
+`hz`, `dial` or named cab convenience endpoint is implemented. See `/api/rules`
+and [verify-mode.md](verify-mode.md) for the current limits.
+
+
 All wire values are what goes into the param frame HI/LO (14-bit: HI = v>>7, LO = v&0x7F) and what shows in the record at `record_offset` (lo byte, hi byte follows).
 
 | Param | Editor display | Wire/raw | Rule | Confidence |

@@ -29,7 +29,7 @@ A param write whose model code does not match the model the slot currently holds
 | What | Body |
 | --- | --- |
 | model select | `10 AA 00 01 HH LL` (HH LL = model code, 14-bit as two 7-bit bytes) |
-| parameter set | `10 AA 00 02 HH LL SS HI LO` (SS = param number in the manual's order, HI LO = value; only 0-127 seen) |
+| parameter set | `10 AA 00 02 HH LL SS HI LO` (SS = param number in the manual's order, HI LO = raw 14-bit value; high-byte writes require live confirmation) |
 | save, frame A | `00 02 06 07 01 <idx>` |
 | save, frame B | `10 00 00 00 01 <idx> <name, 18 bytes, NUL padded>` |
 
@@ -151,7 +151,7 @@ Proven codes are in `docs/models.md`.
 Through the bridge, `POST /api/param {slot, model_code, param, value}` (value 0-127) was checked on the
 real pedal: FX2 Governor, Marshell 50, Slapback and Spring params all read back exactly. The model code in
 the frame must be the one the block holds now. Slapback's time is 14 bits (130 ms was its default), so
-values above 127 would need a wider write that the bridge does not send yet.
+v2.12.0 adds a 14-bit encoder and opt-in bounded rules. New high-byte writes are not yet captured from the official editor or live-verified.
 
 ### Order of a preset write
 
@@ -167,3 +167,12 @@ FX1, EQ, FX3 off. FX2 Governor (gain 35, volume 55, bass 50, mid 60, treble 55).
 (volume 55, presence 50, master 55, bass 45, mid 60, treble 55). CAB UK Black 4x12 (defaults).
 DLY Slapback (mix 25, feedback 15, time 110). RVB Spring (mix 20, decay 35, tone 55). Every byte
 read back as written, then one save.
+
+### Read captures, October 14
+
+Manual screen changes confirmed Analog Eko Time raw + 20 ms (0-3980), its synced
+Time index × 398, FX3 Sweller Attack raw + 80 ms (0-3920), cab Z 0-100,
+Low Cut raw + 19 Hz (0 = Off) and High Cut 2000 + 10 × raw Hz (1801 = Off).
+Magic T Treble in FX2 reads 0 at minimum and 100 at maximum. Mode is a separate
+control; Mode II reads 1. These are storage measurements, not outgoing write captures.
+The old Treble-as-switch theory is withdrawn. The earlier crash cause is unknown.

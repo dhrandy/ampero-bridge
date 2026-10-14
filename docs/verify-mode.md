@@ -13,8 +13,9 @@ says `"verify": true` uses it. Every other write goes through the strict rules e
 
 ## What it will not write
 
-- Anything without a documented range, the packed cab fields (Z, Low Cut, High Cut) and Magic T Treble.
-- Wide params (delay Time, Sweller Attack). The bridge has no 14-bit writer yet.
+- Anything without a documented range or an enabled encoding. Unrelated wide fields stay capped.
+- Newly decoded fields have bounded opt-in rules, but their new outgoing writes are not hardware-proven.
+  Cab addressing and wide high-byte writes still need an outgoing editor capture before live testing.
 - A model that is not in the proven list, even with `AMPERO_ALLOW_UNPROVEN_MODELS=1`.
 
 ## Synced Rate
@@ -36,3 +37,15 @@ param. Reading the result back is the caller's job: use `GET /api/patch/current`
 `records.py` (`decode_params`).
 
 Only the edit buffer changes. Nothing here saves a patch.
+
+## Read-confirmed fields (v2.12.0)
+
+The encoder carries HI/LO as two seven-bit bytes. Delay Time uses its editor raw
+maximum (3980 normally, Backmask 1980, Slapback 280), FX3 Sweller Attack 0-3920,
+cab Z 0-100, Low Cut 0-1981 and High Cut 0-1801, Magic T Treble 0-100.
+These rules remain unverified. The synthetic tests prove limits and byte ownership,
+not an actual outgoing USB transaction. Capture that transaction before live testing.
+
+Time checks current Sync even on the strict opt-in path. Analog Eko was read at
+all eleven division steps: 0,398,796,1194,1592,1990,2388,2786,3184,3582,3980.
+Other synced Time scales are intentionally refused rather than inferred.

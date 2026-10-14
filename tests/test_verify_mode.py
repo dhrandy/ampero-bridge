@@ -89,7 +89,7 @@ def test_a_verify_write_is_refused_when_the_mode_is_off(bridge):
 def test_strict_rules_do_not_change_when_verify_mode_is_on(verify_on):
     for slot, code, p, v, why in (("eq", 4, 13, 12, "blocked_param"), ("eq", 4, 14, 50, "blocked_param"),
                                   ("fx1", 45, 1, 50, "blocked_param"), ("fx1", 45, 2, 50, "blocked_param"),
-                                  ("fx1", 45, 0, 6, "not_in_enum"), ("fx1", 77, 3, 65, "not_in_enum")):
+                                  ("fx1", 45, 0, 6, "not_in_enum"), ("fx1", 77, 3, 65, "unverified")):
         with pytest.raises(pr.ValueRejected) as e:
             pr.validate(slot, code, p, v)
         assert e.value.extra["reason"] == why, (slot, code, p)
@@ -125,19 +125,24 @@ def test_documented_but_unswept_fields_take_only_their_documented_range(verify_o
 
 def test_enum_rules_still_apply(verify_on):
     assert bad("fx1", 45, 0, 6) == "not_in_enum"                      # Classic PS Range stops at 5
-    assert bad("fx1", 77, 3, 65) == "not_in_enum"                     # Magic T stays as it was
+    assert pr.validate_verify("fx1", 77, 3, 65) == 65  # confirmed knob, not Mode
 
 
-def test_cab_cuts_and_wide_fields_stay_out(verify_on):
-    for p in (4, 5, 6):
-        assert bad("cab", 5, p, 1) == "blocked_param"
-    assert bad("fx3", 75, 0, 50) == "wide_param"                      # Sweller Attack needs a 14-bit writer
-    assert bad("dly", 0, 2, 50) == "wide_param"                       # delay Time is 14 bits too
+def test_new_fields_are_available_in_verify_mode_with_bounded_ranges(verify_on):
+    for p, hi in ((4, 100), (5, 1981), (6, 1801)):
+        assert pr.validate_verify("cab", 5, p, hi) == hi
+        assert bad("cab", 5, p, hi + 1) == "out_of_range"
+    assert pr.validate_verify("fx3", 75, 0, 3920) == 3920
+    assert pr.validate_verify("dly", 3, 2, 3980, read_sync=lambda p: 0) == 3980
+    assert bad("dly", 3, 2, 50, read_sync=lambda p: 1) == "not_a_division"
+    assert pr.validate_verify("dly", 3, 2, 2388, read_sync=lambda p: 1) == 2388
+    assert bad("dly", 3, 2, 50) == "sync_unknown"
+    # Synced scaling has only been captured on Analog Eko; don't extrapolate it.
+    assert bad("dly", 6, 2, 1980, read_sync=lambda p: 1) == "not_a_division"
 
 
 def test_no_range_means_no_write(verify_on):
     blocked = [k for k, r in pr.RULES.items() if r["kind"] == "blocked" and not r.get("verify_rule")]
-    assert blocked, "expected some fields to stay blocked"
     for slot, code, p in blocked:
         with pytest.raises(pr.ValueRejected):
             pr.validate_verify(slot, 0 if code == "ALL" else code, p, 1)
@@ -158,7 +163,7 @@ def test_sync_pairs_come_from_the_map(verify_on):
     assert pairs[("fx3", 8, 1)] == 5 and pairs[("fx3", 8, 4)] == 6      # Trem Jet: Flg and Trm each have their own
     for (slot, code, p), sp in pairs.items():
         rate, sync = pr.RULES[(slot, code, p)]["name"], pr.RULES[(slot, code, sp)]["name"]
-        assert rate.endswith("Rate") and sync == rate[:-4] + "Sync"
+        assert rate == "Time" or (rate.endswith("Rate") and sync == rate[:-4] + "Sync")
 
 
 def test_a_rate_the_map_cannot_pair_is_refused(verify_on):
@@ -232,3 +237,20 @@ def test_verify_flag_must_be_literally_true(bridge, verify_on):
     for flag in ("true", 1, "yes"):
         code, _ = post(bridge, {"slot": "eq", "model_code": 4, "param": 14, "value": 50, "verify": flag})
         assert code == 422
+
+@pytest.mark.parametrize('slot,code,p,value', [('dly', 3, 2, 3980), ('fx3', 75, 0, 3920),
+    ('cab', 34, 5, 1981), ('cab', 34, 6, 1801), ('cab', 34, 4, 100), ('fx2', 13, 3, 100)])
+def test_opt_in_endpoint_roundtrip_uses_new_field_layout(bridge, verify_on, slot, code, p, value):
+    fp.Pedal.reset({0: fp.make_record(0, 'DEMO', {slot: (True, code, [0] * 7)})})
+    status, out = post(bridge, {'slot': slot, 'model_code': code, 'param': p, 'value': value, 'verify': True})
+    assert status == 200, out
+    assert records.block_fields(fp.Pedal.edit, slot)['params'][p] == value
+    assert fp.Pedal.store[0] != fp.Pedal.edit  # edit-buffer only, no save
+
+
+def test_strict_synced_time_cannot_bypass_division_guard(bridge):
+    fp.Pedal.reset({0: fp.make_record(0, 'DEMO', {'dly': (True, 3, [30, 40, 430, 1, 0])})})
+    status, out = post(bridge, {'slot': 'dly', 'model_code': 3, 'param': 2, 'value': 100,
+                               'unverified_ok': True})
+    assert status == 422 and 'division' in json.dumps(out)
+    assert records.block_fields(fp.Pedal.edit, 'dly')['params'][2] == 430

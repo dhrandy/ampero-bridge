@@ -62,6 +62,21 @@ differently. The model lists and codes in `docs/` are a snapshot of firmware V2.
 before you let anything change it, and save last. Bug reports, and notes on what
 works or breaks on your Mini, are welcome as GitHub issues.
 
+## Latest changes
+
+v2.12.0 adds a 14-bit raw parameter encoder, bounded opt-in rules for delay Time,
+FX3 Sweller Attack, cab Position Z/cuts and Magic T Treble, and regression coverage
+from the previous hardware sweeps. Newly enabled fields remain **unverified**:
+read captures confirm stored values, not the outgoing write frame. Use only after
+checking `/api/rules`, and verify the pedal's screen and read-back before saving.
+A raw match does not verify sound. No new hardware writes are claimed for this release.
+
+Raw units: delay Time + 20 = ms; FX3 Sweller Attack + 80 = ms; cab Low Cut 0 = Off,
+otherwise raw + 19 = Hz; High Cut 1801 = Off, otherwise 2000 + 10 × raw = Hz.
+Analog Eko synced Time accepts eleven values 0, 398, ... 3980. Other delay models'
+synced scales are not confirmed and are refused while Sync is on. Position Z and
+Treble are 0-100. Bulk copy/restore retains its earlier gates for wide and cab fields.
+
 ## What it is for
 
 You tell an agent "make me a clean Fender-ish patch with a bit of spring reverb",

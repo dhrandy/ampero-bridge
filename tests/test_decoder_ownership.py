@@ -101,10 +101,10 @@ def test_cab_z_does_not_move_when_the_low_cut_changes():
     assert za == zb == 50
 
 
-def test_cab_params_stay_blocked_for_writes():
-    # the read fix does not unblock anything
+def test_cab_rules_now_match_read_fields_but_bulk_copy_stays_gated():
+    # New single writes are opt-in; bulk copy/restore remains unchanged.
     for p in (4, 5, 6):
-        assert paramrules.OVERRIDES[("cab", "ALL", p)]["kind"] == "blocked"
+        assert paramrules.OVERRIDES[("cab", "ALL", p)]["trust"] == paramrules.UNVERIFIED
     d = {"slot": "cab", "field": "param", "index": 4, "want": 50}
     assert records.why_not(d, {}, True) == "CAB position Z and the cuts are not writable yet"
 
@@ -134,9 +134,9 @@ def test_other_eq_models_keep_fourteen_params():
 
 # --- nothing here loosens the gate -------------------------------------------------------
 
-def test_default_rules_are_unchanged_for_the_fields_above():
-    assert paramrules.OVERRIDES[("dly", 9, 2)]["hi"] == 127
-    assert paramrules.OVERRIDES[("dly", 9, 2)]["trust"] == paramrules.PROVEN
+def test_slapback_range_is_documented_but_not_yet_write_verified():
+    assert paramrules.OVERRIDES[("dly", 9, 2)]["hi"] == 280
+    assert paramrules.OVERRIDES[("dly", 9, 2)]["trust"] == paramrules.UNVERIFIED
 
 
 def test_diff_between_two_delays_now_compares_time_not_feedback():

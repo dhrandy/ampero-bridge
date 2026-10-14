@@ -1,10 +1,8 @@
 """Rules for what a param write may carry, so a bad value is refused before it reaches the pedal.
 
-The table is built once at start-up from docs/param-map.json (the per-model, per-param map) plus the
-OVERRIDES below, which win. Every rule holds RAW wire values, never display units: a knob the
-editor shows as 0-100 can be a three-position switch on the wire (Magic T), and a time shown in ms
-is stored with an offset. Phase 1 only covers what the 7-bit param frame can carry (raw 0-127).
-Wider params are capped at 127 and marked so; packed fields (the cab cuts) stay blocked.
+The table is built from docs/param-map.json plus explicit overrides. Values are raw wire
+values, not display units. Only fields with a documented encoding get wider ranges; unrelated
+wide controls remain capped. Read-confirmed fields stay unverified until a live write is checked.
 
     validate(slot, model_code, param, value, unverified_ok=False) -> value, or raises ValueRejected
 
@@ -26,7 +24,7 @@ import ampero_mini as am
 
 log = logging.getLogger("ampero-bridge")
 
-MAX_RAW = 127   # the largest value the 7-bit param frame carries (phase 1)
+MAX_RAW = 127   # default cap; only explicitly enabled encodings may exceed it
 PROVEN, UNVERIFIED, BLOCKED, DOCUMENTED = "proven", "unverified", "blocked", "documented"
 MODE = os.environ.get("AMPERO_VALIDATE", "strict").strip().lower()
 if MODE not in ("strict", "warn", "off"):
@@ -54,26 +52,44 @@ class ValueRejected(am.ProtocolError):
 # Hand-written rules win over anything derived. Key: (slot, model_code, param).
 # kind "enum" lists the allowed raw values, kind "range" gives raw lo..hi inclusive.
 OVERRIDES: dict[tuple, dict] = {}
-# Magic T: the map labels p3 Treble (knob 0-100), but the only values ever written and read back are
-# 0, 1 and 2, and Treble = 65 crashed the pedal. Allow only the three until a screen check settles it.
+# Read captures confirmed Treble is a normal knob, not the separate Mode switch.
 for _slot, _code in (("fx1", 77), ("fx2", 13)):
-    OVERRIDES[(_slot, _code, 3)] = {"kind": "enum", "allowed": [0, 1, 2], "trust": PROVEN,
-                                    "note": "wire values are 0/1/2 (3-position control), not 0-100"}
-# Slapback time: raw value, only 0-127 reaches the pedal today (editor raw range is 0-280). Raw 110
-# and 130 read back exactly. Whether raw maps to ms with an offset is not settled.
-OVERRIDES[("dly", 9, 2)] = {"kind": "range", "lo": 0, "hi": 127, "trust": PROVEN,
-                            "note": "raw, editor range is 0-280; values above 127 need the 14-bit frame"}
+    OVERRIDES[(_slot, _code, 3)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
+        "note": "Treble 0-100; read-confirmed in FX2, new writes await live verification"}
+# The editor documents the same Time layout for every delay. Analog Eko min/max and all
+# divisions were read on the pedal. Other models retain their own editor maximum and Sync ID.
+try:
+    _editor_path = os.path.join(os.path.dirname(__file__), "docs", "editor-parameters.json")
+    with open(_editor_path) as _f:
+        _editor = json.load(_f)
+    for _code, _model in _editor["blocks"]["dly"]["models"].items():
+        _time = next(p for p in _model["params"] if p["name"] == "Time")
+        _attrs = _time["editor_attributes"]
+        _max = int(float(_attrs["Max"]))
+        _sync = next((p["param"] for p in _model["params"] if p["name"] == _attrs.get("bind")), None)
+        _rule = {"kind": "range", "lo": 0, "hi": _max, "trust": UNVERIFIED,
+            "encoding": "14bit", "note": "raw + 20 ms with Sync off; wide writes await live verification"}
+        if _sync is not None:
+            _rule.update(sync_param=_sync,
+                         synced_values=[i * 398 for i in range(11)] if int(_code) == 3 else [],
+                         sync_required=True)
+        OVERRIDES[("dly", int(_code), _time["param"])] = _rule
+except (OSError, ValueError, KeyError, StopIteration) as error:
+    log.error("delay wide rules unavailable: %s", error)
+OVERRIDES[("fx3", 75, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": UNVERIFIED,
+    "encoding": "14bit", "note": "raw + 80 ms; read-confirmed, wide writes await live verification"}
 # Shimmer Lo/Hi End: editor range -50..50 shown, raw 0-100 (probably dial + 50), not yet read on a screen.
 for _p in (3, 4):
     OVERRIDES[("rvb", 9, _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
                                  "note": "raw 0-100, shown as -50..50; offset not confirmed on screen"}
-# Cab: mic is an index, volume and positions X and Y are raw 0-100. Position Z and the two cuts share
-# packed bytes and cannot be set with this frame.
-OVERRIDES[("cab", "ALL", 1)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN}
-OVERRIDES[("cab", "ALL", 2)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN}
-OVERRIDES[("cab", "ALL", 3)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN}
-for _p in (4, 5, 6):
-    OVERRIDES[("cab", "ALL", _p)] = {"kind": "blocked", "note": "packed cab field, not writable yet"}
+# Cab fields own separate bytes in the record. Logical write addressing still needs a capture.
+for _p in (1, 2, 3):
+    OVERRIDES[("cab", "ALL", _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN}
+for _p, _hi, _note in ((4, 100, "Position Z: raw = screen"),
+        (5, 1981, "Low Cut: 0 = Off; otherwise raw + 19 Hz"),
+        (6, 1801, "High Cut: 1801 = Off; otherwise 2000 + 10 * raw Hz")):
+    OVERRIDES[("cab", "ALL", _p)] = {"kind": "range", "lo": 0, "hi": _hi, "trust": UNVERIFIED,
+        "encoding": "14bit" if _p > 4 else "7bit", "note": _note + "; read-confirmed, new writes await live verification"}
 
 
 def _map_path() -> str:
@@ -169,7 +185,8 @@ def build(map_path: str | None = None) -> dict:
     for key, rule in OVERRIDES.items():
         base = table.get(key, {})
         merged = {**base, **rule}
-        merged.pop("wide", None) if rule.get("kind") != "range" else None
+        if rule.get("encoding") or key in OVERRIDES:
+            merged.pop("wide", None)
         table[key] = merged
     return table
 
@@ -201,7 +218,7 @@ def _view(rule: dict) -> dict:
             v = rule["verify_rule"]
             out["verify_range"] = {"min": v["lo"], "max": v["hi"]} if v["kind"] == "range" else {"allowed": v["allowed"]}
         if rule.get("sync_param") is not None:
-            out["sync_param"], out["synced_values"] = rule["sync_param"], DIVISIONS
+            out["sync_param"], out["synced_values"] = rule["sync_param"], rule.get("synced_values", DIVISIONS)
     return out
 
 
@@ -228,12 +245,15 @@ def _reject(reason: str, message: str, slot, model_code, param, value, rule=None
     raise ValueRejected(message, **detail)
 
 
-def validate(slot, model_code: int, param: int, value: int, unverified_ok: bool = False) -> int:
+def validate(slot, model_code: int, param: int, value: int, unverified_ok: bool = False, read_sync=None) -> int:
     """Return the value to send, or raise ValueRejected. Never talks to the pedal."""
     if MODE == "off":
         return value
     try:
         _check(slot, model_code, param, value, unverified_ok)
+        rule = rule_for(slot, model_code, param)
+        if rule and rule.get("sync_required"):
+            _check_sync(slot, model_code, param, value, rule, read_sync)
     except ValueRejected as e:
         if MODE == "warn":
             log.warning("param write would be refused (warn mode): %s", e)
@@ -300,6 +320,11 @@ def validate_verify(slot, model_code: int, param: int, value: int, read_sync=Non
     elif not eff["lo"] <= value <= eff["hi"]:
         _reject("out_of_range", f"{value} is outside {eff['lo']}-{eff['hi']} for {rule.get('name')} "
                 f"({slot} {rule.get('model')} p{param})", slot, model_code, param, value, rule)
+    _check_sync(slot, model_code, param, value, rule, read_sync)
+    return value
+
+
+def _check_sync(slot, model_code, param, value, rule, read_sync):
     sync_param = rule.get("sync_param")
     if sync_param == UNPAIRED:
         _reject("sync_unknown", f"{rule.get('name')} ({slot} {rule.get('model')} p{param}) sits in a model "
@@ -310,7 +335,7 @@ def validate_verify(slot, model_code: int, param: int, value: int, read_sync=Non
         if state is None:
             _reject("sync_unknown", f"cannot tell whether Sync is on for {rule.get('model')}, so "
                     f"{rule.get('name')} is not written", slot, model_code, param, value, rule)
-        if state == SYNC_ON and value not in DIVISIONS:
+        if state == SYNC_ON and value not in rule.get("synced_values", DIVISIONS):
             _reject("not_a_division", f"Sync is on, so {rule.get('name')} takes a division step "
-                    f"{DIVISIONS}, not {value}", slot, model_code, param, value, rule, sync=True)
+                    f"{rule.get('synced_values', DIVISIONS)}, not {value}", slot, model_code, param, value, rule, sync=True)
     return value

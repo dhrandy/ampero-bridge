@@ -79,12 +79,12 @@
       if (rule.verify_range.allowed) { kind = 'enum'; allowed = rule.verify_range.allowed; }
       else { kind = 'range'; lo = rule.verify_range.min; hi = rule.verify_range.max; }
     }
-    if (rule.editor_raw_max) return { type: 'blocked', note: 'A 14-bit value (0 to ' + rule.editor_raw_max + '). The bridge has no 14-bit writer yet.' };
+    if (rule.editor_raw_max) return { type: 'blocked', note: 'A 14-bit value (0 to ' + rule.editor_raw_max + '). This field uses a wider encoding that is not enabled.' };
     var syncNote = '';
     if (verifyMode && rule.sync_param !== undefined && rule.sync_param !== null) {
       if (rule.sync_param === UNPAIRED) return { type: 'blocked', note: 'The map cannot tie this Rate to one Sync switch, so verify mode will not write it.' };
       viaVerify = true;
-      syncNote = 'With Sync on, Rate takes only the steps ' + (rule.synced_values || []).join(', ') + '. The bridge reads Sync first.';
+      syncNote = rule.synced_values && rule.synced_values.length ? 'With Sync on, this control takes only the steps ' + rule.synced_values.join(', ') + '. The bridge reads Sync first.' : 'Synced values are not captured for this model. Turn Sync off before writing this control.';
     }
     var note = [cleanNote(rule.note), syncNote].filter(Boolean).join(' ');
     if (kind === 'enum') {

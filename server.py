@@ -1025,7 +1025,13 @@ def handle_post(path: str, data: dict) -> dict:
             raise paramrules.ValueRejected(
                 f"model code {code} is not proven for slot {slot!r}, so its params are not written",
                 reason="model_not_proven", slot=slot, model_code=code)
-        paramrules.validate(slot, code, param, value, unverified_ok=data.get("unverified_ok") is True)
+        def read_sync(sync_param):
+            f = records.block_fields(_record(read_current_patch()), slot)
+            if f["code"] != code:
+                raise paramrules.ValueRejected("model changed before Time write", reason="model_mismatch")
+            return f["params"][sync_param]
+        paramrules.validate(slot, code, param, value, unverified_ok=data.get("unverified_ok") is True,
+                            read_sync=read_sync)
         frame = am.param_set(slot, code, param, value)
         send_sysex([frame], "param")
         return {"ok": True}
@@ -1060,7 +1066,7 @@ def status_for(exc: Exception) -> int:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "ampero-bridge/2.11.0"
+    server_version = "ampero-bridge/2.12.0"
     timeout = CLIENT_TIMEOUT   # socket timeout: a stalled client cannot pin a thread
 
     def version_string(self):
