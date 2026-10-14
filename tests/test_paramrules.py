@@ -34,12 +34,13 @@ def test_every_param_in_the_map_has_a_rule_and_ranges_fit_their_encoder():
                     assert rule["allowed"] and max(rule["allowed"]) <= (16383 if rule.get("encoding") == "14bit" else pr.MAX_RAW)
 
 
-def test_magic_t_treble_is_a_knob_but_new_writes_stay_unverified():
-    for slot, code in (("fx1", 77), ("fx2", 13)):
-        for v in (0, 1, 2, 50, 65, 100):
-            assert pr.validate(slot, code, 3, v, unverified_ok=True) == v
-        bad(slot, code, 3, 101, "out_of_range", unverified_ok=True)
-        bad(slot, code, 3, 65, "unverified")
+def test_magic_t_treble_fx2_is_proven_and_fx1_stays_unverified():
+    for v in (0, 1, 2, 50, 65, 100):
+        assert pr.validate("fx2", 13, 3, v) == v
+        assert pr.validate("fx1", 77, 3, v, unverified_ok=True) == v
+    bad("fx2", 13, 3, 101, "out_of_range")
+    bad("fx1", 77, 3, 101, "out_of_range", unverified_ok=True)
+    bad("fx1", 77, 3, 65, "unverified")
 
 
 def test_classic_ps_range_stops_at_5():

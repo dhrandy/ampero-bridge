@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "scope": "Sanitized measured write tuples, Oct 12-13. Synthetic replay is regression coverage, not a new hardware test. No preset records or identities retained.",
+  "scope": "Sanitized measured write tuples, Oct 12-14. Synthetic replay is regression coverage, not a new hardware test. No preset records or identities retained.",
   "columns": [
     "slot",
     "model",
@@ -4975,7 +4975,11 @@
     ["rvb", 9, 2, 50, 50, "other", null],
     ["rvb", 9, 2, 75, 75, "other", null],
     ["rvb", 9, 5, 0, 0, "other", null],
-    ["rvb", 9, 5, 1, 1, "other", null]
+    ["rvb", 9, 5, 1, 1, "other", null],
+    ["fx2", 13, 3, 65, 65, "verify", null],
+    ["fx2", 13, 3, 0, 0, "verify", null],
+    ["fx2", 13, 3, 100, 100, "verify", null],
+    ["fx2", 13, 3, 50, 50, "verify", null]
   ],
   "excluded_mismatches": []
 }

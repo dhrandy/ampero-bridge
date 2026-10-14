@@ -174,5 +174,7 @@ Manual screen changes confirmed Analog Eko Time raw + 20 ms (0-3980), its synced
 Time index × 398, FX3 Sweller Attack raw + 80 ms (0-3920), cab Z 0-100,
 Low Cut raw + 19 Hz (0 = Off) and High Cut 2000 + 10 × raw Hz (1801 = Off).
 Magic T Treble in FX2 reads 0 at minimum and 100 at maximum. Mode is a separate
-control; Mode II reads 1. These are storage measurements, not outgoing write captures.
-The old Treble-as-switch theory is withdrawn. The earlier crash cause is unknown.
+control; Mode II reads 1. The old Treble-as-switch theory is withdrawn. The earlier
+crash cause is unknown. FX2 Treble was then write-proven the same day: 65, 0, 100 and
+50 written through the bridge each read back exactly and only byte 138 and the record
+checksum moved (edit buffer only). FX1 Treble and Mode remain write-unverified.

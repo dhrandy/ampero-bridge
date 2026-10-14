@@ -52,10 +52,10 @@ class ValueRejected(am.ProtocolError):
 # Hand-written rules win over anything derived. Key: (slot, model_code, param).
 # kind "enum" lists the allowed raw values, kind "range" gives raw lo..hi inclusive.
 OVERRIDES: dict[tuple, dict] = {}
-# Read captures confirmed Treble is a normal knob, not the separate Mode switch.
-for _slot, _code in (("fx1", 77), ("fx2", 13)):
-    OVERRIDES[(_slot, _code, 3)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
-        "note": "Treble 0-100; read-confirmed in FX2, new writes await live verification"}
+# Read captures confirmed Treble is a normal knob, not the separate Mode switch. FX2's knob is
+# write-verified (0, 50, 65 and 100 read back exactly); FX1's still awaits its own live write.
+OVERRIDES[("fx1", 77, 3)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
+    "note": "Treble 0-100; read-confirmed, FX1 writes await live verification"}
 # The editor documents the same Time layout for every delay. Analog Eko min/max and all
 # divisions were read on the pedal. Other models retain their own editor maximum and Sync ID.
 try:

@@ -42,9 +42,12 @@ Only the edit buffer changes. Nothing here saves a patch.
 
 The encoder carries HI/LO as two seven-bit bytes. Delay Time uses its editor raw
 maximum (3980 normally, Backmask 1980, Slapback 280), FX3 Sweller Attack 0-3920,
-cab Z 0-100, Low Cut 0-1981 and High Cut 0-1801, Magic T Treble 0-100.
+cab Z 0-100, Low Cut 0-1981 and High Cut 0-1801, FX1 Magic T Treble 0-100.
 These rules remain unverified. The synthetic tests prove limits and byte ownership,
 not an actual outgoing USB transaction. Capture that transaction before live testing.
+
+FX2 Magic T Treble left this list in v2.12.1: 65, 0, 100 and 50 written through the
+bridge each read back exactly on a throwaway patch, edit buffer only.
 
 Time checks current Sync even on the strict opt-in path. Analog Eko was read at
 all eleven division steps: 0,398,796,1194,1592,1990,2388,2786,3184,3582,3980.

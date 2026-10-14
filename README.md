@@ -64,6 +64,11 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.1 marks FX2 Magic T Treble write-verified after a live test on a throwaway
+patch: 65, 0, 100 and 50 written through the bridge each read back exactly, edit
+buffer only. The strict rules now take 0-100 without the unverified flag. FX1
+Magic T Treble, Magic T Mode and the other newly decoded fields stay unverified.
+
 v2.12.0 adds a 14-bit raw parameter encoder, bounded opt-in rules for delay Time,
 FX3 Sweller Attack, cab Position Z/cuts and Magic T Treble, and regression coverage
 from the previous hardware sweeps. Newly enabled fields remain **unverified**:
