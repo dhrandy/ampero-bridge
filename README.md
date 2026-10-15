@@ -64,6 +64,19 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.5 closes the remaining cab and Magic T Mode proof gaps and opens synced
+delay Time on fourteen more models. Cab Position Z, Low Cut and High Cut were
+swept on all 70 cab codes (490 live writes, every read-back exact, record bytes
+identical across models), so the shared cab rules no longer assume untested
+cabs. Magic T Mode value 1 was written live on FX1 and FX2 as a changed value,
+completing the 0/1/2 enum proof. Synced Time now takes the eleven division
+steps (index x 398) on every delay model sharing Analog Eko's 0-3980 Time
+layout; Backmask (Time maximum 1980) keeps its own unproven scale and stays
+refused while Sync is on, and Slapback has no Sync. The fourteen new synced
+tables come from the shared layout and the pedal-proven Analog Eko mapping;
+their live read-back is pending, so the map and docs still mark them
+unverified.
+
 v2.12.4 adds live write/read-back proof for FX3 Sweller Attack, Time on all 17 delay
 models (Sync off), Analog Eko synced Time at 0, 398, 1592 and 3980, FX1 Magic T
 Treble, and Magic T Mode on FX1/FX2 at 0 and 2. Mode 1 was a no-op, not proven as
@@ -101,8 +114,10 @@ A raw match does not verify sound. No new hardware writes are claimed for this r
 
 Raw units: delay Time + 20 = ms; FX3 Sweller Attack + 80 = ms; cab Low Cut 0 = Off,
 otherwise raw + 19 = Hz; High Cut 1801 = Off, otherwise 2000 + 10 × raw = Hz.
-Analog Eko synced Time accepts eleven values 0, 398, ... 3980. Other delay models'
-synced scales are not confirmed and are refused while Sync is on. Position Z and
+Synced Time accepts eleven values 0, 398, ... 3980 on Analog Eko (write-proven)
+and on the other delay models with the same 0-3980 Time range (shared-layout
+tables, live read-back pending). Backmask's synced scale is not confirmed and is
+refused while Sync is on; Slapback has no Sync. Position Z and
 Treble are 0-100. Bulk copy/restore retains its earlier gates for wide and cab fields.
 
 ## What it is for

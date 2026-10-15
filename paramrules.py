@@ -66,16 +66,24 @@ try:
         _attrs = _time["editor_attributes"]
         _max = int(float(_attrs["Max"]))
         _sync = next((p["param"] for p in _model["params"] if p["name"] == _attrs.get("bind")), None)
+        # Synced Time stores division index x (max / 10): eleven steps, proven on Analog Eko
+        # (0..3980 in steps of 398) by live writes 2026-10-14. Every model sharing that exact
+        # 0-3980 Time layout takes the same table; a different maximum is a step scale never
+        # read on the pedal (Backmask 1980), so it stays refused rather than guessed.
+        _steps = [round(i * _max / 10) for i in range(11)] if _max == 3980 else []
         # All 17 delay Time controls passed live writes at 100 and their maximum, Sync off.
         _rule = {"kind": "range", "lo": 0, "hi": _max, "trust": PROVEN,
             "encoding": "14bit", "note": "raw + 20 ms with Sync off; write-verified 2026-10-14; "
                 "Sync off restores model default Time, not last value; " +
                 ("synced writes 0, 398, 1592, 3980 verified; other divisions read-confirmed"
-                 if int(_code) == 3 else "synced Time unverified and refused")}
+                 if int(_code) == 3 else
+                 "no Sync control on this model" if _sync is None else
+                 "synced Time takes the eleven division steps (index x 398) proven on Analog "
+                 "Eko; same 0-3980 Time layout; live read-back pending" if _steps else
+                 "synced Time unverified and refused: step scale for this maximum never read "
+                 "on the pedal")}
         if _sync is not None:
-            _rule.update(sync_param=_sync,
-                         synced_values=[i * 398 for i in range(11)] if int(_code) == 3 else [],
-                         sync_required=True)
+            _rule.update(sync_param=_sync, synced_values=_steps, sync_required=True)
         OVERRIDES[("dly", int(_code), _time["param"])] = _rule
 except (OSError, ValueError, KeyError, StopIteration) as error:
     log.error("delay wide rules unavailable: %s", error)
@@ -89,7 +97,8 @@ OVERRIDES[("fx2", 126, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": PRO
 for _p in (3, 4):
     OVERRIDES[("rvb", 9, _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
                                  "note": "raw 0-100, shown as -50..50; offset not confirmed on screen"}
-# Cab fields own separate bytes; Z/cuts write-tested on seven cabs, others assumed identical.
+# Cab fields own separate bytes; Z/cuts write-tested on seven cabs 2026-10-14, then
+# swept on all 70 cab codes 2026-10-15 (490 writes, all read back exact, bytes identical).
 for _p in (1, 2, 3):
     OVERRIDES[("cab", "ALL", _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN}
 for _p, _hi, _note in ((4, 100, "Position Z: raw = screen"),
@@ -97,7 +106,7 @@ for _p, _hi, _note in ((4, 100, "Position Z: raw = screen"),
         (6, 1801, "High Cut: 1801 = Off; otherwise 2000 + 10 * raw Hz")):
     OVERRIDES[("cab", "ALL", _p)] = {"kind": "range", "lo": 0, "hi": _hi, "trust": PROVEN,
         "encoding": "14bit" if _p > 4 else "7bit",
-        "note": _note + "; write-verified 2026-10-14 on cab codes 0,13,25,49,112,144,153; other cabs assumed identical"}
+        "note": _note + "; write-verified 2026-10-14 on cab codes 0,13,25,49,112,144,153, then on all 70 cab codes 2026-10-15"}
 
 
 def _map_path() -> str:

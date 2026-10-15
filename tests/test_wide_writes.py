@@ -59,15 +59,17 @@ def test_synced_analog_time_divisions_require_current_sync(monkeypatch):
         pr.validate('dly', 3, 2, 100, unverified_ok=True, read_sync=lambda q: 1)
 
 
-def test_oct14_verified_rules_and_remaining_sync_gate():
+def test_oct14_verified_rules_and_sync_division_tables():
     for slot, code, p, values in [
         ('fx3', 75, 0, (0, 100, 920, 3920)),
         ('fx1', 77, 3, (65, 0, 100, 50)),
-        ('fx1', 77, 4, (2, 0)), ('fx2', 13, 4, (2, 0)),
+        ('fx1', 77, 4, (2, 1, 0)), ('fx2', 13, 4, (2, 1, 0)),
     ]:
         assert pr.rule_for(slot, code, p)['trust'] == pr.PROVEN
         for value in values:
             assert pr.validate(slot, code, p, value) == value
+    steps = [i * 398 for i in range(11)]
+    shared = (0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16)   # 0-3980 Time layout
     for code in range(17):
         model = pr.rules_view('dly', code)
         p = next(int(p) for p, rule in model['params'].items() if rule['name'] == 'Time')
@@ -75,25 +77,44 @@ def test_oct14_verified_rules_and_remaining_sync_gate():
         assert rule['trust'] == pr.PROVEN
         for value in (100, rule['hi']):
             assert pr.validate('dly', code, p, value, read_sync=lambda q: 0) == value
-        if code != 3 and rule.get('sync_param') is not None:
-            for value in (0, 398, rule['hi']):
+        if code in shared:
+            assert rule['synced_values'] == steps
+            for value in steps:
+                assert pr.validate('dly', code, p, value, read_sync=lambda q: 1) == value
+            for value in (1, 397, rule['hi'] - 1):
                 with pytest.raises(pr.ValueRejected):
                     pr.validate('dly', code, p, value, read_sync=lambda q: 1)
+            with pytest.raises(pr.ValueRejected):
+                pr.validate('dly', code, p, 398)            # unknown Sync state
+        elif code == 6:     # Backmask: different Time maximum, step scale never read
+            for value in (0, 198, 1980):
+                with pytest.raises(pr.ValueRejected):
+                    pr.validate('dly', code, p, value, read_sync=lambda q: 1)
+        else:               # Slapback has no Sync control
+            assert rule.get('sync_param') is None
     for value in (398, 1592, 3980, 0):
         assert pr.validate('dly', 3, 2, value, read_sync=lambda q: 1) == value
 
 
-def test_oct14_map_keeps_partial_proof_caveats():
+def test_oct15_map_closes_cab_and_mode_proof_gaps():
     import json
     from pathlib import Path
     data = json.loads((Path(__file__).parents[1] / 'docs/param-map.json').read_text())
+    site = (Path(__file__).parents[1] / 'site/param-map.json').read_text()
+    assert site == (Path(__file__).parents[1] / 'docs/param-map.json').read_text()
     blocks = data['blocks']
     for slot, code in [('fx1', '77'), ('fx2', '13')]:
         mode = blocks[slot]['models'][code]['params']['4']
-        assert mode['written'] == [0, 2]
-        assert 'no-op' in mode['note']
+        assert mode['written'] == [0, 1, 2]
+        assert '2026-10-15' in mode['note'] and 'changed value' in mode['note']
+    all_cabs = list(range(50)) + list(range(112, 122)) + list(range(144, 154))
+    assert len(all_cabs) == 70
     for p in ('4', '5', '6'):
         cab = blocks['cab']['models']['ALL']['params'][p]
-        assert cab['verified_models'] == [0, 13, 25, 49, 112, 144, 153]
-        assert 'assumed identical' in cab['note']
+        assert cab['verified_models'] == all_cabs
+        assert 'assumed identical' not in cab['note']
     assert blocks['dly']['models']['3']['params']['2']['synced_written'] == [0, 398, 1592, 3980]
+    for code in ('0', '1', '2', '4', '5', '7', '8', '10', '11', '12', '13', '14', '15', '16'):
+        note = blocks['dly']['models'][code]['params']['2']['note']
+        assert 'read-back pending' in note
+    assert 'refused' in blocks['dly']['models']['6']['params']['2']['note']

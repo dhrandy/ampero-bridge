@@ -209,5 +209,22 @@ Values below are raw wire units, not screen units.
   seven models are write-tested. The shared cab rules still assume the other models
   use the same layout; they are not individually write-verified for these fields.
 
+### Cab and Mode sweep, October 15 (v2.12.5)
+
+Through the bridge, edit buffer only, nothing saved:
+
+- Cab Position Z, Low Cut and High Cut swept on all 70 cab codes (0-49, 112-121,
+  144-153): 490 writes, every read-back exact, record bytes identical across
+  models. The "assumed identical" caveat is retired for these three fields.
+- Magic T Mode 1 written live on FX1 (byte 107) and FX2 (byte 140) as a changed
+  value, read back exact. Mode 0, 1 and 2 are all write-proven now.
+- Delay Sync switches write on/off on all 15 synced models (byte 336 on codes
+  0-5 and 7, 340 on 8, 10 and 13, 342 on 11, 12, 14 and 15, 348 on 16). Turning
+  Sync on resets the Time bytes 333-334, so Sync goes first, then Time.
+- Synced-Time division tables opened on the fourteen delay models sharing
+  Analog Eko's 0-3980 Time layout: eleven steps, index x 398, derived from each
+  model's editor-documented Time range. Live read-back of synced writes on
+  these models is pending; Backmask (maximum 1980) stays refused.
+
 Sanitized measured tuples are in `tests/fixtures/hardware-regressions.json`. Replaying
 those tuples is regression coverage, not another live hardware test.

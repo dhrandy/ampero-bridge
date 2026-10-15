@@ -55,7 +55,9 @@ bridge each read back exactly on a throwaway patch, edit buffer only.
 
 Time checks current Sync even on the strict opt-in path. Analog Eko was read at
 all eleven division steps: 0,398,796,1194,1592,1990,2388,2786,3184,3582,3980.
-Other synced Time scales are intentionally refused rather than inferred.
+The same table serves every delay model with the identical 0-3980 Time layout
+(added in v2.12.5, live read-back pending). Backmask's different maximum keeps
+its scale refused rather than inferred.
 
 ## Added write proof (v2.12.4)
 
@@ -68,5 +70,14 @@ are read-confirmed only. Other models' synced Time remains unverified and refuse
 Turning Sync off restores the model default Time, not the last value set.
 Cab Z/cuts passed on seven cab codes (0, 13, 25, 49, 112, 144, 153). Shared rules
 assume the same layout on other cabs, not individual live proof on all 70.
+
+## Added write proof (v2.12.5)
+
+Cab Z/cuts were swept on all 70 cab codes: 490 live writes, every read-back
+exact, record bytes identical across models, so no cab is assumed any more.
+Magic T Mode 1 was written live on FX1 and FX2 as a changed value and read back
+exact, completing the enum proof. Synced-Time division tables (index x 398 over
+0-3980) were opened on the fourteen delay models sharing Analog Eko's Time
+layout; those tables are live read-back pending and not yet counted as proven.
 All checks were edit-buffer only, nothing saved, no USB errors, expected bytes
 plus checksum only. No other fields gain verified status in this release.
