@@ -178,3 +178,12 @@ control; Mode II reads 1. The old Treble-as-switch theory is withdrawn. The earl
 crash cause is unknown. FX2 Treble was then write-proven the same day: 65, 0, 100 and
 50 written through the bridge each read back exactly and only byte 138 and the record
 checksum moved (edit buffer only). FX1 Treble and Mode remain write-unverified.
+
+### Wide-field write proof, October 14
+
+Through the bridge, edit buffer only, each read back exact with only the written bytes and
+the record checksum moving: Analog Eko Time 100, 480 and 3980 (Sync off; bytes 333-334),
+FX2 Sweller Attack 100, 920 and 3920 (bytes 131-132), cab Z 60 and 100 (byte 239), Low Cut
+0, 81 and 1981 (240-241) and High Cut 100, 894 and 1801 = Off (242-243). Cab fields were
+tried on UK Green 4x12 only. Turning Analog Eko Sync on rewrites Time and turning it off
+restores the earlier Time. FX3 Sweller, other delay models and synced Time were not tested.

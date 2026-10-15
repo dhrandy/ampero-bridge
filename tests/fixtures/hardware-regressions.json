@@ -4979,7 +4979,21 @@
     ["fx2", 13, 3, 65, 65, "verify", null],
     ["fx2", 13, 3, 0, 0, "verify", null],
     ["fx2", 13, 3, 100, 100, "verify", null],
-    ["fx2", 13, 3, 50, 50, "verify", null]
+    ["fx2", 13, 3, 50, 50, "verify", null],
+    ["dly", 3, 2, 100, 100, "verify", 0],
+    ["dly", 3, 2, 480, 480, "verify", 0],
+    ["dly", 3, 2, 3980, 3980, "verify", 0],
+    ["fx2", 126, 0, 100, 100, "verify", null],
+    ["fx2", 126, 0, 920, 920, "verify", null],
+    ["fx2", 126, 0, 3920, 3920, "verify", null],
+    ["cab", 25, 4, 60, 60, "verify", null],
+    ["cab", 25, 4, 100, 100, "verify", null],
+    ["cab", 25, 5, 0, 0, "verify", null],
+    ["cab", 25, 5, 81, 81, "verify", null],
+    ["cab", 25, 5, 1981, 1981, "verify", null],
+    ["cab", 25, 6, 100, 100, "verify", null],
+    ["cab", 25, 6, 894, 894, "verify", null],
+    ["cab", 25, 6, 1801, 1801, "verify", null]
   ],
   "excluded_mismatches": []
 }

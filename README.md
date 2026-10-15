@@ -64,6 +64,14 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.3 marks five fields write-verified after live tests on a throwaway patch, edit
+buffer only: Analog Eko Time (100, 480, 3980 with Sync off), FX2 Sweller Attack (100,
+920, 3920), cab Position Z (60, 100), cab Low Cut (0 = Off, 81, 1981) and cab High
+Cut (100, 894, 1801 = Off). Each read back exactly; only the written bytes and the
+record checksum moved. The cab writes were tested on one cab model (UK Green 4x12).
+FX3 Sweller Attack, other delay models, synced delay Time, Magic T Mode and FX1 Magic T
+Treble stay unverified.
+
 v2.12.2 fixes the Docker image: it was missing `docs/editor-parameters.json`, so the
 delay Time wide rule (Analog Eko 0-3980) silently fell back to the 0-127 cap on a
 built container. It also adds the FX2 Sweller (code 126) Attack rule, 0-3920 raw

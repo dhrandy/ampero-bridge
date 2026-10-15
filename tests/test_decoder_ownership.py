@@ -101,10 +101,10 @@ def test_cab_z_does_not_move_when_the_low_cut_changes():
     assert za == zb == 50
 
 
-def test_cab_rules_now_match_read_fields_but_bulk_copy_stays_gated():
-    # New single writes are opt-in; bulk copy/restore remains unchanged.
+def test_cab_rules_are_write_verified_but_bulk_copy_stays_gated():
+    # Single writes were verified live on 2026-10-14; bulk copy/restore remains unchanged.
     for p in (4, 5, 6):
-        assert paramrules.OVERRIDES[("cab", "ALL", p)]["trust"] == paramrules.UNVERIFIED
+        assert paramrules.OVERRIDES[("cab", "ALL", p)]["trust"] == paramrules.PROVEN
     d = {"slot": "cab", "field": "param", "index": 4, "want": 50}
     assert records.why_not(d, {}, True) == "CAB position Z and the cuts are not writable yet"
 

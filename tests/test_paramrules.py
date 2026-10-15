@@ -56,12 +56,17 @@ def test_out_of_range_and_negative_values_are_refused():
 
 
 def test_wide_fields_use_only_captured_or_editor_documented_ranges():
-    for slot, code, p, hi in (("dly", 9, 2, 280), ("fx3", 75, 0, 3920), ("fx2", 126, 0, 3920)):
+    for slot, code, p, hi in (("dly", 9, 2, 280), ("fx3", 75, 0, 3920)):
         assert pr.validate(slot, code, p, hi, unverified_ok=True) == hi
         bad(slot, code, p, hi + 1, "out_of_range", unverified_ok=True)
         bad(slot, code, p, 100, "unverified")
+    # FX2 Sweller Attack and Analog Eko Time were written live and read back exact on 2026-10-14.
+    assert pr.validate("fx2", 126, 0, 3920) == 3920
+    bad("fx2", 126, 0, 3921, "out_of_range")
+    assert pr.validate("dly", 3, 2, 3980, read_sync=lambda p: 0) == 3980
+    bad("dly", 3, 2, 3981, "out_of_range")
     bad("dly", 3, 2, 3980, "sync_unknown", unverified_ok=True)
-    assert pr.validate("dly", 3, 2, 3980, unverified_ok=True, read_sync=lambda p: 0) == 3980
+    assert pr.validate("dly", 3, 2, 3980, read_sync=lambda p: 0) == 3980
 
 
 def test_shimmer_range_is_raw_and_unverified():
@@ -73,9 +78,9 @@ def test_shimmer_range_is_raw_and_unverified():
 def test_cab_fields_have_separate_bounded_rules():
     assert pr.validate("cab", 34, 1, 50) == 50
     for p, hi in ((4, 100), (5, 1981), (6, 1801)):
-        assert pr.validate("cab", 34, p, hi, unverified_ok=True) == hi
-        bad("cab", 34, p, hi + 1, "out_of_range", unverified_ok=True)
-        bad("cab", 34, p, 10, "unverified")
+        # Write-verified live on 2026-10-14 (Z, Low Cut, High Cut incl. the off values), so no flag needed.
+        assert pr.validate("cab", 34, p, hi) == hi
+        bad("cab", 34, p, hi + 1, "out_of_range")
 
 
 def test_unknown_things_are_refused():
@@ -101,7 +106,7 @@ def test_every_value_the_map_says_was_written_still_passes():
                     rule = pr.rule_for(slot, 0 if code == "ALL" else int(code), int(p))
                     if rule["kind"] == "blocked":
                         continue
-                    pr.validate(slot, 0 if code == "ALL" else int(code), int(p), v, unverified_ok=True)
+                    pr.validate(slot, 0 if code == "ALL" else int(code), int(p), v, unverified_ok=True, read_sync=lambda q: 0)
                     checked += 1
     assert checked > 500
 
@@ -120,4 +125,4 @@ def test_dockerfile_ships_the_editor_parameter_file():
     import os
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     assert "COPY docs/editor-parameters.json" in open(os.path.join(root, "Dockerfile")).read()
-    assert pr.validate("dly", 3, 2, 3980, unverified_ok=True, read_sync=lambda p: 0) == 3980
+    assert pr.validate("dly", 3, 2, 3980, read_sync=lambda p: 0) == 3980
