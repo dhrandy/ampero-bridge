@@ -56,7 +56,7 @@ def test_out_of_range_and_negative_values_are_refused():
 
 
 def test_wide_fields_use_only_captured_or_editor_documented_ranges():
-    for slot, code, p, hi in (("dly", 9, 2, 280), ("fx3", 75, 0, 3920)):
+    for slot, code, p, hi in (("dly", 9, 2, 280), ("fx3", 75, 0, 3920), ("fx2", 126, 0, 3920)):
         assert pr.validate(slot, code, p, hi, unverified_ok=True) == hi
         bad(slot, code, p, hi + 1, "out_of_range", unverified_ok=True)
         bad(slot, code, p, 100, "unverified")
@@ -113,3 +113,11 @@ def test_rules_view_lists_a_model():
         pr.rules_view("fx1", 9999)
     with pytest.raises(am.ProtocolError):
         pr.rules_view("nope", 1)
+
+
+def test_dockerfile_ships_the_editor_parameter_file():
+    # The delay Time wide rule is built from this file; a missing copy silently left Time capped at 127.
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    assert "COPY docs/editor-parameters.json" in open(os.path.join(root, "Dockerfile")).read()
+    assert pr.validate("dly", 3, 2, 3980, unverified_ok=True, read_sync=lambda p: 0) == 3980

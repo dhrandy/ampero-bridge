@@ -9,6 +9,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY server.py ampero_mini.py usbmidi.py records.py prst.py paramrules.py ./
 COPY docs/param-map.json ./docs/param-map.json
+COPY docs/editor-parameters.json ./docs/editor-parameters.json
 COPY site/models.json ./
 
 ENV PORT=8080

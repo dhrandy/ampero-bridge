@@ -78,6 +78,10 @@ except (OSError, ValueError, KeyError, StopIteration) as error:
     log.error("delay wide rules unavailable: %s", error)
 OVERRIDES[("fx3", 75, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": UNVERIFIED,
     "encoding": "14bit", "note": "raw + 80 ms; read-confirmed, wide writes await live verification"}
+# FX2 Sweller (code 126) Attack: same 0-3920 raw range, stored at bytes 131-132 of the record. The
+# outgoing frame was seen in an official-editor USB capture; a bridge write is not live-tested yet.
+OVERRIDES[("fx2", 126, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": UNVERIFIED,
+    "encoding": "14bit", "note": "raw + 80 ms; editor-capture frame, wide writes await live verification"}
 # Shimmer Lo/Hi End: editor range -50..50 shown, raw 0-100 (probably dial + 50), not yet read on a screen.
 for _p in (3, 4):
     OVERRIDES[("rvb", 9, _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,

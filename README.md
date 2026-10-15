@@ -64,6 +64,11 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.2 fixes the Docker image: it was missing `docs/editor-parameters.json`, so the
+delay Time wide rule (Analog Eko 0-3980) silently fell back to the 0-127 cap on a
+built container. It also adds the FX2 Sweller (code 126) Attack rule, 0-3920 raw
+(+ 80 = ms). Both stay **unverified** until a live write is read back.
+
 v2.12.1 marks FX2 Magic T Treble write-verified after a live test on a throwaway
 patch: 65, 0, 100 and 50 written through the bridge each read back exactly, edit
 buffer only. The strict rules now take 0-100 without the unverified flag. FX1
