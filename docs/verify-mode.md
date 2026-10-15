@@ -56,8 +56,8 @@ bridge each read back exactly on a throwaway patch, edit buffer only.
 Time checks current Sync even on the strict opt-in path. Analog Eko was read at
 all eleven division steps: 0,398,796,1194,1592,1990,2388,2786,3184,3582,3980.
 The same table serves every delay model with the identical 0-3980 Time layout
-(added in v2.12.5, live read-back pending). Backmask's different maximum keeps
-its scale refused rather than inferred.
+(opened in v2.12.5, write-proven on all fourteen in v2.12.6). Backmask's
+different maximum keeps its scale refused rather than inferred.
 
 ## Added write proof (v2.12.4)
 
@@ -78,6 +78,13 @@ exact, record bytes identical across models, so no cab is assumed any more.
 Magic T Mode 1 was written live on FX1 and FX2 as a changed value and read back
 exact, completing the enum proof. Synced-Time division tables (index x 398 over
 0-3980) were opened on the fourteen delay models sharing Analog Eko's Time
-layout; those tables are live read-back pending and not yet counted as proven.
+layout; those tables were live read-back pending at this release.
+
+## Added write proof (v2.12.6)
+
+Synced Time on the fourteen 0-3980 delay models: all eleven division steps
+written live on each model and read back exact (154 writes), plus Sync on/off
+on each (closing Sweetie's editor-defined Sync switch). Edit buffer only,
+nothing saved. Only the written Time/Sync bytes and the record checksum moved.
 All checks were edit-buffer only, nothing saved, no USB errors, expected bytes
 plus checksum only. No other fields gain verified status in this release.

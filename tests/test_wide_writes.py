@@ -96,7 +96,7 @@ def test_oct14_verified_rules_and_sync_division_tables():
         assert pr.validate('dly', 3, 2, value, read_sync=lambda q: 1) == value
 
 
-def test_oct15_map_closes_cab_and_mode_proof_gaps():
+def test_oct15_map_records_full_cab_mode_and_sync_proof():
     import json
     from pathlib import Path
     data = json.loads((Path(__file__).parents[1] / 'docs/param-map.json').read_text())
@@ -114,7 +114,10 @@ def test_oct15_map_closes_cab_and_mode_proof_gaps():
         assert cab['verified_models'] == all_cabs
         assert 'assumed identical' not in cab['note']
     assert blocks['dly']['models']['3']['params']['2']['synced_written'] == [0, 398, 1592, 3980]
+    steps = [i * 398 for i in range(11)]
     for code in ('0', '1', '2', '4', '5', '7', '8', '10', '11', '12', '13', '14', '15', '16'):
-        note = blocks['dly']['models'][code]['params']['2']['note']
-        assert 'read-back pending' in note
+        time_entry = blocks['dly']['models'][code]['params']['2']
+        assert '2026-10-15' in time_entry['note']
+        assert time_entry['synced_written'] == steps
+    assert blocks['dly']['models']['0']['params']['3']['status'] == 'write-verified'
     assert 'refused' in blocks['dly']['models']['6']['params']['2']['note']

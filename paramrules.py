@@ -66,10 +66,10 @@ try:
         _attrs = _time["editor_attributes"]
         _max = int(float(_attrs["Max"]))
         _sync = next((p["param"] for p in _model["params"] if p["name"] == _attrs.get("bind")), None)
-        # Synced Time stores division index x (max / 10): eleven steps, proven on Analog Eko
-        # (0..3980 in steps of 398) by live writes 2026-10-14. Every model sharing that exact
-        # 0-3980 Time layout takes the same table; a different maximum is a step scale never
-        # read on the pedal (Backmask 1980), so it stays refused rather than guessed.
+        # Synced Time stores division index x (max / 10): eleven steps. Proven on Analog Eko
+        # (0..3980 in steps of 398) 2026-10-14, then written and read back exact at all eleven
+        # steps on every other 0-3980 model 2026-10-15. A different maximum is a step scale
+        # never read on the pedal (Backmask 1980), so it stays refused rather than guessed.
         _steps = [round(i * _max / 10) for i in range(11)] if _max == 3980 else []
         # All 17 delay Time controls passed live writes at 100 and their maximum, Sync off.
         _rule = {"kind": "range", "lo": 0, "hi": _max, "trust": PROVEN,
@@ -78,8 +78,8 @@ try:
                 ("synced writes 0, 398, 1592, 3980 verified; other divisions read-confirmed"
                  if int(_code) == 3 else
                  "no Sync control on this model" if _sync is None else
-                 "synced Time takes the eleven division steps (index x 398) proven on Analog "
-                 "Eko; same 0-3980 Time layout; live read-back pending" if _steps else
+                 "synced writes at all eleven division steps verified 2026-10-15"
+                 if _steps else
                  "synced Time unverified and refused: step scale for this maximum never read "
                  "on the pedal")}
         if _sync is not None:

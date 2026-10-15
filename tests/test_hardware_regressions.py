@@ -19,7 +19,9 @@ def test_recovered_sweep_coverage():
     assert len({code for slot, code, *_ in cases if slot == 'amp'}) == 60
     assert len({code for slot, code, *_ in cases if slot == 'cab'}) == 70
     assert DATA['coverage']['other_models'] == 187
-    assert len({(slot, code) for slot, code, p, v, got, source, sync in cases if source == 'sync'}) == 31
+    # 31 sync/rate models from the Oct 13 sweep plus the 14 delay models whose synced Time
+    # tables were proven 2026-10-15.
+    assert len({(slot, code) for slot, code, p, v, got, source, sync in cases if source == 'sync'}) == 45
     assert any(row[:5] == ['eq', 4, 13, 6, 6] for row in cases)
     assert any(row[:5] == ['eq', 4, 14, 75, 75] for row in cases)
 

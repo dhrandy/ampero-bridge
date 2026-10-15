@@ -64,6 +64,13 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.6 marks synced delay Time write-verified on the fourteen models sharing
+Analog Eko's 0-3980 Time layout: all eleven division steps (0, 398, ... 3980)
+written live on each model and read back exact (154 writes, edit buffer only,
+nothing saved). Sync on/off on the same models also read back exact, closing
+Sweetie's last editor-defined Sync switch. Backmask keeps its refused unproven
+scale; Slapback has no Sync. The measured tuples are in the regression fixture.
+
 v2.12.5 closes the remaining cab and Magic T Mode proof gaps and opens synced
 delay Time on fourteen more models. Cab Position Z, Low Cut and High Cut were
 swept on all 70 cab codes (490 live writes, every read-back exact, record bytes
@@ -114,10 +121,10 @@ A raw match does not verify sound. No new hardware writes are claimed for this r
 
 Raw units: delay Time + 20 = ms; FX3 Sweller Attack + 80 = ms; cab Low Cut 0 = Off,
 otherwise raw + 19 = Hz; High Cut 1801 = Off, otherwise 2000 + 10 × raw = Hz.
-Synced Time accepts eleven values 0, 398, ... 3980 on Analog Eko (write-proven)
-and on the other delay models with the same 0-3980 Time range (shared-layout
-tables, live read-back pending). Backmask's synced scale is not confirmed and is
-refused while Sync is on; Slapback has no Sync. Position Z and
+Synced Time accepts eleven values 0, 398, ... 3980, write-proven on Analog Eko
+and on every other delay model with the same 0-3980 Time range. Backmask's
+synced scale is not confirmed and is refused while Sync is on; Slapback has no
+Sync. Position Z and
 Treble are 0-100. Bulk copy/restore retains its earlier gates for wide and cab fields.
 
 ## What it is for

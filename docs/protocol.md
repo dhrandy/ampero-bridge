@@ -223,8 +223,13 @@ Through the bridge, edit buffer only, nothing saved:
   Sync on resets the Time bytes 333-334, so Sync goes first, then Time.
 - Synced-Time division tables opened on the fourteen delay models sharing
   Analog Eko's 0-3980 Time layout: eleven steps, index x 398, derived from each
-  model's editor-documented Time range. Live read-back of synced writes on
-  these models is pending; Backmask (maximum 1980) stays refused.
+  model's editor-documented Time range. Backmask (maximum 1980) stays refused.
+
+Later the same day (v2.12.6) every one of the fourteen models passed a live
+synced-Time run: Sync on, all eleven division steps (0, 398, ... 3980) written
+and read back exact, Sync off, 154 Time writes in total. Sync on/off read back
+exact on each model too, which closed Sweetie's last editor-defined Sync
+switch. Edit buffer only, nothing saved, no USB errors.
 
 Sanitized measured tuples are in `tests/fixtures/hardware-regressions.json`. Replaying
 those tuples is regression coverage, not another live hardware test.
