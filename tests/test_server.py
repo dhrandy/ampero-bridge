@@ -574,15 +574,15 @@ def test_blank_env_values_count_as_unset():
 
 def test_param_rules_reject_before_the_pedal(monkeypatch):
     srv, base = start(monkeypatch)
-    # A read-confirmed knob still needs explicit permission until its new writes are verified.
-    code, out = call(base, "/api/param", {"slot": "fx1", "model_code": 77, "param": 3, "value": 65})
+    # An unrelated unverified knob still needs explicit permission.
+    code, out = call(base, "/api/param", {"slot": "rvb", "model_code": 9, "param": 3, "value": 65})
     assert code == 422 and out["reason"] == "unverified" and out["rule"]["max"] == 100
     assert call(base, "/api/param", {"slot": "fx1", "model_code": 45, "param": 0, "value": 6})[0] == 422
     assert call(base, "/api/param", {"slot": "fx1", "model_code": 0, "param": 0, "value": 1.5})[0] == 422
     assert call(base, "/api/param", {"slot": "fx1", "model_code": 4000, "param": 0, "value": 1})[0] == 422
-    assert call(base, "/api/param", {"slot": "dly", "model_code": 9, "param": 2, "value": 50})[0] == 422
+    assert call(base, "/api/param", {"slot": "rvb", "model_code": 9, "param": 3, "value": 50})[0] == 422
     assert Fake.sent == []
-    assert call(base, "/api/param", {"slot": "dly", "model_code": 9, "param": 2, "value": 50,
+    assert call(base, "/api/param", {"slot": "rvb", "model_code": 9, "param": 3, "value": 50,
                                      "unverified_ok": True})[0] == 200
     assert call(base, "/api/param", {"slot": "fx1", "model_code": 77, "param": 3, "value": 2, "unverified_ok": True})[0] == 200
     assert len(Fake.sent) == 2

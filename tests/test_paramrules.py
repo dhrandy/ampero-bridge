@@ -34,13 +34,13 @@ def test_every_param_in_the_map_has_a_rule_and_ranges_fit_their_encoder():
                     assert rule["allowed"] and max(rule["allowed"]) <= (16383 if rule.get("encoding") == "14bit" else pr.MAX_RAW)
 
 
-def test_magic_t_treble_fx2_is_proven_and_fx1_stays_unverified():
+def test_magic_t_treble_both_slots_are_proven():
     for v in (0, 1, 2, 50, 65, 100):
         assert pr.validate("fx2", 13, 3, v) == v
-        assert pr.validate("fx1", 77, 3, v, unverified_ok=True) == v
+        assert pr.validate("fx1", 77, 3, v) == v
     bad("fx2", 13, 3, 101, "out_of_range")
     bad("fx1", 77, 3, 101, "out_of_range", unverified_ok=True)
-    bad("fx1", 77, 3, 65, "unverified")
+    assert pr.validate("fx1", 77, 3, 65) == 65
 
 
 def test_classic_ps_range_stops_at_5():
@@ -59,7 +59,7 @@ def test_wide_fields_use_only_captured_or_editor_documented_ranges():
     for slot, code, p, hi in (("dly", 9, 2, 280), ("fx3", 75, 0, 3920)):
         assert pr.validate(slot, code, p, hi, unverified_ok=True) == hi
         bad(slot, code, p, hi + 1, "out_of_range", unverified_ok=True)
-        bad(slot, code, p, 100, "unverified")
+        assert pr.validate(slot, code, p, 100) == 100
     # FX2 Sweller Attack and Analog Eko Time were written live and read back exact on 2026-10-14.
     assert pr.validate("fx2", 126, 0, 3920) == 3920
     bad("fx2", 126, 0, 3921, "out_of_range")

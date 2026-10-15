@@ -14,8 +14,8 @@ says `"verify": true` uses it. Every other write goes through the strict rules e
 ## What it will not write
 
 - Anything without a documented range or an enabled encoding. Unrelated wide fields stay capped.
-- Newly decoded fields have bounded opt-in rules, but their new outgoing writes are not hardware-proven.
-  Cab addressing and wide high-byte writes still need an outgoing editor capture before live testing.
+- Unlisted new fields remain unverified. The October 14 live tests below cover only the listed
+  models, fields and states; they do not establish a general wide-write guarantee.
 - A model that is not in the proven list, even with `AMPERO_ALLOW_UNPROVEN_MODELS=1`.
 
 ## Synced Rate
@@ -44,11 +44,11 @@ The encoder carries HI/LO as two seven-bit bytes. Delay Time uses its editor raw
 maximum (3980 normally, Backmask 1980, Slapback 280), FX3 Sweller Attack 0-3920,
 cab Z 0-100, Low Cut 0-1981 and High Cut 0-1801, FX1 Magic T Treble 0-100.
 These rules were unverified when added. The synthetic tests prove limits and byte ownership,
-not an actual outgoing USB transaction. Capture that transaction before live testing.
+not an actual outgoing USB transaction. Later live checks are listed below.
 
 Analog Eko Time, FX2 Sweller Attack and cab Z, Low Cut and High Cut left this list in
-v2.12.3 after live write and read-back tests (see docs/protocol.md). FX3 Sweller Attack,
-the other delay models and FX1 Magic T Treble remain unverified.
+v2.12.3 after live write and read-back tests (see docs/protocol.md). The remaining
+checks below were added in v2.12.4.
 
 FX2 Magic T Treble left this list in v2.12.1: 65, 0, 100 and 50 written through the
 bridge each read back exactly on a throwaway patch, edit buffer only.
@@ -56,3 +56,17 @@ bridge each read back exactly on a throwaway patch, edit buffer only.
 Time checks current Sync even on the strict opt-in path. Analog Eko was read at
 all eleven division steps: 0,398,796,1194,1592,1990,2388,2786,3184,3582,3980.
 Other synced Time scales are intentionally refused rather than inferred.
+
+## Added write proof (v2.12.4)
+
+FX3 Sweller Attack (0, 100, 920, 3920), Time on all 17 delays (100 and each
+maximum, Sync off), FX1 Magic T Treble (65, 0, 100, 50), and Magic T Mode on
+FX1/FX2 (2 and 0) now have live write/read-back proof. Mode 1 was already stored;
+its write was a no-op, not proven as a changed value. The documented enum is unchanged.
+Analog Eko synced Time was written at 398, 1592, 3980 and 0; other division steps
+are read-confirmed only. Other models' synced Time remains unverified and refused.
+Turning Sync off restores the model default Time, not the last value set.
+Cab Z/cuts passed on seven cab codes (0, 13, 25, 49, 112, 144, 153). Shared rules
+assume the same layout on other cabs, not individual live proof on all 70.
+All checks were edit-buffer only, nothing saved, no USB errors, expected bytes
+plus checksum only. No other fields gain verified status in this release.

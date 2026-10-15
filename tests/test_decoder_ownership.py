@@ -134,9 +134,9 @@ def test_other_eq_models_keep_fourteen_params():
 
 # --- nothing here loosens the gate -------------------------------------------------------
 
-def test_slapback_range_is_documented_but_not_yet_write_verified():
+def test_slapback_range_is_live_write_verified():
     assert paramrules.OVERRIDES[("dly", 9, 2)]["hi"] == 280
-    assert paramrules.OVERRIDES[("dly", 9, 2)]["trust"] == paramrules.UNVERIFIED
+    assert paramrules.OVERRIDES[("dly", 9, 2)]["trust"] == paramrules.PROVEN
 
 
 def test_diff_between_two_delays_now_compares_time_not_feedback():

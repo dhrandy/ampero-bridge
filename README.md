@@ -64,6 +64,16 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.4 adds live write/read-back proof for FX3 Sweller Attack, Time on all 17 delay
+models (Sync off), Analog Eko synced Time at 0, 398, 1592 and 3980, FX1 Magic T
+Treble, and Magic T Mode on FX1/FX2 at 0 and 2. Mode 1 was a no-op, not proven as
+a changed value. Cab Z/cuts now have proof on seven models (codes 0, 13, 25, 49,
+112, 144, 153); the other cabs are assumed identical, not individually tested.
+All tests used a throwaway edit buffer, nothing saved, with only the expected
+bytes plus checksum changing and no USB errors. Sync off restores the model's
+default Time, not the last value set. Other models' synced Time stays unverified
+and refused. The measured tuples are retained in the hardware regression fixture.
+
 v2.12.3 marks five fields write-verified after live tests on a throwaway patch, edit
 buffer only: Analog Eko Time (100, 480, 3980 with Sync off), FX2 Sweller Attack (100,
 920, 3920), cab Position Z (60, 100), cab Low Cut (0 = Off, 81, 1981) and cab High

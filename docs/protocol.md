@@ -151,7 +151,7 @@ Proven codes are in `docs/models.md`.
 Through the bridge, `POST /api/param {slot, model_code, param, value}` (value 0-127) was checked on the
 real pedal: FX2 Governor, Marshell 50, Slapback and Spring params all read back exactly. The model code in
 the frame must be the one the block holds now. Slapback's time is 14 bits (130 ms was its default), so
-v2.12.0 adds a 14-bit encoder and opt-in bounded rules. New high-byte writes are not yet captured from the official editor or live-verified.
+v2.12.0 adds a 14-bit encoder and opt-in bounded rules. The October 14 live tests below verify the listed high-byte writes; unrelated fields remain unverified.
 
 ### Order of a preset write
 
@@ -177,7 +177,7 @@ Magic T Treble in FX2 reads 0 at minimum and 100 at maximum. Mode is a separate
 control; Mode II reads 1. The old Treble-as-switch theory is withdrawn. The earlier
 crash cause is unknown. FX2 Treble was then write-proven the same day: 65, 0, 100 and
 50 written through the bridge each read back exactly and only byte 138 and the record
-checksum moved (edit buffer only). FX1 Treble and Mode remain write-unverified.
+checksum moved (edit buffer only). FX1 Treble and Mode were checked later that night, as listed below.
 
 ### Wide-field write proof, October 14
 
@@ -185,5 +185,29 @@ Through the bridge, edit buffer only, each read back exact with only the written
 the record checksum moving: Analog Eko Time 100, 480 and 3980 (Sync off; bytes 333-334),
 FX2 Sweller Attack 100, 920 and 3920 (bytes 131-132), cab Z 60 and 100 (byte 239), Low Cut
 0, 81 and 1981 (240-241) and High Cut 100, 894 and 1801 = Off (242-243). Cab fields were
-tried on UK Green 4x12 only. Turning Analog Eko Sync on rewrites Time and turning it off
-restores the earlier Time. FX3 Sweller, other delay models and synced Time were not tested.
+tried on UK Green 4x12 only. The later check corrected the Sync observation: turning Sync off restores the model
+default Time, not the last value set. The following tests extend this first pass.
+
+### Remaining-field write proof, October 14 (v2.12.4)
+
+All writes used a throwaway patch's edit buffer, never saved. Each read back exactly;
+only the expected parameter bytes plus checksum 459 changed. No USB errors or crashes.
+Values below are raw wire units, not screen units.
+
+- FX3 Sweller (code 75) Attack: 100, 920, 3920, 0; bytes 296-297, raw + 80 = ms.
+- Delay Time on every model (codes 0-16): 100 and the model maximum, Sync off.
+  Maximum is 3980 except Backmask 1980 and Slapback 280; bytes 333-334.
+- Analog Eko Time with Sync on: 398, 1592, 3980, 0. The other division values are
+  read-confirmed, not individually write-tested. Non-Analog-Eko synced scales remain
+  unverified and are refused. Sync off restores the model default Time, not the last value set.
+- Magic T FX1 Treble (byte 105): 65, 0, 100, 50.
+- Magic T Mode on FX1 (byte 107) and FX2 (byte 140): 2 and 0. Value 1 was already
+  stored, so its write was a no-op and is not proven as a changed value. The documented
+  enum remains 0, 1, 2; this does not claim changed-value proof for 1.
+- Cab Position Z 60/100, Low Cut 0/81/1981, High Cut 100/894/1801 on six more
+  cab codes: 0, 13, 49, 112, 144, 153. With UK Green 4x12 (25) from the first pass,
+  seven models are write-tested. The shared cab rules still assume the other models
+  use the same layout; they are not individually write-verified for these fields.
+
+Sanitized measured tuples are in `tests/fixtures/hardware-regressions.json`. Replaying
+those tuples is regression coverage, not another live hardware test.

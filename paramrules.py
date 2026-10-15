@@ -52,10 +52,9 @@ class ValueRejected(am.ProtocolError):
 # Hand-written rules win over anything derived. Key: (slot, model_code, param).
 # kind "enum" lists the allowed raw values, kind "range" gives raw lo..hi inclusive.
 OVERRIDES: dict[tuple, dict] = {}
-# Read captures confirmed Treble is a normal knob, not the separate Mode switch. FX2's knob is
-# write-verified (0, 50, 65 and 100 read back exactly); FX1's still awaits its own live write.
-OVERRIDES[("fx1", 77, 3)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
-    "note": "Treble 0-100; read-confirmed, FX1 writes await live verification"}
+# Magic T Treble: both slots were live write/read-back verified on 2026-10-14.
+OVERRIDES[("fx1", 77, 3)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN,
+    "note": "Treble 0-100; live writes 65, 0, 100, 50 read back exact 2026-10-14"}
 # The editor documents the same Time layout for every delay. Analog Eko min/max and all
 # divisions were read on the pedal. Other models retain their own editor maximum and Sync ID.
 try:
@@ -67,10 +66,12 @@ try:
         _attrs = _time["editor_attributes"]
         _max = int(float(_attrs["Max"]))
         _sync = next((p["param"] for p in _model["params"] if p["name"] == _attrs.get("bind")), None)
-        # Analog Eko (3) Time was written live at 100, 480 and 3980 with Sync off and read back exact.
-        _rule = {"kind": "range", "lo": 0, "hi": _max, "trust": PROVEN if int(_code) == 3 else UNVERIFIED,
-            "encoding": "14bit", "note": "raw + 20 ms with Sync off; " + ("write-verified on the pedal 2026-10-14"
-                if int(_code) == 3 else "wide writes await live verification")}
+        # All 17 delay Time controls passed live writes at 100 and their maximum, Sync off.
+        _rule = {"kind": "range", "lo": 0, "hi": _max, "trust": PROVEN,
+            "encoding": "14bit", "note": "raw + 20 ms with Sync off; write-verified 2026-10-14; "
+                "Sync off restores model default Time, not last value; " +
+                ("synced writes 0, 398, 1592, 3980 verified; other divisions read-confirmed"
+                 if int(_code) == 3 else "synced Time unverified and refused")}
         if _sync is not None:
             _rule.update(sync_param=_sync,
                          synced_values=[i * 398 for i in range(11)] if int(_code) == 3 else [],
@@ -78,17 +79,17 @@ try:
         OVERRIDES[("dly", int(_code), _time["param"])] = _rule
 except (OSError, ValueError, KeyError, StopIteration) as error:
     log.error("delay wide rules unavailable: %s", error)
-OVERRIDES[("fx3", 75, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": UNVERIFIED,
-    "encoding": "14bit", "note": "raw + 80 ms; read-confirmed, wide writes await live verification"}
+OVERRIDES[("fx3", 75, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": PROVEN,
+    "encoding": "14bit", "note": "raw + 80 ms; live writes 100, 920, 3920, 0 read back exact 2026-10-14"}
 # FX2 Sweller (code 126) Attack: same 0-3920 raw range, stored at bytes 131-132 of the record. The
-# outgoing frame was seen in an official-editor USB capture; a bridge write is not live-tested yet.
+# outgoing frame was captured from the official editor and bridge writes read back exactly.
 OVERRIDES[("fx2", 126, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": PROVEN,
     "encoding": "14bit", "note": "raw + 80 ms; write-verified on the pedal 2026-10-14 (100, 920, 3920 read back exact)"}
 # Shimmer Lo/Hi End: editor range -50..50 shown, raw 0-100 (probably dial + 50), not yet read on a screen.
 for _p in (3, 4):
     OVERRIDES[("rvb", 9, _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,
                                  "note": "raw 0-100, shown as -50..50; offset not confirmed on screen"}
-# Cab fields own separate bytes in the record. Logical write addressing still needs a capture.
+# Cab fields own separate bytes; Z/cuts write-tested on seven cabs, others assumed identical.
 for _p in (1, 2, 3):
     OVERRIDES[("cab", "ALL", _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": PROVEN}
 for _p, _hi, _note in ((4, 100, "Position Z: raw = screen"),
@@ -96,7 +97,7 @@ for _p, _hi, _note in ((4, 100, "Position Z: raw = screen"),
         (6, 1801, "High Cut: 1801 = Off; otherwise 2000 + 10 * raw Hz")):
     OVERRIDES[("cab", "ALL", _p)] = {"kind": "range", "lo": 0, "hi": _hi, "trust": PROVEN,
         "encoding": "14bit" if _p > 4 else "7bit",
-        "note": _note + "; write-verified on the pedal 2026-10-14 (read back exact)"}
+        "note": _note + "; write-verified 2026-10-14 on cab codes 0,13,25,49,112,144,153; other cabs assumed identical"}
 
 
 def _map_path() -> str:

@@ -89,7 +89,7 @@ def test_a_verify_write_is_refused_when_the_mode_is_off(bridge):
 def test_strict_rules_do_not_change_when_verify_mode_is_on(verify_on):
     for slot, code, p, v, why in (("eq", 4, 13, 12, "blocked_param"), ("eq", 4, 14, 50, "blocked_param"),
                                   ("fx1", 45, 1, 50, "blocked_param"), ("fx1", 45, 2, 50, "blocked_param"),
-                                  ("fx1", 45, 0, 6, "not_in_enum"), ("fx1", 77, 3, 65, "unverified")):
+                                  ("fx1", 45, 0, 6, "not_in_enum"), ("rvb", 9, 3, 65, "unverified")):
         with pytest.raises(pr.ValueRejected) as e:
             pr.validate(slot, code, p, v)
         assert e.value.extra["reason"] == why, (slot, code, p)
