@@ -68,20 +68,28 @@ try:
         _sync = next((p["param"] for p in _model["params"] if p["name"] == _attrs.get("bind")), None)
         # Synced Time stores division index x (max / 10): eleven steps. Proven on Analog Eko
         # (0..3980 in steps of 398) 2026-10-14, then written and read back exact at all eleven
-        # steps on every other 0-3980 model 2026-10-15. A different maximum is a step scale
-        # never read on the pedal (Backmask 1980), so it stays refused rather than guessed.
-        _steps = [round(i * _max / 10) for i in range(11)] if _max == 3980 else []
+        # steps on every other 0-3980 model 2026-10-15. Backmask's 1980 ms maximum applies
+        # only with Sync off: a hand capture on P12-2 (edit buffer, 2026-10-16) read all
+        # eleven divisions live and every one sat on the shared 0-3980 grid, so its synced
+        # scale is the same as every other delay and its synced range runs past 1980.
+        _backmask = int(_code) == 6
+        _steps = [i * 398 for i in range(11)] if (_max == 3980 or _backmask) else []
         # All 17 delay Time controls passed live writes at 100 and their maximum, Sync off.
-        _rule = {"kind": "range", "lo": 0, "hi": _max, "trust": PROVEN,
+        _rule = {"kind": "range", "lo": 0, "hi": 3980 if _backmask else _max, "trust": PROVEN,
             "encoding": "14bit", "note": "raw + 20 ms with Sync off; write-verified 2026-10-14; "
                 "Sync off restores model default Time, not last value; " +
                 ("synced writes 0, 398, 1592, 3980 verified; other divisions read-confirmed"
                  if int(_code) == 3 else
                  "no Sync control on this model" if _sync is None else
+                 "all eleven synced divisions read live on the pedal 2026-10-16: shared 0-3980 "
+                 "grid, past the 1980 ms Sync-off maximum"
+                 if _backmask else
                  "synced writes at all eleven division steps verified 2026-10-15"
                  if _steps else
                  "synced Time unverified and refused: step scale for this maximum never read "
                  "on the pedal")}
+        if _backmask:
+            _rule["unsynced_hi"] = _max
         if _sync is not None:
             _rule.update(sync_param=_sync, synced_values=_steps, sync_required=True)
         OVERRIDES[("dly", int(_code), _time["param"])] = _rule
@@ -355,4 +363,7 @@ def _check_sync(slot, model_code, param, value, rule, read_sync):
         if state == SYNC_ON and value not in rule.get("synced_values", DIVISIONS):
             _reject("not_a_division", f"Sync is on, so {rule.get('name')} takes a division step "
                     f"{rule.get('synced_values', DIVISIONS)}, not {value}", slot, model_code, param, value, rule, sync=True)
+        if state != SYNC_ON and "unsynced_hi" in rule and value > rule["unsynced_hi"]:
+            _reject("over_unsynced_max", f"Sync is off, so {rule.get('name')} stops at "
+                    f"{rule['unsynced_hi']}, not {value}", slot, model_code, param, value, rule)
     return value

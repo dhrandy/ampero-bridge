@@ -69,13 +69,13 @@ def test_oct14_verified_rules_and_sync_division_tables():
         for value in values:
             assert pr.validate(slot, code, p, value) == value
     steps = [i * 398 for i in range(11)]
-    shared = (0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16)   # 0-3980 Time layout
+    shared = (0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16)   # shared 0-3980 synced grid
     for code in range(17):
         model = pr.rules_view('dly', code)
         p = next(int(p) for p, rule in model['params'].items() if rule['name'] == 'Time')
         rule = pr.rule_for('dly', code, p)
         assert rule['trust'] == pr.PROVEN
-        for value in (100, rule['hi']):
+        for value in (100, rule.get('unsynced_hi', rule['hi'])):
             assert pr.validate('dly', code, p, value, read_sync=lambda q: 0) == value
         if code in shared:
             assert rule['synced_values'] == steps
@@ -86,14 +86,29 @@ def test_oct14_verified_rules_and_sync_division_tables():
                     pr.validate('dly', code, p, value, read_sync=lambda q: 1)
             with pytest.raises(pr.ValueRejected):
                 pr.validate('dly', code, p, 398)            # unknown Sync state
-        elif code == 6:     # Backmask: different Time maximum, step scale never read
-            for value in (0, 198, 1980):
-                with pytest.raises(pr.ValueRejected):
-                    pr.validate('dly', code, p, value, read_sync=lambda q: 1)
         else:               # Slapback has no Sync control
             assert rule.get('sync_param') is None
     for value in (398, 1592, 3980, 0):
         assert pr.validate('dly', 3, 2, value, read_sync=lambda q: 1) == value
+
+
+def test_backmask_synced_time_shared_grid_and_unsynced_cap():
+    steps = [i * 398 for i in range(11)]
+    rule = pr.rule_for('dly', 6, 2)
+    assert rule['synced_values'] == steps
+    assert rule['hi'] == 3980 and rule['unsynced_hi'] == 1980
+    for value in steps:                      # Sync on: the eleven divisions, past 1980
+        assert pr.validate('dly', 6, 2, value, read_sync=lambda q: 1) == value
+    for value in (1, 397, 1980, 3979):
+        with pytest.raises(pr.ValueRejected):
+            pr.validate('dly', 6, 2, value, read_sync=lambda q: 1)
+    for value in (0, 430, 1980):             # Sync off: free knob up to the 1980 maximum
+        assert pr.validate('dly', 6, 2, value, read_sync=lambda q: 0) == value
+    for value in (1981, 2388, 3980):
+        with pytest.raises(pr.ValueRejected):
+            pr.validate('dly', 6, 2, value, read_sync=lambda q: 0)
+    with pytest.raises(pr.ValueRejected):
+        pr.validate('dly', 6, 2, 398)        # unknown Sync state
 
 
 def test_oct15_map_records_full_cab_mode_and_sync_proof():
@@ -120,4 +135,6 @@ def test_oct15_map_records_full_cab_mode_and_sync_proof():
         assert '2026-10-15' in time_entry['note']
         assert time_entry['synced_written'] == steps
     assert blocks['dly']['models']['0']['params']['3']['status'] == 'write-verified'
-    assert 'refused' in blocks['dly']['models']['6']['params']['2']['note']
+    backmask = blocks['dly']['models']['6']['params']['2']
+    assert 'refused' not in backmask['note'] and '2026-10-16' in backmask['note']
+    assert backmask['synced_read'] == [i * 398 for i in range(11)]

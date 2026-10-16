@@ -64,6 +64,14 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.7 lifts the last refused delay field, Backmask synced Time. A hand
+capture on the test patch (Sync on, Time knob turned by hand, bridge reading
+each step) read all eleven divisions live, and every one sits on the shared
+0-3980 grid (index x 398) - past Backmask's 1980 ms maximum, which now binds
+only with Sync off. Synced Backmask writes take the same division steps as
+every other delay. Read-side proof; the per-step write/read-back run the other
+fifteen models had is still open.
+
 v2.12.6 marks synced delay Time write-verified on the fourteen models sharing
 Analog Eko's 0-3980 Time layout: all eleven division steps (0, 398, ... 3980)
 written live on each model and read back exact (154 writes, edit buffer only,

@@ -137,9 +137,13 @@ def test_new_fields_are_available_in_verify_mode_with_bounded_ranges(verify_on):
     assert bad("dly", 3, 2, 50, read_sync=lambda p: 1) == "not_a_division"
     assert pr.validate_verify("dly", 3, 2, 2388, read_sync=lambda p: 1) == 2388
     assert bad("dly", 3, 2, 50) == "sync_unknown"
-    # Synced scaling has only been captured on Analog Eko; don't extrapolate it to a
-    # different Time maximum (Backmask 1980 stays refused).
+    # Backmask shares the 0-3980 division grid with Sync on (hand capture 2026-10-16);
+    # its 1980 ms maximum still binds with Sync off.
     assert bad("dly", 6, 2, 1980, read_sync=lambda p: 1) == "not_a_division"
+    assert pr.validate_verify("dly", 6, 2, 3980, read_sync=lambda p: 1) == 3980
+    assert pr.validate_verify("dly", 6, 2, 0, read_sync=lambda p: 1) == 0
+    assert bad("dly", 6, 2, 2388, read_sync=lambda p: 0) == "over_unsynced_max"
+    assert pr.validate_verify("dly", 6, 2, 1980, read_sync=lambda p: 0) == 1980
     # Models sharing Analog Eko's 0-3980 Time layout take the same division table.
     assert pr.validate_verify("dly", 8, 2, 796, read_sync=lambda p: 1) == 796
     assert pr.validate_verify("dly", 16, 2, 0, read_sync=lambda p: 1) == 0

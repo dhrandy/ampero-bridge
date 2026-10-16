@@ -231,5 +231,18 @@ and read back exact, Sync off, 154 Time writes in total. Sync on/off read back
 exact on each model too, which closed Sweetie's last editor-defined Sync
 switch. Edit buffer only, nothing saved, no USB errors.
 
+### Backmask synced Time hand capture, October 16 (v2.12.7)
+
+Test patch P12-2, edit buffer only, nothing saved: Backmask (code 6) in the DLY
+block, Sync on, the Time knob turned by hand while the bridge read the record
+after each step. Every division sat on the shared 0-3980 grid: 1/1=0, 1/2=398,
+1/2D=796, 1/2T=1194, 1/4=1592, 1/4D=1990, 1/4T=2388, 1/8=2786, 1/8D=3184,
+1/8T=3582, 1/16=3980 - nine direct screen-and-read pairs, two by elimination
+between confirmed neighbours. So Backmask's 1980 ms maximum binds only with
+Sync off; with Sync on it takes the same eleven division steps as every other
+delay, and the old refusal is lifted. This is read-side proof: the per-step
+write-and-read-back run the other fifteen models had is still open for
+Backmask.
+
 Sanitized measured tuples are in `tests/fixtures/hardware-regressions.json`. Replaying
 those tuples is regression coverage, not another live hardware test.
