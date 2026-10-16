@@ -71,7 +71,8 @@ try:
         # steps on every other 0-3980 model 2026-10-15. Backmask's 1980 ms maximum applies
         # only with Sync off: a hand capture on P12-2 (edit buffer, 2026-10-16) read all
         # eleven divisions live and every one sat on the shared 0-3980 grid, so its synced
-        # scale is the same as every other delay and its synced range runs past 1980.
+        # scale is the same as every other delay and its synced range runs past 1980. All
+        # eleven steps were then written and read back exact the same day (v2.12.8).
         _backmask = int(_code) == 6
         _steps = [i * 398 for i in range(11)] if (_max == 3980 or _backmask) else []
         # All 17 delay Time controls passed live writes at 100 and their maximum, Sync off.
@@ -81,8 +82,8 @@ try:
                 ("synced writes 0, 398, 1592, 3980 verified; other divisions read-confirmed"
                  if int(_code) == 3 else
                  "no Sync control on this model" if _sync is None else
-                 "all eleven synced divisions read live on the pedal 2026-10-16: shared 0-3980 "
-                 "grid, past the 1980 ms Sync-off maximum"
+                 "synced writes at all eleven division steps verified 2026-10-16; shared "
+                 "0-3980 grid, past the 1980 ms Sync-off maximum"
                  if _backmask else
                  "synced writes at all eleven division steps verified 2026-10-15"
                  if _steps else

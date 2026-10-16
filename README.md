@@ -64,6 +64,11 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.8 marks Backmask synced Time write-verified: with v2.12.7's refusal
+lifted, all eleven division steps were written through the bridge and read
+back exact (edit buffer only, nothing saved), the same run the other fifteen
+delay models had. Every documented delay field is now proven.
+
 v2.12.7 lifts the last refused delay field, Backmask synced Time. A hand
 capture on the test patch (Sync on, Time knob turned by hand, bridge reading
 each step) read all eleven divisions live, and every one sits on the shared

@@ -240,9 +240,13 @@ after each step. Every division sat on the shared 0-3980 grid: 1/1=0, 1/2=398,
 1/8T=3582, 1/16=3980 - nine direct screen-and-read pairs, two by elimination
 between confirmed neighbours. So Backmask's 1980 ms maximum binds only with
 Sync off; with Sync on it takes the same eleven division steps as every other
-delay, and the old refusal is lifted. This is read-side proof: the per-step
-write-and-read-back run the other fifteen models had is still open for
-Backmask.
+delay, and the old refusal is lifted.
+
+Later the same day (v2.12.8), with the refusal lifted, Backmask passed the same
+run the other fifteen models had: Sync on, all eleven division steps written
+through the bridge and read back exact, edit buffer only, nothing saved, no
+USB errors. Backmask synced Time is write-verified; every documented delay
+field is now proven.
 
 Sanitized measured tuples are in `tests/fixtures/hardware-regressions.json`. Replaying
 those tuples is regression coverage, not another live hardware test.

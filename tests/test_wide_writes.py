@@ -136,5 +136,5 @@ def test_oct15_map_records_full_cab_mode_and_sync_proof():
         assert time_entry['synced_written'] == steps
     assert blocks['dly']['models']['0']['params']['3']['status'] == 'write-verified'
     backmask = blocks['dly']['models']['6']['params']['2']
-    assert 'refused' not in backmask['note'] and '2026-10-16' in backmask['note']
-    assert backmask['synced_read'] == [i * 398 for i in range(11)]
+    assert 'refused' not in backmask['note'] and 'write-verified 2026-10-16' in backmask['note']
+    assert backmask['synced_written'] == [i * 398 for i in range(11)]
