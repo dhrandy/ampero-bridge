@@ -38,8 +38,12 @@ def store_param(buf, slot, code, param, value):
         buf[off + 6] = value
     elif slot == "dly" and param == 2:
         buf[off + 7], buf[off + 8] = am.split14(value)
-        buf[off + 9] = 0
-    elif slot == "fx3" and code == 75 and param == 0:
+        if code != 16:
+            buf[off + 9] = 0
+    elif slot == "dly" and code == 16 and param == 3:
+        buf[off + 9], buf[off + 10] = am.split14(value)
+        buf[off + 11] = 0
+    elif slot in ("fx1", "fx2", "fx3") and code == {"fx1": 142, "fx2": 126, "fx3": 75}[slot] and param == 0:
         buf[off + 3], buf[off + 4] = am.split14(value)
         buf[off + 5] = 0
     elif slot == "cab" and param == 4:

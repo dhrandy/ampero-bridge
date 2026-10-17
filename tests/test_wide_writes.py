@@ -21,7 +21,7 @@ def test_encoder_rejects_outside_fourteen_bits(value):
 
 @pytest.mark.parametrize('slot,code,p,lo,hi', [
     ('dly', 3, 2, 0, 3980), ('dly', 9, 2, 0, 280), ('dly', 6, 2, 0, 1980),
-    ('fx3', 75, 0, 0, 3920), ('fx1', 142, 0, 0, 3920), ('dly', 16, 3, 0, 990),
+    ('fx3', 75, 0, 0, 3920), ('fx1', 142, 0, 0, 3920), ('fx2', 126, 0, 0, 3920), ('dly', 16, 3, 0, 990),
     ('cab', 34, 4, 0, 100),
     ('cab', 34, 5, 0, 1981), ('cab', 34, 6, 0, 1801), ('fx2', 13, 3, 0, 100)])
 def test_boundaries_and_record_ownership(monkeypatch, slot, code, p, lo, hi):

@@ -37,7 +37,7 @@ def test_official_editor_coverage_and_black_twin_names():
     black = m['blocks']['amp']['models']['2']['params']
     assert [black[str(i)]['name'] for i in range(6)] == [
         'Gain', 'Master', 'Bass', 'Middle', 'Treble', 'Bright']
-    assert black['5']['status'] == 'address-confirmed-only'
+    assert black['5']['status'] == 'write-verified'  # promoted after the 2026-10-16 live run
     assert all(black[str(i)]['name_screen_verified'] for i in range(6))
 
 
@@ -54,6 +54,6 @@ def test_editor_does_not_override_proven_conflicts():
     for block, code in [('fx1', '45'), ('fx2', '93'), ('fx3', '76')]:
         p = m['blocks'][block]['models'][code]['params']
         assert p['0']['valid_range'] == [0, 5]
-        assert p['3']['status'] == 'editor-defined'
-    assert m['blocks']['amp']['models']['9']['params']['3']['status'] == 'editor-defined'
-    assert m['blocks']['dly']['models']['0']['params']['4']['status'] == 'editor-defined'
+        assert p['3']['status'] == 'write-verified'  # editor-defined until written live 2026-10-16
+    assert m['blocks']['amp']['models']['9']['params']['3']['status'] == 'write-verified'
+    assert m['blocks']['dly']['models']['0']['params']['4']['status'] == 'write-verified'

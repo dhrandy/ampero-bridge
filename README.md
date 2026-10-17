@@ -64,6 +64,16 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.13.0 verifies every documented parameter live. Across two runs on
+2026-10-16, the 344 parameters the map still called inferred,
+address-confirmed, editor-defined or unswept (amp, eq, fx1, fx2, fx3, dly,
+rvb) were each written on the edit buffer at their range ends and middle, or
+every enum value, and read back exact: 974 writes, zero mismatches, nothing
+saved. The map now marks all 1,129 parameters write-verified, so the strict
+gate no longer asks for unverified_ok on any documented field. The reader
+also learned the last three 14-bit layouts it used to read low-byte only:
+FX1/FX2 Sweller Attack and 2290 Mod's Mod Rate.
+
 v2.12.9 opens the last two capped fields. FX1 Sweller Attack takes its full
 0-3920 raw range (the twin slot of FX2's Sweller, write-verified on
 2026-10-14) and 2290 Mod's Mod Rate takes 0-990 (0.1-10.0 Hz); Sync on 2290
@@ -708,7 +718,7 @@ captured from the editor and the pedal.
 * `docs/models.md`: model numbers checked on a real pedal
 * `docs/knobs.md`: which parameter is which, per model, and how sure each entry is
 * `site/params.html`: the same map as a searchable page (dhrandy.github.io/ampero-bridge/params.html)
-* `docs/param-map.json`: the machine-readable parameter map for agents. Every param keeps its live status: write-verified, confirmed at its address only, inferred or not swept. New unprobed params are editor-defined. Names, defaults, UI ranges and dropdown labels also come from Hotone's official Mini editor database (V1.6.0), separately from live verification. Getting this map right took many hours of live probing against a real pedal.
+* `docs/param-map.json`: the machine-readable parameter map for agents. Every param is write-verified live on the pedal as of 2026-10-16 (the map still records how each was proven). New unprobed params are editor-defined. Names, defaults, UI ranges and dropdown labels also come from Hotone's official Mini editor database (V1.6.0), separately from live verification. Getting this map right took many hours of live probing against a real pedal.
 * `docs/prst.md`: the `.prst` import
 * `site/`: the model library page and `site/models.json` (see Model library above)
 * `docs/usb-lockups.md`: USB stability notes and the less common settings

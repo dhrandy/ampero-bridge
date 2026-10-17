@@ -114,7 +114,7 @@ The five bands show -50 to +50 on the pedal and are stored as the shown value pl
 
 ## FX3
 
-The full per-parameter map, with every param tagged write-verified, confirmed at its address only, inferred or not swept, is in `docs/param-map.json`. A record byte at offset 459 changes on every edit; it is a trailer, not a parameter. Turning any Sync switch on rewrites the linked Rate to 40.
+The full per-parameter map, with every param write-verified live as of 2026-10-16, is in `docs/param-map.json`. A record byte at offset 459 changes on every edit; it is a trailer, not a parameter. Turning any Sync switch on rewrites the linked Rate to 40.
 
 FX3 has its own model list; its codes are not the FX2 codes (Liquid C is 114 in FX2) and they do not follow the screen number past screen 17 (see the list in `docs/models.md`). Read each model's code from the record.
 

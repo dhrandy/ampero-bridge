@@ -107,15 +107,15 @@ OVERRIDES[("fx2", 126, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": PRO
 # full-range live pass runs once a bridge carrying this rule is deployed.
 OVERRIDES[("fx1", 142, 0)] = {"kind": "range", "lo": 0, "hi": 3920, "trust": PROVEN,
     "encoding": "14bit", "note": "raw + 80 ms; twin of fx2 126 (write-verified 2026-10-14); "
-    "writes through 127 read back exact 2026-10-16, full-range live pass follows this rule"}
+    "write-verified 2026-10-16 (0, 127, 128, 920, 1960, 3920 read back exact)"}
 # 2290 Mod (dly code 16) Mod Rate: the editor documents raw 0-990 (0.1-10.0 Hz, (raw + 10) / 100).
 # Sync on this model binds Time, not Mod Rate, so the rate takes any value in range; clear the
 # UNPAIRED marker the Rate/Sync pairing heuristic left on it. Writes through 127 read back exact
 # on 2026-10-16; the full-range live pass runs once a bridge carrying this rule is deployed.
 OVERRIDES[("dly", 16, 3)] = {"kind": "range", "lo": 0, "hi": 990, "trust": PROVEN,
     "encoding": "14bit", "sync_param": None,
-    "note": "0.1-10.0 Hz, (raw + 10) / 100; Sync binds Time on this model; writes through 127 "
-    "read back exact 2026-10-16, full-range live pass follows this rule"}
+    "note": "0.1-10.0 Hz, (raw + 10) / 100; Sync binds Time on this model; "
+    "write-verified 2026-10-16 (0, 90, 128, 495, 990 read back exact; high half at block offset 9)"}
 # Shimmer Lo/Hi End: editor range -50..50 shown, raw 0-100 (probably dial + 50), not yet read on a screen.
 for _p in (3, 4):
     OVERRIDES[("rvb", 9, _p)] = {"kind": "range", "lo": 0, "hi": 100, "trust": UNVERIFIED,

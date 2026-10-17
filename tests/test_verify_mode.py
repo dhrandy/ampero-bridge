@@ -87,28 +87,33 @@ def test_a_verify_write_is_refused_when_the_mode_is_off(bridge):
 
 
 def test_strict_rules_do_not_change_when_verify_mode_is_on(verify_on):
-    for slot, code, p, v, why in (("eq", 4, 13, 12, "blocked_param"), ("eq", 4, 14, 50, "blocked_param"),
-                                  ("fx1", 45, 1, 50, "blocked_param"), ("fx1", 45, 2, 50, "blocked_param"),
-                                  ("fx1", 45, 0, 6, "not_in_enum"), ("rvb", 9, 3, 65, "unverified")):
+    # Para EQ Hi Shelf/Volume and Classic PS Position/Mix were blocked here until their live
+    # write-verification on 2026-10-16 promoted them to proven; strict now takes them directly.
+    for slot, code, p, v in (("eq", 4, 13, 12), ("eq", 4, 14, 50),
+                             ("fx1", 45, 1, 50), ("fx1", 45, 2, 50), ("fx3", 5, 1, 50)):
+        assert pr.validate(slot, code, p, v) == v
+    for slot, code, p, v, why in (("fx1", 45, 0, 6, "not_in_enum"), ("rvb", 9, 3, 65, "unverified")):
         with pytest.raises(pr.ValueRejected) as e:
             pr.validate(slot, code, p, v)
         assert e.value.extra["reason"] == why, (slot, code, p)
     with pytest.raises(pr.ValueRejected) as e:
-        pr.validate("fx3", 5, 1, 50)                                  # unverified still needs the flag
+        pr.validate("rvb", 9, 4, 65)                                  # unverified still needs the flag
     assert e.value.extra["reason"] == "unverified"
 
 
 def test_strict_endpoint_ignores_a_missing_verify_flag_even_with_the_mode_on(bridge, verify_on):
-    assert post(bridge, {"slot": "eq", "model_code": 4, "param": 14, "value": 50})[0] == 422
+    # Shimmer Lo End is still unverified (screen offset unconfirmed), so strict refuses it;
+    # a stray verify flag is not unverified_ok and changes nothing.
+    assert post(bridge, {"slot": "rvb", "model_code": 9, "param": 3, "value": 65})[0] == 422
 
 
 def test_rules_view_is_unchanged_when_off_and_shows_verify_info_when_on(monkeypatch):
-    assert "verify_range" not in pr.rules_view("eq", 4)["params"]["14"]
     assert pr.rules_view("eq", 4)["verify_mode"] is False
     monkeypatch.setattr(pr, "VERIFY_ENABLED", True)
     v = pr.rules_view("eq", 4)
-    assert v["verify_mode"] is True and v["params"]["14"]["verify_range"] == {"min": 0, "max": 100}
-    assert v["params"]["14"]["kind"] == "blocked"                      # the strict rule itself is the same
+    assert v["verify_mode"] is True
+    assert v["params"]["14"]["kind"] == "range"                        # proven 2026-10-16, no longer blocked
+    assert v["params"]["14"]["min"] == 0 and v["params"]["14"]["max"] == 100
     assert pr.rules_view("fx3", 7)["params"]["1"]["sync_param"] == 4
 
 
@@ -249,7 +254,7 @@ def test_unproven_model_is_refused_even_with_the_unproven_override(bridge, verif
 
 def test_verify_flag_must_be_literally_true(bridge, verify_on):
     for flag in ("true", 1, "yes"):
-        code, _ = post(bridge, {"slot": "eq", "model_code": 4, "param": 14, "value": 50, "verify": flag})
+        code, _ = post(bridge, {"slot": "rvb", "model_code": 9, "param": 3, "value": 65, "verify": flag})
         assert code == 422
 
 @pytest.mark.parametrize('slot,code,p,value', [('dly', 3, 2, 3980), ('fx3', 75, 0, 3920),

@@ -54,13 +54,16 @@ def to_bytes(record_hex: str) -> bytes:
 # Everything here is reading only: it changes what a record decodes to, not what the bridge may write.
 #   DLY: Feedback is the single byte at block offset 6. Time is a 14-bit value, high 7 bits at offset 7
 #        and low 7 bits at offset 8 (the generic read glued Feedback's byte to Time's high half).
-#   FX3 Sweller: Attack is 14 bits, high half at offset 3 (the header byte before slot 0), low half at 4.
+#   Sweller (FX1 code 142, FX2 code 126, FX3 code 75): Attack is 14 bits, high half at offset 3
+#        (the header byte before slot 0), low half at 4.
+#   DLY 2290 Mod: Mod Rate is 14 bits, high half at offset 9, low half at 10 (Time owns 7 and 8).
 #   CAB: Position Z is the single byte at offset 12. Low Cut is offset 13 (high 7) and 14 (low 7), High Cut
 #        is 15 and 16, so Z must not be read together with the byte after it.
 #   EQ Para EQ: Volume is a 15th control, one byte at offset 32, the last byte of the block. A two-byte
 #        read would run into the next block's state byte.
 DLY_FEEDBACK, DLY_TIME = 1, 2
-SWELLER_FX3 = 75
+SWELLER_CODES = {"fx1": 142, "fx2": 126, "fx3": 75}
+DLY_2290_MOD, DLY_2290_MOD_RATE = 16, 3
 PARA_EQ = 4
 EQ_EXTRA_PARAM = 14
 
@@ -76,7 +79,9 @@ def decode_params(rec: bytes, slot: str, code: int) -> list[int]:
     if slot == "dly":
         params[DLY_FEEDBACK] = rec[off + 6]
         params[DLY_TIME] = _wide(rec, off + 7, off + 8)
-    elif slot == "fx3" and code == SWELLER_FX3:
+        if code == DLY_2290_MOD:
+            params[DLY_2290_MOD_RATE] = _wide(rec, off + 9, off + 10)
+    elif slot in SWELLER_CODES and code == SWELLER_CODES[slot]:
         params[0] = _wide(rec, off + 3, off + 4)
     elif slot == "cab":
         params[4] = rec[off + 12]

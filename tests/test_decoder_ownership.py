@@ -64,12 +64,22 @@ def test_every_delay_model_in_the_map_names_feedback_then_time():
 # --- Sweller Attack --------------------------------------------------------------------
 
 def test_sweller_attack_is_14_bit_with_high_half_before_slot_zero():
-    rec = blank({"fx3": records.SWELLER_FX3})
-    raw = 920                                  # 1000 ms shown, raw = ms - 80
-    rec[FX3 + 3], rec[FX3 + 4] = raw >> 7, raw & 0x7F
-    assert (rec[FX3 + 3], rec[FX3 + 4]) == (7, 24)
-    f = records.block_fields(bytes(rec), "fx3")
-    assert f["code"] == 75 and f["params"][0] == raw   # the old read gave 24
+    offs = {"fx1": records.BLOCK_OFFSETS["fx1"], "fx2": records.BLOCK_OFFSETS["fx2"], "fx3": FX3}
+    for slot, code in records.SWELLER_CODES.items():
+        rec = blank({slot: code})
+        raw = 920                              # 1000 ms shown, raw = ms - 80
+        rec[offs[slot] + 3], rec[offs[slot] + 4] = raw >> 7, raw & 0x7F
+        assert (rec[offs[slot] + 3], rec[offs[slot] + 4]) == (7, 24)
+        f = records.block_fields(bytes(rec), slot)
+        assert f["code"] == code and f["params"][0] == raw   # the old read gave 24
+
+
+def test_2290_mod_rate_is_14_bit_at_offsets_9_and_10():
+    rec = blank({"dly": records.DLY_2290_MOD})
+    raw = 495                                  # 5.05 Hz shown, (raw + 10) / 100
+    rec[DLY + 9], rec[DLY + 10] = raw >> 7, raw & 0x7F
+    f = records.block_fields(bytes(rec), "dly")
+    assert f["code"] == 16 and f["params"][3] == raw   # the old read gave 111
 
 
 def test_other_fx3_models_keep_the_generic_read():

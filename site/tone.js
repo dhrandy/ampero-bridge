@@ -16,7 +16,7 @@
     { slot: 'fx1', key: 'FX1', label: 'FX1' }, { slot: 'fx2', key: 'FX2', label: 'FX2' }, { slot: 'fx3', key: 'FX3', label: 'FX3' },
     { slot: 'dly', key: 'DLY', label: 'Delay' }, { slot: 'rvb', key: 'RVB', label: 'Reverb' },
     { slot: 'nr', key: 'NR', label: 'Noise gate' }, { slot: 'eq', key: 'EQ', label: 'EQ' }];
-  var SWELLER = 75, PARA_EQ = 4, UNPAIRED = -1;
+  var SWELLER = { fx1: 142, fx2: 126, fx3: 75 }, PARA_EQ = 4, UNPAIRED = -1;
   var PARAM_SLOTS = 14, RECORD_LEN = 460, GAP_MS = 700, SETTLE_MS = 900;
 
   function patchLabel(i) { return 'P' + (Math.floor(i / 3) + 1) + '-' + (i % 3 + 1); }
@@ -42,8 +42,8 @@
   function decodeParams(b, slot, o, code) {
     var params = [], wide = function (hi, lo) { return b[o + hi] * 128 + b[o + lo]; };
     for (var p = 0; p < PARAM_SLOTS; p++) params.push(b[o + 4 + 2 * p] | (b[o + 5 + 2 * p] << 8));
-    if (slot === 'dly') { params[1] = b[o + 6]; params[2] = wide(7, 8); }
-    else if (slot === 'fx3' && code === SWELLER) params[0] = wide(3, 4);
+    if (slot === 'dly') { params[1] = b[o + 6]; params[2] = wide(7, 8); if (code === 16) params[3] = wide(9, 10); }
+    else if (SWELLER[slot] === code) params[0] = wide(3, 4);
     else if (slot === 'cab') { params[4] = b[o + 12]; params[5] = wide(13, 14); params[6] = wide(15, 16); }
     else if (slot === 'eq' && code === PARA_EQ) params.push(b[o + 32]);
     return params;
