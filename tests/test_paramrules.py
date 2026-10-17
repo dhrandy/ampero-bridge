@@ -63,6 +63,11 @@ def test_wide_fields_use_only_captured_or_editor_documented_ranges():
     # FX2 Sweller Attack and Analog Eko Time were written live and read back exact on 2026-10-14.
     assert pr.validate("fx2", 126, 0, 3920) == 3920
     bad("fx2", 126, 0, 3921, "out_of_range")
+    # FX1 Sweller (twin slot) and 2290 Mod's Mod Rate opened to their editor ranges in v2.12.9.
+    assert pr.validate("fx1", 142, 0, 3920) == 3920
+    bad("fx1", 142, 0, 3921, "out_of_range")
+    assert pr.validate("dly", 16, 3, 990) == 990
+    bad("dly", 16, 3, 991, "out_of_range")
     assert pr.validate("dly", 3, 2, 3980, read_sync=lambda p: 0) == 3980
     bad("dly", 3, 2, 3981, "out_of_range")
     bad("dly", 3, 2, 3980, "sync_unknown", unverified_ok=True)

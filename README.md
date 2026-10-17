@@ -64,6 +64,13 @@ works or breaks on your Mini, are welcome as GitHub issues.
 
 ## Latest changes
 
+v2.12.9 opens the last two capped fields. FX1 Sweller Attack takes its full
+0-3920 raw range (the twin slot of FX2's Sweller, write-verified on
+2026-10-14) and 2290 Mod's Mod Rate takes 0-990 (0.1-10.0 Hz); Sync on 2290
+Mod binds Time, not Mod Rate. Both passed the 2026-10-16 live sweep through
+127; their full ranges are editor-documented and get their live full-range
+pass once this build is deployed.
+
 v2.12.8 marks Backmask synced Time write-verified: with v2.12.7's refusal
 lifted, all eleven division steps were written through the bridge and read
 back exact (edit buffer only, nothing saved), the same run the other fifteen

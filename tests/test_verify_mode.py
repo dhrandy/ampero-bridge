@@ -178,7 +178,11 @@ def test_sync_pairs_come_from_the_map(verify_on):
 
 def test_a_rate_the_map_cannot_pair_is_refused(verify_on):
     unpaired = [k for k, r in pr.RULES.items() if r.get("sync_param") == pr.UNPAIRED]
-    assert {pr.RULES[k]["model"] for k in unpaired} >= {"Sweep Eko", "2290 Mod"}
+    assert {pr.RULES[k]["model"] for k in unpaired} >= {"Sweep Eko"}
+    # 2290 Mod's Mod Rate left this set in v2.12.9: Sync on that model binds Time, so the
+    # rate is a free knob and verify mode accepts it across its 0-990 range.
+    assert ("dly", 16, 3) not in unpaired
+    assert pr.validate_verify("dly", 16, 3, 990, read_sync=lambda q: 1) == 990
     for slot, code, p in unpaired:
         assert bad(slot, code, p, 10, read_sync=lambda q: 0) in ("sync_unknown", "wide_param")
 
